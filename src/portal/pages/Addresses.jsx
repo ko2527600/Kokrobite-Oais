@@ -98,14 +98,15 @@ const SavedAddresses = () => {
       {/* Header */}
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Saved Addresses</h2>
-          <p className="text-white/40 text-sm font-medium mt-1">Manage your delivery locations for faster checkout.</p>
+          <h2 className="text-3xl font-display font-bold text-white tracking-tight uppercase">Saved Addresses</h2>
+          <p className="text-white/40 text-sm font-sans font-medium mt-1">Manage your delivery locations for faster checkout.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="bg-brand-orange text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-brand-orange/20"
+          className="text-white px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-[#F97316]/20"
+          style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
         >
-           <HiOutlinePlus size={20} /> Add New
+           <HiOutlinePlus size={20} /> Add New Address
         </button>
       </div>
 
@@ -117,23 +118,23 @@ const SavedAddresses = () => {
             <motion.div 
               key={addr.id}
               layout
-              className={`bg-[#141414] border-2 rounded-[2rem] p-8 space-y-6 relative group transition-all ${
-                addr.isDefault ? 'border-brand-orange' : 'border-white/5 hover:border-white/10'
+              className={`bg-[#0C0A09] border-2 rounded-[2rem] p-8 space-y-6 relative group transition-all ${
+                addr.isDefault ? 'border-[#F97316]' : 'border-white/5 hover:border-white/10'
               }`}
             >
                <div className="flex justify-between items-start">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${addr.isDefault ? 'bg-brand-orange text-white' : 'bg-white/5 text-white/40'}`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${addr.isDefault ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
                      <Icon size={24} />
                   </div>
                   {addr.isDefault && (
-                    <span className="text-[8px] bg-brand-orange/20 text-brand-orange px-3 py-1 rounded-full font-black uppercase tracking-[0.2em] shadow-sm">Default</span>
+                    <span className="text-[8px] bg-[#F97316]/20 text-[#F97316] px-3 py-1 rounded-full font-black uppercase tracking-[0.2em] shadow-sm">Default</span>
                   )}
                </div>
 
                <div>
-                  <h4 className="font-black text-white text-lg tracking-tight mb-2 uppercase">{addr.label}</h4>
-                  <p className="text-sm text-white/60 leading-relaxed min-h-[48px]">{addr.address}</p>
-                  <p className="text-xs text-white/30 mt-4 font-bold uppercase tracking-widest">{addr.area} {addr.landmark && `• ${addr.landmark}`}</p>
+                  <h4 className="font-display font-bold text-white text-lg tracking-tight mb-2 uppercase">{addr.label}</h4>
+                  <p className="text-sm text-white/60 leading-relaxed min-h-[48px] font-sans">{addr.address}</p>
+                  <p className="text-xs text-white/30 mt-4 font-bold uppercase tracking-widest font-sans">{addr.area} {addr.landmark && `• ${addr.landmark}`}</p>
                </div>
 
                <div className="flex items-center gap-2 pt-4 border-t border-white/5">
@@ -144,7 +145,7 @@ const SavedAddresses = () => {
                     <HiOutlineTrash size={18} />
                   </button>
                   {!addr.isDefault && (
-                    <button onClick={() => handleSetDefault(addr.id)} className="p-3 bg-white/5 hover:bg-green-500/20 rounded-xl text-white/40 hover:text-green-400 transition-all flex-1 flex justify-center" title="Set as default">
+                    <button onClick={() => handleSetDefault(addr.id)} className="p-3 bg-white/5 hover:bg-[#F97316]/20 rounded-xl text-white/40 hover:text-[#F97316] transition-all flex-1 flex justify-center" title="Set as default">
                       <HiOutlineCheckCircle size={18} />
                     </button>
                   )}
@@ -152,12 +153,17 @@ const SavedAddresses = () => {
             </motion.div>
           );
         }) : (
-          <div className="col-span-full bg-[#141414] border border-white/5 p-20 rounded-[3rem] text-center space-y-6">
-             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10">
-                <HiOutlineMapPin size={40} />
+          <div className="col-span-full bg-[#0C0A09] border border-white/5 p-20 rounded-[3rem] text-center space-y-6">
+             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10 text-4xl">
+                📍
              </div>
-             <p className="text-white/40 font-bold max-w-xs mx-auto">No saved addresses found. Add one to make your next checkout a breeze!</p>
-             <button onClick={() => handleOpenModal()} className="text-brand-orange font-bold text-xs hover:underline uppercase tracking-widest">Add your first address</button>
+             <div>
+                <h3 className="text-xl font-display font-bold text-white mb-2">No Saved Addresses</h3>
+                <p className="text-white/40 text-sm max-w-xs mx-auto font-sans">Save your delivery address for faster Kokrobite Oasis ordering</p>
+             </div>
+             <button onClick={() => handleOpenModal()} className="inline-flex bg-[#F97316] text-white font-black px-8 py-3 rounded-xl text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-[#F97316]/20">
+                + Add Your First Address
+             </button>
           </div>
         )}
       </div>
@@ -175,11 +181,11 @@ const SavedAddresses = () => {
                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-               className="relative w-full max-w-xl bg-[#141414] border border-white/10 rounded-[3rem] p-10 overflow-hidden"
+               className="relative w-full max-w-xl bg-[#0C0A09] border border-white/10 rounded-[3rem] p-10 overflow-hidden"
              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#F97316]/5 rounded-full -mr-16 -mt-16 blur-2xl" />
                 
-                <h3 className="text-2xl font-black text-white uppercase mb-8 relative z-10">{editingId ? 'Edit Address' : 'New Address'}</h3>
+                <h3 className="text-2xl font-display font-bold text-white uppercase mb-8 relative z-10">{editingId ? 'Edit Address' : 'New Address'}</h3>
                 
                 <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                    <div className="grid grid-cols-4 gap-2">
@@ -188,8 +194,8 @@ const SavedAddresses = () => {
                           key={l}
                           type="button"
                           onClick={() => setFormData({...formData, label: l})}
-                          className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                            formData.label === l ? 'bg-brand-orange border-brand-orange text-white' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'
+                          className={`py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                            formData.label === l ? 'bg-[#F97316] border-[#F97316] text-white' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'
                           }`}
                         >
                           {l}
@@ -203,7 +209,7 @@ const SavedAddresses = () => {
                         required
                         value={formData.address}
                         onChange={e => setFormData({...formData, address: e.target.value})}
-                        className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-brand-orange outline-none h-24"
+                        className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none h-24 font-sans"
                         placeholder="e.g. 15th Street, Apartment 4B"
                       />
                    </div>
@@ -216,7 +222,7 @@ const SavedAddresses = () => {
                             type="text"
                             value={formData.area}
                             onChange={e => setFormData({...formData, area: e.target.value})}
-                            className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-brand-orange outline-none"
+                            className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none font-sans"
                             placeholder="e.g. Osu"
                          />
                       </div>
@@ -226,7 +232,7 @@ const SavedAddresses = () => {
                             type="text"
                             value={formData.landmark}
                             onChange={e => setFormData({...formData, landmark: e.target.value})}
-                            className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-brand-orange outline-none"
+                            className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none font-sans"
                             placeholder="e.g. Near Big Garden"
                          />
                       </div>
@@ -238,14 +244,14 @@ const SavedAddresses = () => {
                         id="isDefault" 
                         checked={formData.isDefault}
                         onChange={e => setFormData({...formData, isDefault: e.target.checked})}
-                        className="w-5 h-5 rounded accent-brand-orange" 
+                        className="w-5 h-5 rounded accent-[#F97316]" 
                       />
-                      <label htmlFor="isDefault" className="text-xs font-bold text-white/60 uppercase tracking-widest cursor-pointer">Set as default address</label>
+                      <label htmlFor="isDefault" className="text-xs font-bold text-white/60 uppercase tracking-widest cursor-pointer font-sans">Set as default address</label>
                    </div>
 
                    <div className="flex gap-4 pt-4">
                       <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest">Cancel</button>
-                      <button type="submit" disabled={loading} className="flex-[2] bg-brand-orange text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 disabled:opacity-50">
+                      <button type="submit" disabled={loading} className="flex-[2] bg-[#F97316] text-white font-black py-4 rounded-2xl shadow-xl shadow-[#F97316]/20 disabled:opacity-50 uppercase tracking-widest text-xs">
                         {loading ? 'SAVING...' : 'SAVE ADDRESS'}
                       </button>
                    </div>

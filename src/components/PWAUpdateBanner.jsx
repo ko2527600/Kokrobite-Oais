@@ -1,4 +1,4 @@
-import { usePWAUpdate } from "../hooks/usePWAUpdate"
+﻿import { usePWAUpdate } from "../hooks/usePWAUpdate"
 import { motion, AnimatePresence } from "motion/react"
 
 export default function PWAUpdateBanner() {
@@ -15,9 +15,9 @@ export default function PWAUpdateBanner() {
           className="fixed top-0 left-0 right-0 z-[999]
             flex items-center justify-between
             px-6 py-3 text-white text-sm font-medium"
-          style={{ background: "#EC4824" }}>
+          style={{ background: "#F97316" }}>
           <span>
-            🎉 New version of CD Boat available!
+            🎉 New version of KO Eats available!
           </span>
           <div className="flex gap-3">
             <button
@@ -28,7 +28,7 @@ export default function PWAUpdateBanner() {
             </button>
             <button
               onClick={() => updateServiceWorker(true)}
-              className="bg-white text-[#EC4824] 
+              className="bg-white text-[#F97316] 
                 font-bold text-xs uppercase tracking-wider
                 px-4 py-1.5 rounded-sm">
               Update Now

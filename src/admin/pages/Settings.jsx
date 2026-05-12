@@ -22,7 +22,7 @@ const Settings = () => {
   const [loading, setLoading] = useState({ profile: false, config: false, pass: false, clear: false });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("cd_admin_user") || "{}");
+    const user = JSON.parse(localStorage.getItem("ko_admin_user") || "{}");
     setAdmin({ name: user.name || "", email: user.email || "" });
 
     const fetchConfig = async () => {
@@ -41,7 +41,7 @@ const Settings = () => {
     setLoading({ ...loading, profile: true });
     try {
       const response = await api.put("/auth/me", { name: admin.name });
-      localStorage.setItem("cd_admin_user", JSON.stringify(response.data));
+      localStorage.setItem("ko_admin_user", JSON.stringify(response.data));
       showToast("Profile updated");
     } catch (err) {
       showToast("Update failed", "error");
@@ -118,13 +118,13 @@ const Settings = () => {
       {/* Account Settings */}
       <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
         <div className="p-8 border-b border-white/5">
-          <h3 className="text-xl font-bold text-white flex items-center gap-3">
-            <HiOutlineUser className="text-brand-orange" /> Account Settings
+          <h3 className="text-xl font-display font-bold text-white flex items-center gap-3">
+            <HiOutlineUser className="text-[#F97316]" /> Account Settings
           </h3>
         </div>
         <div className="p-8 space-y-8">
            <div className="flex flex-col items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-[#EC4824] flex items-center justify-center text-2xl font-bold text-white">
+              <div className="w-20 h-20 rounded-full bg-[#F97316] flex items-center justify-center text-2xl font-bold text-white">
                 {admin.name.charAt(0)}
               </div>
               <button disabled className="text-[10px] font-bold text-white/20 uppercase tracking-widest cursor-not-allowed">Upload Photo</button>
@@ -133,15 +133,16 @@ const Settings = () => {
            <form onSubmit={handleProfileSave} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                   <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Display Name</label>
-                   <input value={admin.name} onChange={e => setAdmin({ ...admin, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" />
+                   <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Display Name</label>
+                   <input value={admin.name} onChange={e => setAdmin({ ...admin, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
                 </div>
                 <div className="space-y-2 opacity-50">
                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Email (Immutable)</label>
-                   <input disabled value={admin.email} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white/40 cursor-not-allowed" />
+                   <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Email (Immutable)</label>
+                   <input disabled value={admin.email} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white/40 cursor-not-allowed font-sans" />
                 </div>
               </div>
-              <button type="submit" className="bg-[#EC4824] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105">
+              <button type="submit" className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105 font-sans">
                 {loading.profile ? "Updating..." : "Save Changes"}
               </button>
            </form>
@@ -149,11 +150,11 @@ const Settings = () => {
            <div className="h-[1px] bg-white/5" />
 
            <form onSubmit={handlePasswordSave} className="space-y-6">
-              <h4 className="text-lg font-bold text-white">Change Password</h4>
+              <h4 className="text-lg font-display font-bold text-white">Change Password</h4>
               <div className="space-y-4">
                  <div className="relative">
-                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2">Current Password</label>
-                    <input required type={showPass.current ? "text" : "password"} value={passwords.current} onChange={e => setPasswords({ ...passwords, current: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">Current Password</label>
+                    <input required type={showPass.current ? "text" : "password"} value={passwords.current} onChange={e => setPasswords({ ...passwords, current: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
                     <button type="button" onClick={() => setShowPass({ ...showPass, current: !showPass.current })} className="absolute right-4 bottom-3.5 text-white/20">
                       {showPass.current ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
                     </button>
@@ -190,8 +191,8 @@ const Settings = () => {
       {/* Business Information */}
       <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
         <div className="p-8 border-b border-white/5">
-          <h3 className="text-xl font-bold text-white flex items-center gap-3">
-            <HiOutlineBuildingOffice2 className="text-brand-orange" /> Business Information
+          <h3 className="text-xl font-display font-bold text-white flex items-center gap-3">
+            <HiOutlineBuildingOffice2 className="text-[#F97316]" /> Business Information
           </h3>
           <p className="text-xs text-white/20 font-bold uppercase tracking-widest mt-1 ml-9">This updates info shown across the website</p>
         </div>
@@ -233,7 +234,7 @@ const Settings = () => {
                  <input value={config.email} onChange={e => setConfig({ ...config, email: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
               </div>
            </div>
-           <button type="submit" className="bg-[#EC4824] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105">
+           <button type="submit" className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105">
               {loading.config ? "Saving..." : "Save Business Profile"}
            </button>
         </form>

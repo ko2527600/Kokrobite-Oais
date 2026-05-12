@@ -106,21 +106,22 @@ const FeedbackPage = () => {
   return (
     <div className="space-y-10 pb-20">
       <div>
-        <h1 className="text-4xl font-black text-white mb-2">Feedback</h1>
-        <p className="text-white/40 font-medium">Help us build the perfect dining experience.</p>
+        <h1 className="text-4xl font-display font-bold text-white mb-2 uppercase">Feedback</h1>
+        <p className="text-white/40 font-sans font-medium">Help us build the perfect dining experience.</p>
       </div>
 
       {/* Past Feedback */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-             <HiOutlineClock className="text-brand-orange" />
+           <h2 className="text-xl font-display font-bold text-white flex items-center gap-2 uppercase">
+             <HiOutlineClock className="text-[#F97316]" />
              History
            </h2>
            {!showForm && (
              <button 
                onClick={() => { setShowForm(true); setSubmitted(false); }}
-               className="bg-brand-orange hover:bg-brand-orange/90 text-white font-bold px-6 py-2.5 rounded-xl transition-all active:scale-95 text-sm"
+               className="text-white font-bold px-6 py-2.5 rounded-xl transition-all active:scale-95 text-xs uppercase tracking-widest"
+               style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
              >
                + New Submission
              </button>
@@ -132,12 +133,12 @@ const FeedbackPage = () => {
              {[1,2].map(i => <div key={i} className="h-40 bg-white/5 rounded-3xl animate-pulse" />)}
           </div>
         ) : feedbacks.length === 0 ? (
-          <div className="bg-white/5 border border-white/5 rounded-[40px] p-12 text-center">
+          <div className="bg-[#0C0A09] border border-white/5 rounded-[40px] p-12 text-center">
              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
                <HiOutlineChatBubbleLeftRight className="text-white/20" size={32} />
              </div>
-             <h3 className="text-xl font-bold text-white mb-2">No feedback yet</h3>
-             <p className="text-white/40 max-w-xs mx-auto mb-8">Share your thoughts with us and earn loyalty points!</p>
+             <h3 className="text-xl font-display font-bold text-white mb-2 uppercase">No feedback yet</h3>
+             <p className="text-white/40 max-w-xs mx-auto mb-8 font-sans">Share your thoughts with us and earn Oasis points!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -152,7 +153,7 @@ const FeedbackPage = () => {
                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${CATEGORIES.find(c => c.id === f.category)?.color}`}>
                        {CATEGORIES.find(c => c.id === f.category)?.label}
                      </span>
-                     <div className="flex text-brand-orange">
+                     <div className="flex text-[#F97316]">
                         {[...Array(5)].map((_, i) => (
                           <HiStar key={i} size={14} className={i >= f.rating ? 'opacity-20' : ''} />
                         ))}
@@ -170,10 +171,10 @@ const FeedbackPage = () => {
 
                   {f.adminNote && (
                     <div className="mt-4 pt-4 border-t border-white/5">
-                       <p className="text-[10px] text-brand-orange font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
+                       <p className="text-[10px] text-[#F97316] font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
                          <HiOutlineInformationCircle size={14} /> Admin Response
                        </p>
-                       <p className="text-xs text-white/60 italic">"{f.adminNote}"</p>
+                       <p className="text-xs text-white/60 italic font-sans">"{f.adminNote}"</p>
                     </div>
                   )}
                </motion.div>
@@ -191,31 +192,31 @@ const FeedbackPage = () => {
             exit={{ opacity: 0, scale: 0.95 }}
             className="relative"
           >
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
+            <div className="bg-[#0C0A09] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
                <div className="p-8 border-b border-white/5 flex justify-between items-center">
                   <div>
-                    <h3 className="text-2xl font-black text-white">Share Your Feedback</h3>
-                    <p className="text-white/40 text-sm font-medium">Earn ⭐ 5 loyalty points for every submission!</p>
+                    <h3 className="text-2xl font-display font-bold text-white uppercase">Share Your Feedback</h3>
+                    <p className="text-white/40 text-sm font-sans font-medium">Help us make KO Eats better. Earn 🌴 5 Oasis Points per submission!</p>
                   </div>
                   <button onClick={() => setShowForm(false)} className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors">
                     <HiOutlineXMark size={20} />
                   </button>
                </div>
 
-               {submitted ? (
+                {submitted ? (
                  <div className="p-16 text-center">
                     <motion.div 
                       initial={{ scale: 0 }} 
                       animate={{ scale: 1 }} 
-                      className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                      className="w-20 h-20 bg-[#F97316]/20 text-[#F97316] rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"
                     >
-                      <HiOutlineCheckCircle size={48} />
+                      🌴
                     </motion.div>
-                    <h4 className="text-2xl font-black text-white mb-2">Thank you!</h4>
-                    <p className="text-white/40 mb-8">You've earned 5 loyalty points 🎉<br/>Your feedback helps us serve you better.</p>
+                    <h4 className="text-2xl font-display font-bold text-white mb-2 uppercase">Thank You For Your Feedback!</h4>
+                    <p className="text-white/40 font-sans mb-8">You have earned 5 Oasis Points 🎉<br/>Your feedback helps us serve you better at Kokrobite Oasis</p>
                     <button 
                       onClick={() => { setShowForm(false); setSubmitted(false); }}
-                      className="bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-3 rounded-2xl transition-all"
+                      className="bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-3 rounded-2xl transition-all uppercase tracking-widest text-xs"
                     >
                       Back to History
                     </button>
@@ -231,13 +232,13 @@ const FeedbackPage = () => {
                               key={star}
                               type="button"
                               onClick={() => setFormData({...formData, rating: star})}
-                              className={`transition-all ${formData.rating >= star ? 'text-brand-orange scale-110' : 'text-white/10 hover:text-white/30'}`}
+                              className={`transition-all ${formData.rating >= star ? 'text-[#F97316] scale-110' : 'text-white/10 hover:text-white/30'}`}
                             >
-                              {formData.rating >= star ? <HiStar size={40} /> : <HiOutlineStar size={40} />}
+                               {formData.rating >= star ? <HiStar size={40} /> : <HiOutlineStar size={40} />}
                             </button>
                           ))}
                        </div>
-                       <p className="text-brand-orange font-bold text-lg">{RATING_LABELS[formData.rating]}</p>
+                       <p className="text-[#F97316] font-display font-bold text-lg">{RATING_LABELS[formData.rating]}</p>
                     </div>
 
                     {/* Category */}
@@ -246,12 +247,12 @@ const FeedbackPage = () => {
                        <div className="flex flex-wrap gap-2">
                           {CATEGORIES.map(cat => (
                             <button
-                              key={cat.id}
+                               key={cat.id}
                               type="button"
                               onClick={() => setFormData({...formData, category: cat.id})}
-                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border font-sans ${
                                 formData.category === cat.id 
-                                  ? 'bg-brand-orange border-brand-orange text-white shadow-lg shadow-brand-orange/20' 
+                                  ? 'bg-[#F97316] border-[#F97316] text-white shadow-lg shadow-[#F97316]/20' 
                                   : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:bg-white/10'
                               }`}
                             >
@@ -270,10 +271,10 @@ const FeedbackPage = () => {
                             type="text" 
                             required
                             maxLength={100}
-                            value={formData.title}
-                            onChange={e => setFormData({...formData, title: e.target.value})}
-                            placeholder="Give your feedback a title"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-orange transition-all font-medium"
+                             value={formData.title}
+                             onChange={e => setFormData({...formData, title: e.target.value})}
+                             placeholder="Give your feedback a title"
+                             className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-sans font-medium"
                           />
                        </div>
 
@@ -288,10 +289,10 @@ const FeedbackPage = () => {
                             required
                             rows={4}
                             maxLength={500}
-                            value={formData.message}
-                            onChange={e => setFormData({...formData, message: e.target.value})}
-                            placeholder="Tell us more about your experience... (min 20 characters)"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-orange transition-all font-medium resize-none"
+                             value={formData.message}
+                             onChange={e => setFormData({...formData, message: e.target.value})}
+                             placeholder="Tell us more about your experience... (min 20 characters)"
+                             className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-sans font-medium resize-none"
                           />
                        </div>
                     </div>
@@ -301,12 +302,12 @@ const FeedbackPage = () => {
                        <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Screenshot (Optional)</p>
                        {!preview ? (
                          <label className="block cursor-pointer">
-                            <div className="border-2 border-dashed border-white/10 rounded-[32px] p-8 text-center hover:border-brand-orange/50 hover:bg-brand-orange/5 transition-all group">
+                            <div className="border-2 border-dashed border-white/10 rounded-[32px] p-8 text-center hover:border-[#F97316]/50 hover:bg-[#F97316]/5 transition-all group">
                                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                  <HiOutlinePhoto className="text-white/20 group-hover:text-brand-orange" size={24} />
+                                  <HiOutlinePhoto className="text-white/20 group-hover:text-[#F97316]" size={24} />
                                </div>
-                               <p className="text-sm font-bold text-white mb-1">Attach a screenshot</p>
-                               <p className="text-xs text-white/30">Drag & drop or click to browse (Max 5MB)</p>
+                               <p className="text-sm font-bold text-white mb-1 font-sans">Attach a screenshot</p>
+                               <p className="text-xs text-white/30 font-sans">Drag & drop or click to browse (Max 5MB)</p>
                             </div>
                             <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                          </label>
@@ -327,22 +328,23 @@ const FeedbackPage = () => {
                        )}
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-brand-orange/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
-                    >
-                      {submitting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          SUBMITTING...
-                        </>
-                      ) : (
-                        <>
-                          SUBMIT FEEDBACK — EARN ⭐ 5 POINTS
-                        </>
-                      )}
-                    </button>
+                     <button
+                       type="submit"
+                       disabled={submitting}
+                       className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-[#F97316]/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest text-sm"
+                       style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
+                     >
+                       {submitting ? (
+                         <>
+                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                           SUBMITTING...
+                         </>
+                       ) : (
+                         <>
+                           SUBMIT FEEDBACK — EARN 🌴 5 POINTS
+                         </>
+                       )}
+                     </button>
                  </form>
                )}
             </div>

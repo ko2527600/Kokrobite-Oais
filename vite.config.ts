@@ -24,12 +24,13 @@ export default defineConfig(({mode}) => {
           globPatterns: [
             "**/*.{js,css,html,ico,png,svg,woff2}"
           ],
+
           
           // Cache strategies:
           runtimeCaching: [
             {
               // API calls — Network first, fallback cache
-              urlPattern: /^https?:\/\/(localhost:5000|cookers-delight-api\.onrender\.com)\/api\/.*/i,
+              urlPattern: /^https?:\/\/(localhost:5000|kokrobite-oasis-api\.onrender\.com)\/api\/.*/i,
               handler: "NetworkFirst",
               options: {
                 cacheName: "api-cache",

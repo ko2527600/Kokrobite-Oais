@@ -29,15 +29,15 @@ export const MENU_DATA = [
     price: "₵55",
     category: "Nigerian",
     description: "Melon seed soup with spinach and assorted meats",
-    image: "/assets/cookers delight3.webp"
+    image: "/assets/menu3.jpg"
   },
   {
     id: 5,
-    name: "Famous Meat Pie",
-    price: "₵15",
-    category: "Snacks",
-    description: "Golden flaky pastry with savory minced meat",
-    image: "/assets/meat pie.jpg"
+    name: "Grilled Lobster",
+    price: "₵120",
+    category: "Seafood",
+    description: "Whole grilled lobster with garlic butter and herbs",
+    image: "/assets/menu4.jpg"
   },
   {
     id: 6,
@@ -49,11 +49,11 @@ export const MENU_DATA = [
   },
   {
     id: 7,
-    name: "Special Fried Rice",
-    price: "₵50",
-    category: "Continental",
-    description: "Savory fried rice with assorted vegetables and protein",
-    image: "/assets/fridrice.jpg"
+    name: "Tropical Cocktail",
+    price: "₵35",
+    category: "Drinks",
+    description: "Signature beach blend with fresh tropical fruits",
+    image: "/assets/drinks1.jpg"
   },
   {
     id: 8,
@@ -65,11 +65,11 @@ export const MENU_DATA = [
   },
   {
     id: 9,
-    name: "House Pizza",
-    price: "₵80",
-    category: "Fast Food",
-    description: "Freshly baked with premium toppings",
-    image: "/assets/cookers delight1.webp"
+    name: "Grilled Prawns",
+    price: "₵90",
+    category: "Seafood",
+    description: "Tiger prawns grilled with lemon butter and chilli",
+    image: "/assets/menu5.jpg"
   },
   {
     id: 10,
@@ -77,49 +77,28 @@ export const MENU_DATA = [
     price: "₵35",
     category: "Fast Food",
     description: "Spiced chicken, fresh veggies, cream sauce",
-    image: "/assets/cookers delight4.webp"
+    image: "/assets/menu6.jpg"
   }
 ];
 
 export const GALLERY_IMAGES = [
   { url: "/assets/jollof.jpg", title: "Authentic Jollof" },
-  { url: "/assets/meat pie.jpg", title: "Famous Meat Pies" },
+  { url: "/assets/plain rice and stew.jpg", title: "Rice & Stew" },
   { url: "/assets/fridrice.jpg", title: "Special Fried Rice" },
-  { url: "/assets/forcourt.jpg", title: "Our Branch" },
-  { url: "/assets/cookers delight1.webp", title: "Signature Dishes" },
-  { url: "/assets/cookers delight2.webp", title: "Chef Specials" },
-  { url: "/assets/meat pie 2.jpg", title: "Pastry Heaven" },
-  { url: "/assets/jollof2.jpg", title: "Party Jollof" }
+  { url: "/assets/forcourt.jpg", title: "Our Lounge" },
+  { url: "/assets/gallery1.jpg", title: "Beach Vibes" },
+  { url: "/assets/gallery2.jpg", title: "Pool Side" },
+  { url: "/assets/gallery3.jpg", title: "Evening Sunsets" },
+  { url: "/assets/gallery4.jpg", title: "Fresh Seafood" }
 ];
 
 export const BRANCHES = [
   {
-    name: "Kaneshie",
-    area: "Main Branch",
-    landmark: "Opposite Cocoa Clinic",
-    address: "Kaneshie Main Road",
-    phone: "+233243379412"
-  },
-  {
-    name: "Circle",
-    area: "Business Hub",
-    landmark: "American Mall",
-    address: "Circle Interchange",
-    phone: "+233243379412"
-  },
-  {
     name: "East Legon",
-    area: "Residential",
-    landmark: "Near Police Station",
-    address: "Legon Link Road",
-    phone: "+233243379412"
-  },
-  {
-    name: "Swan Lake",
-    area: "North Accra",
-    landmark: "CPP Junction",
-    address: "Swan Lake Area",
-    phone: "+233243379412"
+    area: "Main Branch",
+    landmark: "Behind A&C Mall",
+    address: "East Legon, Accra",
+    phone: "UPDATE_WITH_KO_PHONE"
   }
 ];
 
@@ -128,7 +107,7 @@ export const REVIEWS = [
     id: "rev-1",
     author: "Kofi Mensah",
     rating: 5,
-    comment: "The Jollof rice is exactly what I was looking for. Smokey, spicy, and absolutely delicious!",
+    comment: "The best beach vibes and food in Accra. The grilled lobster is absolutely divine!",
     date: "March 12, 2026",
     avatar: "/assets/guest1.jpg"
   },
@@ -136,7 +115,7 @@ export const REVIEWS = [
     id: "rev-2",
     author: "Amara Okafor",
     rating: 5,
-    comment: "Best Nigerian soups in Accra. Highly recommended for authentic taste.",
+    comment: "Kokrobite Oasis is the perfect spot — amazing food, great cocktails, and stunning ambiance.",
     date: "February 28, 2026",
     avatar: "/assets/guest2.jpg"
   },
@@ -144,7 +123,7 @@ export const REVIEWS = [
     id: "rev-3",
     author: "James Wilson",
     rating: 4,
-    comment: "Great pizza and amazingly fast delivery to East Legon. Professional service indeed.",
+    comment: "What a gem in East Legon! The pool side dining experience is unlike anything else in Accra.",
     date: "April 05, 2026",
     avatar: "https://i.pravatar.cc/150?u=james"
   },
@@ -152,7 +131,7 @@ export const REVIEWS = [
     id: "rev-4",
     author: "Ama Boateng",
     rating: 5,
-    comment: "The Banku & Tilapia is divine. Feels like grandma's kitchen every single time!",
+    comment: "Pure vibes, great food, warm staff. Kokrobite Oasis is my go-to every weekend!",
     date: "April 22, 2026",
     avatar: "https://i.pravatar.cc/150?u=ama"
   }

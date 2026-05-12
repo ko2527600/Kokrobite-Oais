@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import Modal from "./Modal";
 
 const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmLabel = "Confirm", danger = false }) => {
@@ -15,7 +15,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmLabe
           </button>
           <button
             onClick={() => { onConfirm(); onClose(); }}
-            className={`flex-1 ${danger ? 'bg-red-500 hover:bg-red-600' : 'bg-[#EC4824] hover:bg-[#EC4824]/90'} text-white font-bold py-3 rounded-xl transition-all`}
+            className={`flex-1 ${danger ? 'bg-red-500 hover:bg-red-600' : 'bg-[#F97316] hover:bg-[#F97316]/90'} text-white font-bold py-3 rounded-xl transition-all`}
           >
             {confirmLabel}
           </button>

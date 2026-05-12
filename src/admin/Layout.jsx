@@ -19,17 +19,17 @@ const SidebarItem = ({ icon: Icon, label, path, active, badge, badgeColor, onCli
     <Link
       to={path}
       onClick={onClick}
-      className={`flex items-center gap-3 px-6 py-3 cursor-pointer transition-all ${
+      className={`flex items-center gap-3 px-6 py-3 cursor-pointer transition-all border-l-[3px] ${
         active 
-          ? 'text-[#EC4824] bg-[#EC4824]/10 border-l-[3px] border-[#EC4824] pl-[21px]' 
-          : 'text-white/40 hover:text-white hover:bg-white/5'
+          ? 'text-[#F97316] bg-[#F97316]/10 border-[#F97316]' 
+          : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'
       }`}
     >
       <Icon size={18} />
-      <span className="text-sm font-medium">{label}</span>
+      <span className="text-sm font-medium font-sans">{label}</span>
       {badge > 0 && (
         <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold ${
-          badgeColor === 'yellow' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
+          badgeColor === 'yellow' ? 'bg-[#F59E0B]/20 text-[#F59E0B]' : 'bg-[#EF4444]/20 text-[#EF4444]'
         }`}>
           {badge}
         </span>
@@ -143,7 +143,7 @@ const Layout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] font-body selection:bg-[#EC4824]/20">
+    <div className="min-h-screen bg-[#0C0A09] font-sans selection:bg-[#F97316]/20">
       {/* Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -162,14 +162,18 @@ const Layout = () => {
         initial={false}
         animate={{ x: isMobileMenuOpen ? 0 : (window.innerWidth < 1024 ? -280 : 0) }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-0 left-0 h-full w-[280px] bg-[#111] border-r border-white/5 z-[101] flex flex-col"
+        className="fixed top-0 left-0 h-full w-[280px] bg-[#111111] border-r border-[#F97316]/10 z-[101] flex flex-col"
       >
         <div className="p-8">
-          <div className="flex items-center gap-3 mb-2">
-             <div className="w-8 h-8 rounded-full bg-[#EC4824] flex items-center justify-center text-white font-bold font-display">C</div>
-             <h1 className="font-display text-2xl font-bold text-white">Cookers <span className="text-[#EC4824]">Delight</span></h1>
+          <div className="flex items-center gap-3 mb-1">
+             <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center p-2 shadow-lg shadow-[#F97316]/5 overflow-hidden">
+                <img src="/icons/logo.png" alt="Kokrobite Oasis" className="w-full h-full object-contain" />
+             </div>
+             <h1 className="font-display text-2xl font-bold text-white tracking-tight">Kokrobite <span className="text-[#F97316]">Oasis</span></h1>
           </div>
-          <span className="inline-block bg-[#EC4824]/15 text-[#EC4824] text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded">Admin Portal</span>
+          <div className="inline-block bg-[#F97316]/15 px-2 py-0.5 rounded border border-[#F97316]/10 ml-13">
+            <span className="text-[#F97316] text-[9px] font-bold uppercase tracking-[0.2em]">Admin Portal</span>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar py-4">
@@ -190,18 +194,19 @@ const Layout = () => {
           ))}
         </div>
 
-        <div className="p-6 border-t border-white/5 mt-auto">
+        <div className="p-6 border-t border-white/5 mt-auto bg-[#0C0A09]/50">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-full bg-[#EC4824] flex items-center justify-center text-white font-bold">
+             <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
+               style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}>
                {user?.name?.charAt(0) || 'A'}
              </div>
              <div className="flex-1 min-w-0">
-               <p className="text-sm font-bold text-white truncate">{user?.name || 'Admin'}</p>
-               <p className="text-[10px] text-white/40 truncate">{user?.email || 'admin@cookersdelight.com'}</p>
+               <p className="text-sm font-bold text-white truncate font-sans">{user?.name || 'Admin'}</p>
+               <p className="text-[10px] text-white/40 truncate font-sans">{user?.email || 'admin@kokrobiteoasis.com'}</p>
              </div>
              <button 
                onClick={logout}
-               className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+               className="p-2 text-[#EF4444] hover:bg-[#EF4444]/10 rounded-lg transition-all"
                title="Logout"
              >
                <HiOutlineArrowRightOnRectangle size={20} />
@@ -213,7 +218,7 @@ const Layout = () => {
       {/* Main Content Area */}
       <div className="lg:ml-[280px]">
         {/* Header */}
-        <header className="fixed top-0 lg:left-[280px] right-0 h-16 bg-[#111]/95 backdrop-blur-xl border-b border-white/5 z-50 px-8 flex items-center justify-between">
+        <header className="fixed top-0 lg:left-[280px] right-0 h-16 bg-[#0C0A09]/95 backdrop-blur-xl border-b border-[#F97316]/10 z-50 px-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
@@ -221,11 +226,11 @@ const Layout = () => {
             >
               <HiBars3 size={24} />
             </button>
-            <h2 className="font-semibold text-white text-lg hidden sm:block">{getPageTitle()}</h2>
+            <h2 className="font-display font-bold text-white text-lg hidden sm:block uppercase tracking-tight">{getPageTitle()}</h2>
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="hidden md:block text-white/30 text-xs font-mono">
+            <div className="hidden md:block text-white/30 text-xs font-sans tracking-widest uppercase">
               {formatTime(time)}
             </div>
 
@@ -236,7 +241,7 @@ const Layout = () => {
               >
                 <HiBell size={22} />
                 {pendingOrders > 0 && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#EC4824] rounded-full" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#F97316] rounded-full" />
                 )}
               </button>
 
@@ -248,7 +253,7 @@ const Layout = () => {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-12 right-0 w-80 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl z-10 overflow-hidden"
+                      className="absolute top-12 right-0 w-80 bg-[#0C0A09] border border-white/10 rounded-2xl shadow-2xl z-10 overflow-hidden"
                     >
                       <div className="p-4 border-b border-white/5 bg-white/5">
                         <p className="text-xs font-bold text-white uppercase tracking-widest">Recent Orders</p>
@@ -264,7 +269,7 @@ const Layout = () => {
                           </div>
                         ))}
                       </div>
-                      <Link to="/admin/orders" onClick={() => setShowNotifications(false)} className="block p-4 text-center text-[10px] font-bold text-[#EC4824] hover:bg-[#EC4824]/5 transition-colors uppercase tracking-widest">
+                      <Link to="/admin/orders" onClick={() => setShowNotifications(false)} className="block p-4 text-center text-[10px] font-bold text-[#F97316] hover:bg-[#F97316]/5 transition-colors uppercase tracking-widest">
                         View All Orders
                       </Link>
                     </motion.div>
@@ -276,7 +281,8 @@ const Layout = () => {
             <div className="relative">
               <button 
                 onClick={() => setShowUserDropdown(!showUserDropdown)}
-                className="w-8 h-8 rounded-full bg-[#EC4824] flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/5 hover:ring-[#EC4824]/50 transition-all"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/5 hover:ring-[#F97316]/50 transition-all shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
               >
                 {user?.name?.charAt(0) || 'A'}
               </button>
@@ -289,7 +295,7 @@ const Layout = () => {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-12 right-0 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-10 overflow-hidden"
+                      className="absolute top-12 right-0 w-48 bg-[#0C0A09] border border-white/10 rounded-xl shadow-2xl z-10 overflow-hidden"
                     >
                       <button 
                         onClick={() => { navigate('/admin/settings'); setShowUserDropdown(false); }}
@@ -299,7 +305,7 @@ const Layout = () => {
                       </button>
                       <button 
                         onClick={() => { logout(); setShowUserDropdown(false); }}
-                        className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-400/10 flex items-center gap-2 transition-colors border-t border-white/5"
+                        className="w-full px-4 py-3 text-left text-sm text-[#EF4444] hover:bg-[#EF4444]/10 flex items-center gap-2 transition-colors border-t border-white/5 font-sans"
                       >
                         <HiOutlineArrowRightOnRectangle size={18} /> Logout
                       </button>

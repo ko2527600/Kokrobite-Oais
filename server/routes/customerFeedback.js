@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 const router = express.Router();
 import prisma from "../lib/prisma.js";
 import multer from "multer";
@@ -78,7 +78,7 @@ router.post("/", customerAuth, upload.single("screenshot"), async (req, res) => 
         customerId: req.customer.id,
         type: "promotion",
         title: "Feedback Received! ⭐",
-        message: "Thanks! You earned 5 loyalty points for helping us improve CD Boat.",
+        message: "Thanks! You earned 5 loyalty points for helping us improve KO Eats.",
         read: false
       }
     });

@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -35,7 +35,7 @@ router.post("/login", async (req, res) => {
     { expiresIn: tokenExpiry }
   );
 
-  res.cookie("cd_admin_token", token, {
+  res.cookie("ko_admin_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -58,7 +58,7 @@ router.post("/login", async (req, res) => {
 // @desc    Logout user & clear cookie
 // @access  Public
 router.post("/logout", (req, res) => {
-  res.clearCookie("cd_admin_token", {
+  res.clearCookie("ko_admin_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"

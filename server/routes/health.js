@@ -1,4 +1,4 @@
-import { Router } from "express"
+﻿import { Router } from "express"
 import prisma from "../lib/prisma.js"
 const router = Router()
 
@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 
   return res.status(200).json({
     status: "ok",
-    service: "Cookers Delight API",
+    service: "Kokrobite Oasis API",
     version: "1.0.0",
     environment: process.env.NODE_ENV,
     uptime: `${hours}h ${minutes}m ${seconds}s`,

@@ -1,4 +1,4 @@
-const http = require('http');
+﻿const http = require('http');
 
 const makeRequest = (options, data = null) => {
   return new Promise((resolve, reject) => {
@@ -79,7 +79,7 @@ async function runTests() {
     const adminLogin = await makeRequest({
       hostname: 'localhost', port: 5000, path: '/api/auth/login', method: 'POST',
       headers: { 'Content-Type': 'application/json' }
-    }, { email: "admin@cookersdelight.com", password: "CookersAdmin2026!" });
+    }, { email: "admin@kokrobiteoasis.com", password: "KokrobiteAdmin2026!" });
     
     const adminToken = adminLogin.data.token;
     const analyticsRes = await makeRequest({

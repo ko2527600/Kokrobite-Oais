@@ -16,14 +16,14 @@ export default function AdminInstallGate() {
 
   // Check if admin has previously installed or dismissed
   const hasInstalled = isInstalled || 
-    localStorage.getItem("cd_admin_installed") === "true"
+    localStorage.getItem("ko_admin_installed") === "true"
 
   const handleInstall = async () => {
     setInstalling(true)
     const success = await triggerInstall()
     setInstalling(false)
     if (success) {
-      localStorage.setItem("cd_admin_installed", "true")
+      localStorage.setItem("ko_admin_installed", "true")
       setJustInstalled(true)
       setTimeout(() => setDismissed(true), 2000)
     }
@@ -37,8 +37,8 @@ export default function AdminInstallGate() {
   // Show install gate
   return (
     <div className="min-h-screen flex items-center 
-      justify-center p-6"
-      style={{ background: "#0f0f0f" }}>
+      justify-center p-6 font-sans"
+      style={{ background: "#0C0A09" }}>
       
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -48,26 +48,26 @@ export default function AdminInstallGate() {
         
         {/* Logo */}
         <div className="mb-8">
-          <img src="/assets/logo.jpg" 
-            alt="Cookers Delight"
-            className="w-20 h-20 rounded-2xl mx-auto mb-4 object-contain"
-            style={{ border: "2px solid rgba(236,72,36,0.3)" }}/>
-          <h1 className="font-display text-white text-4xl 
-            font-light tracking-tight">
-            Cookers
-            <span className="text-[#EC4824]">Delight</span>
+          <img src="/icons/logo.png" 
+            alt="Kokrobite Oasis"
+            className="w-24 h-24 rounded-2xl mx-auto mb-6 object-contain p-2 bg-white/5"
+            style={{ border: "2px solid rgba(249,115,22,0.3)" }}/>
+          <h1 className="font-display text-white text-4xl font-bold tracking-tight">
+            Kokrobite
+            <span className="text-[#F97316]"> Oasis</span>
           </h1>
-          <p className="text-white/30 text-xs uppercase 
-            tracking-[.25em] mt-1">
-            Admin Portal
-          </p>
+          <div className="inline-block bg-[#F97316]/15 px-4 py-1.5 rounded-full mt-3">
+            <p className="text-[#F97316] text-[10px] font-bold uppercase tracking-[.25em]">
+              Admin Portal
+            </p>
+          </div>
         </div>
 
         {/* Install card */}
-        <div className="rounded-2xl p-8 mb-6"
+        <div className="rounded-[2.5rem] p-10 mb-6"
           style={{ 
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.06)"
+            background: "#1C0A00",
+            border: "1px solid rgba(249,115,22,0.1)"
           }}>
           
           {justInstalled ? (
@@ -75,63 +75,62 @@ export default function AdminInstallGate() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="py-4">
-              <div className="text-5xl mb-4 text-green-500 flex justify-center">
-                <HiCheckCircle size={64} />
+              <div className="text-5xl mb-4 text-[#F97316] flex justify-center">
+                ✅
               </div>
-              <h2 className="text-white font-bold text-xl mb-2">
-                Installed Successfully!
+              <h2 className="text-[#F97316] font-display font-bold text-2xl mb-2">
+                KO Admin Installed!
               </h2>
-              <p className="text-white/50 text-sm">
+              <p className="text-[#F97316]/60 text-sm font-sans">
                 Redirecting to login...
               </p>
             </motion.div>
           ) : (
             <>
-              <div className="text-5xl mb-5 text-[#EC4824] flex justify-center">
+              <div className="text-5xl mb-5 text-[#F97316] flex justify-center">
                 <HiDevicePhoneMobile size={64} />
               </div>
               
-              <h2 className="text-white font-bold text-xl mb-3">
+              <h2 className="text-white font-display font-bold text-2xl mb-3 uppercase tracking-tight">
                 Install Required
               </h2>
               
-              <p className="text-white/50 text-sm 
-                leading-relaxed mb-6">
+              <p className="text-white/50 text-sm font-sans leading-relaxed mb-8">
                 For security and the best experience, 
                 you must install the 
-                <span className="text-[#EC4824] font-bold">
-                  {" "}CD Admin App{" "}
+                <span className="text-[#F97316] font-bold">
+                  {" "}KO Admin App{" "}
                 </span>
                 before accessing the dashboard.
               </p>
 
                <div className="space-y-3 mb-8 text-left">
                 {[
-                  { icon: <HiLockClosed size={16} />, text: "Secure standalone access" },
-                  { icon: <HiBolt size={16} />, text: "Faster dashboard performance" },
-                  { icon: <HiBell size={16} />, text: "Real-time order notifications" },
-                  { icon: <HiChartBar size={16} />, text: "Offline data viewing" },
+                  { icon: "🔒", text: "Secure restaurant management" },
+                  { icon: "⚡", text: "Faster dashboard performance" },
+                  { icon: "🔔", text: "Real-time order notifications" },
+                  { icon: "🌴", text: "Beach bar inventory control" },
                 ].map((b, i) => (
                   <div key={i} className="flex items-center 
                     gap-3 text-sm text-white/60">
-                    <span className="text-[#EC4824]">{b.icon}</span>
+                    <span className="text-[#F97316]">{b.icon}</span>
                     <span>{b.text}</span>
                   </div>
                 ))}
               </div>
 
-              {isInstallable ? (
+               {isInstallable ? (
                 <button
                   onClick={handleInstall}
                   disabled={installing}
-                  className="w-full py-4 rounded-xl 
+                  className="w-full py-5 rounded-xl 
                     text-white font-bold text-sm uppercase 
                     tracking-wider transition-all 
-                    hover:opacity-90 disabled:opacity-60
-                    flex items-center justify-center gap-3 cursor-pointer"
+                    hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60
+                    flex items-center justify-center gap-3 cursor-pointer shadow-2xl"
                   style={{ 
-                    background: "linear-gradient(135deg, #872735, #EC4824)",
-                    boxShadow: "0 10px 30px rgba(236,72,36,0.3)"
+                    background: "linear-gradient(135deg, #F97316, #FB923C)",
+                    boxShadow: "0 10px 30px rgba(249,115,22,0.30)"
                   }}>
                   {installing ? (
                     <>
@@ -142,18 +141,18 @@ export default function AdminInstallGate() {
                     </>
                   ) : (
                     <>
-                      <HiDevicePhoneMobile size={20} />
-                      Install CD Admin App
+                      <span>📲</span>
+                      Install KO Admin App
                     </>
                   )}
                 </button>
               ) : (
                 <div className="rounded-xl p-4 text-sm"
                   style={{ 
-                    background: "rgba(236,72,36,0.1)",
-                    border: "1px solid rgba(236,72,36,0.2)"
+                    background: "rgba(249,115,22,0.10)",
+                    border: "1px solid rgba(249,115,22,0.20)"
                   }}>
-                  <p className="text-[#EC4824] font-bold mb-1">
+                  <p className="text-[#F97316] font-bold mb-2 font-display uppercase tracking-wider">
                     How to install manually:
                   </p>
                   <p className="text-white/50 text-xs 
@@ -168,12 +167,12 @@ export default function AdminInstallGate() {
                   <button
                     onClick={() => {
                       localStorage.setItem(
-                        "cd_admin_installed", "true"
+                        "ko_admin_installed", "true"
                       )
                       setDismissed(true)
                     }}
-                    className="mt-3 text-[#EC4824] 
-                      text-xs underline cursor-pointer">
+                    className="mt-4 text-[#F97316] font-bold
+                      text-xs underline cursor-pointer uppercase tracking-widest">
                     I've installed it manually → Continue
                   </button>
                 </div>
@@ -182,8 +181,8 @@ export default function AdminInstallGate() {
           )}
         </div>
 
-        <p className="text-white/20 text-xs">
-          Cookers Delight Admin Portal · Secured Access
+        <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.2em]">
+          Kokrobite Oasis Admin Portal · Secured Access
         </p>
       </motion.div>
     </div>

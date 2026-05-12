@@ -1,12 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const { Pool } = require('pg');
+import { PrismaClient } from '@prisma/client';
+import { withAccelerate } from '@prisma/extension-accelerate';
 
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Required for some cloud DBs
-});
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+// Initialize Prisma Client with Accelerate extension
+// It will automatically use the DATABASE_URL from .env
+const prisma = new PrismaClient().$extends(withAccelerate());
 
-module.exports = prisma;
+export default prisma;

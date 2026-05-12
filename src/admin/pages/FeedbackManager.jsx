@@ -80,8 +80,8 @@ const FeedbackManager = () => {
     <div className="space-y-8 pb-10">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-black text-white mb-2">Feedback Manager</h1>
-          <p className="text-white/40 font-medium">Monitor and respond to customer suggestions & issues.</p>
+          <h1 className="text-4xl font-display font-bold text-white mb-2 uppercase tracking-tight">Feedback Manager</h1>
+          <p className="text-white/40 font-sans font-medium">Monitor and respond to customer suggestions & issues.</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ const FeedbackManager = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
            {[
              { label: 'Total Feedback', val: stats.total, icon: <HiOutlineChatBubbleLeftRight size={24} />, color: 'text-white' },
-             { label: 'New / Unread', val: stats.new, icon: <HiOutlineExclamationCircle size={24} />, color: 'text-brand-orange', badge: true },
+             { label: 'New / Unread', val: stats.new, icon: <HiOutlineExclamationCircle size={24} />, color: 'text-[#F97316]', badge: true },
              { label: 'Average Rating', val: (stats.avgRating || 0).toFixed(1), icon: <HiOutlineStar size={24} />, color: 'text-yellow-500', stars: true },
              { label: 'Resolved', val: stats.resolved, icon: <HiOutlineCheckCircle size={24} />, color: 'text-green-500' }
            ].map((s, i) => (
@@ -101,7 +101,7 @@ const FeedbackManager = () => {
                 <div>
                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">{s.label}</p>
                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-black text-white">{s.val}</span>
+                      <span className="text-2xl font-display font-bold text-white">{s.val}</span>
                       {s.stars && <HiStar className="text-yellow-500 mb-1" />}
                    </div>
                 </div>
@@ -119,7 +119,7 @@ const FeedbackManager = () => {
                    key={s}
                    onClick={() => setFilters({...filters, status: s})}
                    className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                     filters.status === s ? 'bg-brand-orange text-white' : 'text-white/40 hover:text-white'
+                     filters.status === s ? 'bg-[#F97316] text-white' : 'text-white/40 hover:text-white'
                    }`}
                  >
                    {s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ')}
@@ -134,7 +134,7 @@ const FeedbackManager = () => {
                  placeholder="Search by title or customer name..."
                  value={filters.search}
                  onChange={e => setFilters({...filters, search: e.target.value})}
-                 className="w-full bg-black/40 border border-white/5 rounded-2xl pl-11 pr-6 py-3 text-sm focus:outline-none focus:border-brand-orange/50 transition-all"
+                 className="w-full bg-black/40 border border-white/5 rounded-2xl pl-11 pr-6 py-3 text-sm focus:outline-none focus:border-[#F97316]/50 transition-all font-sans"
                />
             </div>
          </div>
@@ -182,14 +182,14 @@ const FeedbackManager = () => {
                      {f.customer.avatar ? (
                        <img src={f.customer.avatar} className="w-full h-full object-cover" alt="" />
                      ) : (
-                       <div className="w-full h-full bg-brand-orange/20 text-brand-orange flex items-center justify-center font-bold">
+                       <div className="w-full h-full bg-[#F97316]/20 text-[#F97316] flex items-center justify-center font-display font-bold text-lg">
                           {f.customer.name.charAt(0)}
                        </div>
                      )}
                   </div>
                   <div>
                      <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <h4 className="font-bold text-lg text-white">{f.customer.name}</h4>
+                        <h4 className="font-bold text-lg text-white font-sans">{f.customer.name}</h4>
                         <span className="text-[10px] text-white/20 font-bold">•</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${CATEGORIES[f.category]?.color}`}>
                            {CATEGORIES[f.category]?.label}
@@ -199,7 +199,7 @@ const FeedbackManager = () => {
                         </div>
                      </div>
                      <p className="text-white/40 text-xs font-medium mb-4">{f.customer.email}</p>
-                     <h3 className="text-white font-bold text-xl mb-3">{f.title}</h3>
+                     <h3 className="text-white font-bold text-xl mb-3 font-display">{f.title}</h3>
                      <p className="text-white/60 text-sm leading-relaxed max-w-2xl">{f.message}</p>
                      
                      <div className="flex flex-wrap items-center gap-6 mt-6">
@@ -253,7 +253,7 @@ const FeedbackManager = () => {
               className="fixed top-[10%] left-[5%] right-[5%] lg:left-1/2 lg:-translate-x-1/2 lg:w-[800px] bg-[#1a1a1a] border border-white/10 rounded-[40px] z-[101] overflow-hidden flex flex-col max-h-[80vh]"
             >
                <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
-                  <h3 className="text-2xl font-black text-white">Manage Feedback</h3>
+                  <h3 className="text-2xl font-display font-bold text-white uppercase tracking-tight">Manage Feedback</h3>
                   <button onClick={() => setSelectedFeedback(null)} className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/40 hover:text-white">
                     <HiOutlineXMark size={24} />
                   </button>
@@ -266,25 +266,25 @@ const FeedbackManager = () => {
                         <div>
                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2">Customer</p>
                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-brand-orange/20 text-brand-orange flex items-center justify-center font-bold">
+                              <div className="w-10 h-10 rounded-full bg-[#F97316]/20 text-[#F97316] flex items-center justify-center font-display font-bold">
                                  {selectedFeedback.customer.name.charAt(0)}
                               </div>
                               <div>
-                                 <p className="font-bold text-white">{selectedFeedback.customer.name}</p>
-                                 <p className="text-xs text-white/40">{selectedFeedback.customer.email}</p>
+                                 <p className="font-bold text-white font-sans">{selectedFeedback.customer.name}</p>
+                                 <p className="text-xs text-white/40 font-sans">{selectedFeedback.customer.email}</p>
                               </div>
                            </div>
                         </div>
                         <div>
                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2">Original Message</p>
-                           <h4 className="text-white font-bold mb-2">{selectedFeedback.title}</h4>
-                           <p className="text-white/60 text-sm leading-relaxed">{selectedFeedback.message}</p>
+                           <h4 className="text-white font-bold mb-2 font-display">{selectedFeedback.title}</h4>
+                           <p className="text-white/60 text-sm leading-relaxed font-sans">{selectedFeedback.message}</p>
                         </div>
                         {selectedFeedback.deviceInfo && (
                           <div>
                             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Technical Data</p>
-                            <p className="text-[10px] text-white/40 font-medium">OS/Browser: {selectedFeedback.deviceInfo}</p>
-                            <p className="text-[10px] text-white/40 font-medium">App Version: {selectedFeedback.appVersion}</p>
+                            <p className="text-[10px] text-white/40 font-medium font-sans">OS/Browser: {selectedFeedback.deviceInfo}</p>
+                            <p className="text-[10px] text-white/40 font-medium font-sans">App Version: {selectedFeedback.appVersion}</p>
                           </div>
                         )}
                      </div>
@@ -293,7 +293,7 @@ const FeedbackManager = () => {
                         {selectedFeedback.screenshot ? (
                           <div>
                             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2">Screenshot</p>
-                            <a href={selectedFeedback.screenshot} target="_blank" rel="noreferrer" className="block rounded-2xl overflow-hidden border border-white/10 hover:border-brand-orange/50 transition-all">
+                            <a href={selectedFeedback.screenshot} target="_blank" rel="noreferrer" className="block rounded-2xl overflow-hidden border border-white/10 hover:border-[#F97316]/50 transition-all">
                                <img src={selectedFeedback.screenshot} className="w-full object-contain" alt="" />
                             </a>
                           </div>
@@ -308,14 +308,14 @@ const FeedbackManager = () => {
 
                   {/* Update Form */}
                   <div className="pt-10 border-t border-white/5 space-y-6">
-                     <h4 className="text-xl font-bold text-white">Administrative Action</h4>
+                     <h4 className="text-xl font-bold text-white font-display">Administrative Action</h4>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Change Status</label>
                            <select 
                              value={updateData.status}
                              onChange={e => setUpdateData({...updateData, status: e.target.value})}
-                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-orange transition-all font-bold"
+                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-bold font-sans"
                            >
                               {Object.entries(STATUSES).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
                            </select>
@@ -327,7 +327,7 @@ const FeedbackManager = () => {
                              value={updateData.adminNote}
                              onChange={e => setUpdateData({...updateData, adminNote: e.target.value})}
                              placeholder="Internal note or message to customer..."
-                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-orange transition-all font-medium resize-none text-sm"
+                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-medium resize-none text-sm font-sans"
                            />
                            <p className="text-[9px] text-white/20 ml-1 italic">* This note will be sent as a notification if status is 'Resolved'.</p>
                         </div>
@@ -335,7 +335,7 @@ const FeedbackManager = () => {
                      <button
                        onClick={handleUpdateStatus}
                        disabled={updating}
-                       className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-black py-5 rounded-2xl shadow-xl shadow-brand-orange/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
+                       className="w-full bg-[#F97316] hover:bg-[#F97316]/90 text-white font-bold py-5 rounded-2xl shadow-xl shadow-[#F97316]/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 font-sans uppercase tracking-widest text-xs"
                      >
                        {updating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'UPDATE FEEDBACK STATUS'}
                      </button>

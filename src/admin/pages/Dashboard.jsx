@@ -81,7 +81,7 @@ const Dashboard = () => {
         <p className="text-white/40 max-w-md">{error}</p>
         <button 
           onClick={() => fetchSummary()}
-          className="flex items-center gap-2 bg-brand-orange text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-all"
+          className="flex items-center gap-2 bg-[#F97316] text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-all"
         >
           <HiOutlineArrowPath size={20} /> Try Again
         </button>
@@ -102,17 +102,17 @@ const Dashboard = () => {
   const statusColors = {
     pending: "#F59E0B",
     confirmed: "#3B82F6",
-    preparing: "#EC4824",
+    preparing: "#F97316",
     delivered: "#10B981",
     cancelled: "#EF4444"
   };
 
   const statusBadges = {
-    pending: "bg-yellow-500/15 text-yellow-400",
-    confirmed: "bg-blue-500/15 text-blue-400",
-    preparing: "bg-orange-500/15 text-orange-400",
-    delivered: "bg-green-500/15 text-green-400",
-    cancelled: "bg-red-500/15 text-red-400"
+    pending: "bg-[#F59E0B]/15 text-[#F59E0B]",
+    confirmed: "bg-[#3B82F6]/15 text-[#3B82F6]",
+    preparing: "bg-[#F97316]/15 text-[#F97316]",
+    delivered: "bg-[#10B981]/15 text-[#10B981]",
+    cancelled: "bg-[#EF4444]/15 text-[#EF4444]"
   };
 
   const pieData = Object.keys(ordersByStatus).map(key => ({
@@ -150,6 +150,7 @@ const Dashboard = () => {
             icon={<HiOutlineBanknotes size={24} />}
             trend={revenueToday > 0 ? `₵${revenueToday} today` : "No sales today"}
             trendUp={revenueToday > 0}
+            iconColor="#F97316"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
@@ -159,6 +160,7 @@ const Dashboard = () => {
             icon={<HiOutlineShoppingBag size={24} />}
             trend={ordersToday > 0 ? `${ordersToday} new today` : "No orders today"}
             trendUp={ordersToday > 0}
+            iconColor="#FB923C"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
@@ -168,6 +170,7 @@ const Dashboard = () => {
             icon={<HiOutlineStar size={24} />}
             trend={`${totalReviews} reviews`}
             trendUp={true}
+            iconColor="#F59E0B"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
@@ -177,6 +180,7 @@ const Dashboard = () => {
             icon={<HiOutlineRectangleGroup size={24} />}
             trend="All available"
             trendUp={true}
+            iconColor="#1C0A00"
           />
         </motion.div>
         <motion.div variants={itemVariants}>
@@ -186,6 +190,7 @@ const Dashboard = () => {
             icon={<HiOutlineUser size={24} />}
             trend={newCustomersToday > 0 ? `${newCustomersToday} new today` : "No new today"}
             trendUp={newCustomersToday > 0}
+            iconColor="#F97316"
           />
         </motion.div>
       </motion.div>
@@ -195,7 +200,7 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-[#1a1a1a] border border-white/5 rounded-2xl p-8"
+        className="bg-[#1a1a1a] border border-[#F97316]/10 rounded-2xl p-8"
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
@@ -207,7 +212,7 @@ const Dashboard = () => {
               <button
                 key={range}
                 onClick={() => setChartRange(range)}
-                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${chartRange === range ? 'bg-[#EC4824] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${chartRange === range ? 'bg-[#F97316] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
               >
                 {range}
               </button>
@@ -220,8 +225,8 @@ const Dashboard = () => {
             <ComposedChart data={filteredRevenueByDay}>
               <defs>
                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#EC4824" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#EC4824" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#F97316" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
@@ -248,14 +253,19 @@ const Dashboard = () => {
                 hide 
               />
               <Tooltip 
-                contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", fontSize: "12px" }}
+                contentStyle={{ 
+                  backgroundColor: "#1C0A00", 
+                  border: "1px solid rgba(249,115,22,0.20)", 
+                  borderRadius: "12px", 
+                  fontSize: "12px" 
+                }}
                 itemStyle={{ fontWeight: "bold" }}
                 labelStyle={{ marginBottom: "8px", color: "rgba(255,255,255,0.4)" }}
               />
               <Bar 
                 yAxisId="right" 
                 dataKey="orders" 
-                fill="rgba(135,39,53,0.3)" 
+                fill="rgba(249,115,22,0.50)" 
                 radius={[4, 4, 0, 0]} 
                 barSize={30}
                 name="Orders"
@@ -264,7 +274,7 @@ const Dashboard = () => {
                 yAxisId="left" 
                 type="monotone" 
                 dataKey="revenue" 
-                stroke="#EC4824" 
+                stroke="#F97316" 
                 strokeWidth={3} 
                 dot={false}
                 name="Revenue ₵"
@@ -283,13 +293,13 @@ const Dashboard = () => {
           className="lg:col-span-3 bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden"
         >
           <div className="p-8 border-b border-white/5 flex justify-between items-center">
-            <h3 className="text-xl font-bold text-white">Recent Orders</h3>
-            <Link to="/admin/orders" className="text-[#EC4824] text-xs font-bold uppercase tracking-widest hover:underline">View All →</Link>
+            <h3 className="text-xl font-display font-bold text-white uppercase tracking-tight">Recent Orders 🛍️</h3>
+            <Link to="/admin/orders" className="text-[#F97316] text-xs font-bold uppercase tracking-[0.2em] hover:underline">View All Orders →</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-white/5 text-left text-white/20 text-[10px] font-bold uppercase tracking-widest">
+                <tr className="bg-white/5 text-left text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
                   <th className="px-8 py-4">Customer</th>
                   <th className="px-8 py-4">Items</th>
                   <th className="px-8 py-4">Total</th>
@@ -307,7 +317,7 @@ const Dashboard = () => {
                   </tr>
                 ) : (
                   recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-white/[0.02] transition-colors group">
+                    <tr key={order.id} className="hover:bg-[#F97316]/[0.04] transition-colors group">
                       <td className="px-8 py-5">
                         <p className="text-sm font-bold text-white">{order.customerName}</p>
                         <p className="text-[10px] text-white/40">{order.branch}</p>
@@ -316,7 +326,7 @@ const Dashboard = () => {
                         {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                         <span className="block text-[10px] text-white/20 truncate max-w-[120px]">{order.items[0]?.menuItem}...</span>
                       </td>
-                      <td className="px-8 py-5 text-sm font-bold text-brand-orange">
+                      <td className="px-8 py-5 text-sm font-bold text-[#F97316]">
                         ₵{order.totalAmount}
                       </td>
                       <td className="px-8 py-5">
@@ -350,7 +360,7 @@ const Dashboard = () => {
                 <div key={item.name} className="space-y-3">
                   <div className="flex justify-between items-end">
                     <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-full bg-[#EC4824]/20 text-[#EC4824] flex items-center justify-center text-[10px] font-bold">
+                      <span className="w-6 h-6 rounded-full bg-[#F97316]/20 text-[#F97316] flex items-center justify-center text-[10px] font-bold">
                         {idx + 1}
                       </span>
                       <p className="text-sm font-bold text-white">{item.name}</p>
@@ -362,7 +372,7 @@ const Dashboard = () => {
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
                       transition={{ duration: 1, delay: 0.5 + (idx * 0.1) }}
-                      className="h-full bg-[#EC4824] rounded-full"
+                      className="h-full bg-[#F97316] rounded-full"
                     />
                   </div>
                 </div>
@@ -440,9 +450,14 @@ const Dashboard = () => {
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                  contentStyle={{ backgroundColor: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "10px" }}
+                  contentStyle={{ 
+                    backgroundColor: "#1C0A00", 
+                    border: "1px solid rgba(249,115,22,0.20)", 
+                    borderRadius: "8px", 
+                    fontSize: "10px" 
+                  }}
                 />
-                <Bar dataKey="count" fill="#EC4824" opacity={0.8} radius={[0, 4, 4, 0]} barSize={20} />
+                <Bar dataKey="count" fill="#F97316" opacity={0.85} radius={[0, 4, 4, 0]} barSize={20} />
               </RechartsBarChart>
             </ResponsiveContainer>
           </div>
@@ -456,8 +471,8 @@ const Dashboard = () => {
           className="bg-[#1a1a1a] border border-white/5 rounded-2xl p-8 h-[400px] flex flex-col"
         >
           <div className="mb-6">
-            <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-            <p className="text-[10px] text-[#EC4824] font-bold uppercase tracking-widest mt-1">Live Updates</p>
+            <h3 className="text-lg font-bold text-white">Recent Activity 🌴</h3>
+            <p className="text-[10px] text-[#F97316] font-bold uppercase tracking-widest mt-1">Auto-refreshes every 30s</p>
           </div>
           <div className="flex-1 overflow-y-auto no-scrollbar space-y-6">
             {recentOrders.map((order, i) => (
@@ -465,19 +480,16 @@ const Dashboard = () => {
                 {i !== recentOrders.length - 1 && (
                   <div className="absolute left-4 top-10 bottom-[-24px] w-[1px] bg-white/5" />
                 )}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 ${
-                  order.status === 'delivered' ? 'bg-green-500/20 text-green-400' : 
-                  order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
-                }`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 bg-[#F97316]/10 text-[#F97316]`}>
                   {order.status === 'delivered' ? <HiOutlineCheckCircle size={14} /> : 
                    order.status === 'pending' ? <HiOutlineClock size={14} /> : <HiOutlineTruck size={14} />}
                 </div>
-                <div>
+                <div className="flex-1 border-b border-white/5 pb-6 last:border-0 last:pb-0">
                   <p className="text-xs font-bold text-white leading-tight">
                     {order.status === 'pending' ? 'New order received' : `Order ${order.status}`} from {order.customerName.split(' ')[0]}
-                    <span className="text-brand-orange ml-1">₵{order.totalAmount}</span>
+                    <span className="text-[#F97316] ml-1">₵{order.totalAmount}</span>
                   </p>
-                  <p className="text-[10px] text-white/20 font-bold mt-1 uppercase tracking-tighter">{relativeTime(order.createdAt)}</p>
+                  <p className="text-[10px] text-white/30 font-bold mt-1 uppercase tracking-tighter">{relativeTime(order.createdAt)}</p>
                 </div>
               </div>
             ))}
@@ -509,7 +521,7 @@ const Dashboard = () => {
               {recentCustomerOrders && recentCustomerOrders.length > 0 ? (
                 recentCustomerOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-4 py-3 font-mono text-brand-orange">{order.orderNumber}</td>
+                    <td className="px-4 py-3 font-mono text-[#F97316]">{order.orderNumber}</td>
                     <td className="px-4 py-3 font-bold text-white">{order.customer?.name}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded text-xs uppercase font-bold ${order.type === 'delivery' ? 'bg-blue-500/20 text-blue-400' : 'bg-orange-500/20 text-orange-400'}`}>

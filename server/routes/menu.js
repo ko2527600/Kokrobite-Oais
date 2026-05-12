@@ -16,6 +16,26 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+function mapCategory(cat) {
+  const map = {
+    "Brunch":          "Brunch",
+    "Cocktails":       "Cocktails",
+    "Mocktails":       "Mocktails",
+    "Platters":        "Platters",
+    "Pitchers":        "Pitchers",
+    "Juices":          "Juices",
+    "Kissed by Fire":  "KissedByFire",
+    "Sides":           "Sides",
+    "Pizza":           "Pizza",
+    "Burgers & Wraps": "BurgersWraps",
+    "Shots":           "Shots",
+    "Slushys":         "Slushys",
+    "Beers & Ciders":  "BeersAndCiders",
+    "Soft Drinks":     "SoftDrinks",
+  }
+  return map[cat] || cat
+}
+
 // @route   GET /api/menu
 // @desc    Get all menu items with filters
 // @access  Public
@@ -47,7 +67,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       name,
       description,
       price,
-      category,
+      category: mapCategory(category),
       available: available === "true" || available === true,
       featured: featured === "true" || featured === true,
       image: image || "",
@@ -73,7 +93,10 @@ router.put("/:id", auth, upload.single("image"), async (req, res) => {
 
   const item = await prisma.menuItem.update({
     where: { id: req.params.id },
-    data: updateData
+    data: {
+      ...updateData,
+      category: updateData.category ? mapCategory(updateData.category) : undefined
+    }
   });
   res.json(item);
 });

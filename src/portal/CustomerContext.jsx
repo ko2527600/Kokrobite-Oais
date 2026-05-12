@@ -13,8 +13,8 @@ export const CustomerProvider = ({ children }) => {
       setCustomer(res.data);
     } catch (err) {
       setCustomer(null);
-      localStorage.removeItem('cd_customer_token');
-      localStorage.removeItem('cd_customer_user');
+      localStorage.removeItem('ko_customer_token');
+      localStorage.removeItem('ko_customer_user');
     } finally {
       setLoading(false);
     }
@@ -25,8 +25,8 @@ export const CustomerProvider = ({ children }) => {
   }, [checkSession]);
 
   const login = (newToken, customerData) => {
-    localStorage.setItem('cd_customer_token', newToken);
-    localStorage.setItem('cd_customer_user', JSON.stringify(customerData));
+    localStorage.setItem('ko_customer_token', newToken);
+    localStorage.setItem('ko_customer_user', JSON.stringify(customerData));
     setCustomer(customerData);
   };
 
@@ -34,8 +34,8 @@ export const CustomerProvider = ({ children }) => {
     try {
       await api.post('/customers/auth/logout');
     } catch (e) {}
-    localStorage.removeItem('cd_customer_token');
-    localStorage.removeItem('cd_customer_user');
+    localStorage.removeItem('ko_customer_token');
+    localStorage.removeItem('ko_customer_user');
     setCustomer(null);
     window.location.href = '/portal/login';
   };
@@ -48,8 +48,8 @@ export const CustomerProvider = ({ children }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-white/10 border-t-brand-orange rounded-full animate-spin"/>
-          <p className="text-white/30 text-sm">Loading CD Boat...</p>
+          <div className="w-10 h-10 border-2 border-white/10 border-t-[#F97316] rounded-full animate-spin"/>
+          <p className="text-white/30 text-sm">Loading KO Eats...</p>
         </div>
       </div>
     );

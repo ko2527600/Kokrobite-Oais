@@ -1,4 +1,4 @@
-import axios from "axios"
+﻿import axios from "axios"
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -6,8 +6,8 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const adminToken = localStorage.getItem("cd_admin_token")
-  const customerToken = localStorage.getItem("cd_customer_token")
+  const adminToken = localStorage.getItem("ko_admin_token")
+  const customerToken = localStorage.getItem("ko_customer_token")
   const token = adminToken || customerToken
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -23,13 +23,13 @@ api.interceptors.response.use(
     const isLoginCheck = error.config.url.includes('/login') || error.config.url.includes('/google');
 
     if (error.response?.status === 401 && !isMeCheck && !isLoginCheck) {
-      const hasToken = localStorage.getItem("cd_admin_token") || localStorage.getItem("cd_customer_token");
+      const hasToken = localStorage.getItem("ko_admin_token") || localStorage.getItem("ko_customer_token");
       
       if (hasToken) {
-        localStorage.removeItem("cd_admin_token");
-        localStorage.removeItem("cd_admin_user");
-        localStorage.removeItem("cd_customer_token");
-        localStorage.removeItem("cd_customer_user");
+        localStorage.removeItem("ko_admin_token");
+        localStorage.removeItem("ko_admin_user");
+        localStorage.removeItem("ko_customer_token");
+        localStorage.removeItem("ko_customer_user");
         
         const path = window.location.pathname;
         if (path.startsWith("/admin") && path !== "/admin/login") {

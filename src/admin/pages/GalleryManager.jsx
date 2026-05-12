@@ -30,7 +30,7 @@ import Skeleton from "../components/Skeleton";
 import { useToast } from "../components/Toast";
 import { getImgUrl } from "../../utils/image";
 
-const CATEGORIES = ['Food', 'Interior', 'Events', 'Team', 'Other'];
+const CATEGORIES = ['Brunch', 'Cocktails', 'Atmosphere', 'Platters', 'Events', 'Food', 'Drinks'];
 
 const SortableItem = ({ id, item, onEdit, onDelete, onToggle }) => {
   const {
@@ -53,12 +53,12 @@ const SortableItem = ({ id, item, onEdit, onDelete, onToggle }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative aspect-square rounded-2xl overflow-hidden bg-[#1a1a1a] border border-white/5 transition-all ${!item.visible ? 'opacity-40' : ''}`}
+      className={`group relative aspect-square rounded-2xl overflow-hidden bg-[#0C0A09] border transition-all ${!item.visible ? 'opacity-35 border-red-500/20' : 'border-[#F97316]/05'} ${isDragging ? 'border-[#F97316] shadow-[0_20_40_rgba(249,115,22,0.20)]' : ''}`}
     >
       <img src={getImgUrl(item.url)} className="w-full h-full object-cover" alt={item.title} />
       
       {!item.visible && (
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-widest border border-white/10">
+        <div className="absolute top-3 left-3 bg-[#EF4444]/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-[#EF4444] uppercase tracking-widest border border-[#EF4444]/20">
           Hidden
         </div>
       )}
@@ -67,23 +67,23 @@ const SortableItem = ({ id, item, onEdit, onDelete, onToggle }) => {
       <div 
         {...attributes} 
         {...listeners}
-        className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-md flex items-center justify-center text-[#F97316]/50 hover:text-[#F97316] cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-all"
       >
         <HiOutlineArrowsUpDown size={16} />
       </div>
 
       {/* Hover Overlay */}
-      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-end p-6">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1C0A00]/90 to-transparent opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-end p-6">
         <div className="space-y-1 mb-4">
-           <h4 className="text-white font-bold truncate">{item.title}</h4>
-           <span className="inline-block bg-[#EC4824]/20 text-[#EC4824] text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+           <h4 className="text-white font-display font-bold truncate">{item.title}</h4>
+           <span className="inline-block bg-[#F97316]/20 text-[#F97316] text-[10px] font-bold uppercase px-2 py-0.5 rounded font-sans">
              {item.category}
            </span>
         </div>
         <div className="flex gap-2">
-           <button onClick={() => onEdit(item)} className="flex-1 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-all"><HiOutlinePencilSquare size={18} /></button>
-           <button onClick={() => onToggle(item.id)} className="flex-1 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-all">{item.visible ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}</button>
-           <button onClick={() => onDelete(item.id)} className="flex-1 h-10 bg-red-500/20 hover:bg-red-500/30 rounded-xl flex items-center justify-center text-red-500 transition-all"><HiOutlineTrash size={18} /></button>
+           <button onClick={() => onEdit(item)} className="flex-1 h-10 bg-white/10 hover:bg-[#F97316]/20 rounded-xl flex items-center justify-center text-white hover:text-[#F97316] transition-all"><HiOutlinePencilSquare size={18} /></button>
+           <button onClick={() => onToggle(item.id)} className="flex-1 h-10 bg-white/10 hover:bg-[#F59E0B]/20 rounded-xl flex items-center justify-center text-white hover:text-[#F59E0B] transition-all">{item.visible ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}</button>
+           <button onClick={() => onDelete(item.id)} className="flex-1 h-10 bg-red-500/10 hover:bg-red-500/20 rounded-xl flex items-center justify-center text-white hover:text-[#EF4444] transition-all"><HiOutlineTrash size={18} /></button>
         </div>
       </div>
     </div>
@@ -234,7 +234,7 @@ const GalleryManager = () => {
           <select 
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-brand-orange outline-none"
+            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-[#F97316] outline-none font-sans"
           >
             <option value="All">All Categories</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -242,7 +242,7 @@ const GalleryManager = () => {
           <select 
             value={visibilityFilter}
             onChange={(e) => setVisibilityFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-brand-orange outline-none"
+            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-[#F97316] outline-none font-sans"
           >
             <option value="All">All Visibility</option>
             <option value="Visible">Visible</option>
@@ -250,9 +250,9 @@ const GalleryManager = () => {
           </select>
           <button 
             onClick={() => setShowUploadModal(true)}
-            className="bg-[#EC4824] hover:bg-[#EC4824]/90 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
+            className="bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white px-8 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all active:scale-95 shadow-[0_8px_20px_rgba(249,115,22,0.30)]"
           >
-            <HiOutlinePlus size={18} /> Upload
+            <HiOutlinePlus size={18} /> Upload Image
           </button>
         </div>
       </div>
@@ -267,23 +267,37 @@ const GalleryManager = () => {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext 
-            items={filteredItems.map(i => i.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {filteredItems.map((item, idx) => (
-                <SortableItem 
-                  key={item.id || `gall-${idx}`} 
-                  id={item.id || `gall-${idx}`} 
-                  item={item}
-                  onEdit={(it) => { setEditingItem(it); setShowEditModal(true); }}
-                  onDelete={(id) => { setDeletingId(id); setShowConfirm(true); }}
-                  onToggle={handleToggle}
-                />
-              ))}
+          {filteredItems.length === 0 ? (
+            <div className="bg-[#0C0A09] border border-[#F97316]/10 rounded-3xl p-20 text-center">
+              <div className="text-6xl mb-6">🏖️</div>
+              <h3 className="text-2xl font-display font-bold text-white mb-2">No Gallery Images Yet</h3>
+              <p className="text-white/40 mb-8 max-w-sm mx-auto font-sans">Upload Kokrobite Oasis photos to showcase your beach vibes</p>
+              <button 
+                onClick={() => setShowUploadModal(true)}
+                className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 mx-auto font-sans"
+              >
+                <HiOutlinePlus /> Upload First Image
+              </button>
             </div>
-          </SortableContext>
+          ) : (
+            <SortableContext 
+              items={filteredItems.map(i => i.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {filteredItems.map((item, idx) => (
+                  <SortableItem 
+                    key={item.id || `gall-${idx}`} 
+                    id={item.id || `gall-${idx}`} 
+                    item={item}
+                    onEdit={(it) => { setEditingItem(it); setShowEditModal(true); }}
+                    onDelete={(id) => { setDeletingId(id); setShowConfirm(true); }}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          )}
         </DndContext>
       )}
 
@@ -305,34 +319,34 @@ const GalleryManager = () => {
 
           <div className="grid grid-cols-2 gap-6">
              <div className="space-y-2">
-               <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Title</label>
-               <input value={uploadData.title} onChange={e => setUploadData({ ...uploadData, title: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" placeholder="e.g. Interior View" />
+                <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Title</label>
+                <input value={uploadData.title} onChange={e => setUploadData({ ...uploadData, title: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" placeholder="e.g. Interior View" />
              </div>
              <div className="space-y-2">
-               <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Category</label>
-               <select value={uploadData.category} onChange={e => setUploadData({ ...uploadData, category: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange">
-                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-               </select>
+                <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Category</label>
+                <select value={uploadData.category} onChange={e => setUploadData({ ...uploadData, category: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans">
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
              </div>
           </div>
 
           {uploadData.type === 'url' ? (
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Image URL</label>
-              <input value={uploadData.image} onChange={e => setUploadData({ ...uploadData, image: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" placeholder="https://..." />
+               <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Image URL</label>
+               <input value={uploadData.image} onChange={e => setUploadData({ ...uploadData, image: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" placeholder="https://..." />
             </div>
           ) : (
             <div 
-              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-brand-orange', 'bg-brand-orange/5'); }}
-              onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('border-brand-orange', 'bg-brand-orange/5'); }}
-              onDrop={e => { e.preventDefault(); setUploadData({ ...uploadData, files: Array.from(e.dataTransfer.files) }); }}
-              onClick={() => document.getElementById('gallUpload').click()}
-              className="w-full h-48 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-brand-orange/40 hover:bg-white/5 transition-all"
-            >
-              <HiOutlineCloudArrowUp size={32} className="text-white/20" />
-              <p className="text-sm font-medium text-white/40">Drop images here or <span className="text-[#EC4824]">click to browse</span></p>
-              <input id="gallUpload" type="file" hidden multiple accept="image/*" onChange={e => setUploadData({ ...uploadData, files: Array.from(e.target.files) })} />
-              {uploadData.files.length > 0 && <p className="text-[10px] font-bold text-brand-orange">{uploadData.files.length} files selected</p>}
+               onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-[#F97316]', 'bg-[#F97316]/05'); }}
+               onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('border-[#F97316]', 'bg-[#F97316]/05'); }}
+               onDrop={e => { e.preventDefault(); setUploadData({ ...uploadData, files: Array.from(e.dataTransfer.files) }); }}
+               onClick={() => document.getElementById('gallUpload').click()}
+               className="w-full h-48 border-2 border-dashed border-[#F97316]/40 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[#F97316]/05 transition-all"
+             >
+               <HiOutlineCloudArrowUp size={32} className="text-[#F97316]" />
+               <p className="text-sm font-medium text-white/40 font-sans">Drop beach vibes images here or <span className="text-[#F97316]">click to browse</span></p>
+               <input id="gallUpload" type="file" hidden multiple accept="image/*" onChange={e => setUploadData({ ...uploadData, files: Array.from(e.target.files) })} />
+               {uploadData.files.length > 0 && <p className="text-[10px] font-bold text-[#F97316] font-sans">{uploadData.files.length} files selected</p>}
             </div>
           )}
 
@@ -352,7 +366,7 @@ const GalleryManager = () => {
 
           <div className="flex gap-4 pt-4">
             <button type="button" onClick={() => setShowUploadModal(false)} className="flex-1 bg-white/5 font-bold py-4 rounded-2xl">Cancel</button>
-            <button disabled={uploading} type="submit" className="flex-1 bg-[#EC4824] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
+            <button disabled={uploading} type="submit" className="flex-1 bg-[#F97316] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
               {uploading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : "Upload Media"}
             </button>
           </div>
@@ -383,7 +397,7 @@ const GalleryManager = () => {
                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${editingItem.visible ? 'right-1' : 'left-1'}`} />
                </button>
             </div>
-            <button type="submit" className="w-full bg-[#EC4824] text-white font-bold py-4 rounded-2xl">Save Changes</button>
+            <button type="submit" className="w-full bg-[#F97316] text-white font-bold py-4 rounded-2xl">Save Changes</button>
           </form>
         )}
       </Modal>

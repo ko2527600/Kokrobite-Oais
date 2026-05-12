@@ -18,7 +18,7 @@ const BranchesManager = () => {
   const [editingBranch, setEditingBranch] = useState(null);
   const [formData, setFormData] = useState({
     name: "", area: "", landmark: "", address: "", 
-    phone: "", whatsapp: "", hours: "", mapUrl: "", isOpen: true
+    phone: "", whatsapp: "", hours: "", mapUrl: "", isOpen: true, closedDays: "Monday"
   });
   const [saving, setSaving] = useState(false);
 
@@ -54,7 +54,7 @@ const BranchesManager = () => {
       setFormData({ ...branch });
     } else {
       setEditingBranch(null);
-      setFormData({ name: "", area: "", landmark: "", address: "", phone: "", whatsapp: "", hours: "", mapUrl: "", isOpen: true });
+      setFormData({ name: "", area: "", landmark: "", address: "", phone: "", whatsapp: "", hours: "", mapUrl: "", isOpen: true, closedDays: "Monday" });
     }
     setShowModal(true);
   };
@@ -85,7 +85,7 @@ const BranchesManager = () => {
         <h1 className="text-3xl font-display font-bold text-white">Branch Locations</h1>
         <button 
           onClick={() => openModal()}
-          className="bg-[#EC4824] hover:bg-[#EC4824]/90 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
+          className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
         >
           <HiOutlinePlus size={18} /> Add Branch
         </button>
@@ -97,58 +97,61 @@ const BranchesManager = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {branches.map((branch) => (
+          {branches.filter(b => b.name === 'East Legon').map((branch) => (
             <motion.div 
               layout
               key={branch.id}
-              className="bg-[#1a1a1a] border border-white/5 rounded-2xl p-8 relative overflow-hidden group"
+              className="bg-[#1a1a1a] border border-[#F97316]/10 rounded-2xl p-8 relative overflow-hidden group"
             >
               <div className="flex justify-between items-start mb-8">
                  <div>
-                    <h3 className="text-3xl font-display font-bold text-white mb-1">{branch.name}</h3>
-                    <div className="flex items-center gap-2 text-brand-orange text-[10px] font-bold uppercase tracking-widest">
-                       <span className={`w-2 h-2 rounded-full ${branch.isOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                       {branch.isOpen ? 'Now Open' : 'Closed'}
+                    <h3 className="text-[36px] font-display font-light text-white mb-1">{branch.name}</h3>
+                    <div className="flex items-center gap-2 text-[#F97316] text-[10px] font-bold uppercase tracking-widest font-sans">
+                       <span className={`w-2 h-2 rounded-full ${branch.isOpen ? 'bg-[#10B981] animate-pulse' : 'bg-[#EF4444]'}`} />
+                       {branch.isOpen ? 'Open Now' : 'Closed'}
                     </div>
                  </div>
                  <button 
                    onClick={() => handleToggle(branch.id)}
-                   className={`w-12 h-6 rounded-full relative transition-all ${branch.isOpen ? 'bg-green-500' : 'bg-white/10'}`}
+                   className={`w-12 h-6 rounded-full relative transition-all ${branch.isOpen ? 'bg-[#10B981]' : 'bg-[#EF4444]'}`}
                  >
                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${branch.isOpen ? 'right-1' : 'left-1'}`} />
                  </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4 mb-8">
-                 <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3">
                     <HiOutlineMapPin className="text-white/20 mt-1" size={20} />
                     <div>
-                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Area</p>
-                       <p className="text-sm font-medium text-white/80">{branch.area}</p>
+                       <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Area</p>
+                       <p className="text-sm font-medium text-white/70">{branch.area}</p>
                     </div>
                  </div>
                  <div className="flex items-start gap-3">
                     <HiOutlineBuildingLibrary className="text-white/20 mt-1" size={20} />
                     <div>
-                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Landmark</p>
-                       <p className="text-sm font-medium text-white/80">{branch.landmark}</p>
+                       <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Landmark</p>
+                       <p className="text-sm font-medium text-white/70">{branch.landmark}</p>
                     </div>
                  </div>
                  <div className="flex items-start gap-3">
                     <HiOutlinePhone className="text-white/20 mt-1" size={20} />
                     <div>
-                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Contact</p>
+                       <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Contact</p>
                        <div className="flex gap-4 mt-1">
-                          <a href={`tel:${branch.phone}`} className="text-sm font-bold text-white hover:text-brand-orange transition-colors">{branch.phone}</a>
-                          <a href={`https://wa.me/${branch.whatsapp}`} className="text-green-500 hover:scale-110 transition-transform"><BsWhatsapp size={18} /></a>
+                          <a href={`tel:${branch.phone}`} className="text-sm font-bold text-[#F97316] hover:underline transition-colors font-sans">{branch.phone}</a>
+                          <a href={`https://wa.me/${branch.whatsapp}`} className="text-[#25D366] hover:scale-110 transition-transform"><BsWhatsapp size={18} /></a>
                        </div>
                     </div>
                  </div>
                  <div className="flex items-start gap-3">
-                    <HiOutlineClock className="text-white/20 mt-1" size={20} />
+                    <HiOutlineClock className="text-[#F97316] mt-1" size={20} />
                     <div>
-                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Hours</p>
-                       <p className="text-sm font-medium text-white/80">{branch.hours}</p>
+                       <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Hours 🌴</p>
+                       <div className="text-sm font-medium text-white/60 space-y-0.5">
+                         <p>{branch.hours || 'Tuesday–Sunday: 11:00 AM – 11:00 PM'}</p>
+                         <p className="text-xs opacity-80">{branch.closedDays || 'Monday'}: Closed 🌴</p>
+                       </div>
                     </div>
                  </div>
               </div>
@@ -164,9 +167,9 @@ const BranchesManager = () => {
                    href={branch.mapUrl} 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   className="w-12 h-12 bg-white/5 hover:bg-brand-orange hover:text-white text-white/40 rounded-xl flex items-center justify-center transition-all"
+                   className="flex-1 border border-[#F97316]/30 text-[#F97316] hover:bg-[#F97316]/10 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all font-sans"
                  >
-                   <HiOutlineMap size={20} />
+                   Open in Google Maps 📍
                  </a>
               </div>
             </motion.div>
@@ -175,11 +178,11 @@ const BranchesManager = () => {
       )}
 
       {/* Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingBranch ? "Edit Branch" : "Add New Branch"} size="md">
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingBranch ? "Edit Branch" : "Add New Branch"} size="md" className="bg-[#1a1a1a] border border-[#F97316]/10">
          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-               <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Branch Name</label>
-               <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" placeholder="e.g. Accra Central" />
+               <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest font-sans">Branch Name</label>
+               <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" placeholder="e.g. Accra Central" />
             </div>
             
             <div className="grid grid-cols-2 gap-6">
@@ -209,9 +212,15 @@ const BranchesManager = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Opening Hours</label>
-              <input value={formData.hours} onChange={e => setFormData({ ...formData, hours: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" placeholder="e.g. 10:00 AM - 11:00 PM" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Opening Hours</label>
+                <input value={formData.hours} onChange={e => setFormData({ ...formData, hours: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316]" placeholder="e.g. 11:00 AM - 11:00 PM" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Closed Days</label>
+                <input value={formData.closedDays} onChange={e => setFormData({ ...formData, closedDays: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316]" placeholder="e.g. Monday" />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -232,7 +241,7 @@ const BranchesManager = () => {
 
             <div className="flex gap-4 pt-4">
               <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 font-bold py-4 rounded-2xl">Cancel</button>
-              <button disabled={saving} type="submit" className="flex-1 bg-[#EC4824] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
+              <button disabled={saving} type="submit" className="flex-1 bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
                 {saving ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : "Save Changes"}
               </button>
             </div>

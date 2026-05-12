@@ -14,7 +14,7 @@ import Skeleton from "../components/Skeleton";
 import { useToast } from "../components/Toast";
 
 const STATUSES = ['pending', 'confirmed', 'preparing', 'delivered', 'cancelled'];
-const BRANCHES = ['Accra Central', 'East Legon', 'Osu', 'Spintex'];
+const BRANCHES = ['East Legon'];
 const SOURCES = ['whatsapp', 'phone', 'walk-in', 'website'];
 
 const OrdersManager = () => {
@@ -202,11 +202,11 @@ const OrdersManager = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-500/15 text-yellow-400';
-      case 'confirmed': return 'bg-blue-500/15 text-blue-400';
-      case 'preparing': return 'bg-orange-500/15 text-orange-400';
-      case 'delivered': return 'bg-green-500/15 text-green-400';
-      case 'cancelled': return 'bg-red-500/15 text-red-400';
+      case 'pending': return 'bg-[#F59E0B]/15 text-[#F59E0B]';
+      case 'confirmed': return 'bg-[#3B82F6]/15 text-[#3B82F6]';
+      case 'preparing': return 'bg-[#F97316]/15 text-[#F97316]';
+      case 'delivered': return 'bg-[#10B981]/15 text-[#10B981]';
+      case 'cancelled': return 'bg-[#EF4444]/15 text-[#EF4444]';
       default: return 'bg-white/5 text-white/40';
     }
   };
@@ -231,13 +231,13 @@ const OrdersManager = () => {
             <div className="flex bg-white/5 border border-white/10 rounded-xl p-1">
               <button 
                 onClick={() => setActiveTab('WhatsApp')}
-                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'WhatsApp' ? 'bg-[#EC4824] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all font-sans ${activeTab === 'WhatsApp' ? 'bg-[#F97316] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
               >
                 WhatsApp
               </button>
               <button 
                 onClick={() => setActiveTab('Portal')}
-                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'Portal' ? 'bg-[#EC4824] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all font-sans ${activeTab === 'Portal' ? 'bg-[#F97316] text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
               >
                 Portal
               </button>
@@ -246,7 +246,7 @@ const OrdersManager = () => {
           {activeTab === 'WhatsApp' && (
             <button 
               onClick={() => setShowAddModal(true)}
-              className="bg-[#EC4824] hover:bg-[#EC4824]/90 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all transform active:scale-95"
+              className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all transform active:scale-95"
             >
               <HiOutlinePlus size={18} /> Add Order
             </button>
@@ -261,13 +261,13 @@ const OrdersManager = () => {
               placeholder="Search customer or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-brand-orange outline-none transition-all"
+              className="w-full bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-[#F97316] outline-none transition-all font-sans"
             />
           </div>
           <select 
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-brand-orange outline-none"
+            className="bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-[#F97316] outline-none font-sans"
           >
             <option value="All">All Status</option>
             {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
@@ -275,23 +275,23 @@ const OrdersManager = () => {
           <select 
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-brand-orange outline-none"
+            className="bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl px-4 py-2.5 text-sm text-white/60 focus:border-[#F97316] outline-none font-sans"
           >
             <option value="All">All Branches</option>
-            {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+            <option value="East Legon">East Legon</option>
           </select>
           <div className="flex gap-2 lg:col-span-2">
             <div className="relative flex-1">
                <HiOutlineCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
-               <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-2 py-2.5 text-xs text-white/60 focus:border-brand-orange outline-none" />
+                <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl pl-10 pr-2 py-2.5 text-xs text-white/60 focus:border-[#F97316] outline-none font-sans" />
             </div>
             <div className="relative flex-1">
                <HiOutlineCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
-               <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-2 py-2.5 text-xs text-white/60 focus:border-brand-orange outline-none" />
+                <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl pl-10 pr-2 py-2.5 text-xs text-white/60 focus:border-[#F97316] outline-none font-sans" />
             </div>
             <button 
               onClick={exportCSV}
-              className="p-2.5 rounded-xl border border-white/10 text-white/40 hover:text-white hover:bg-white/5 transition-all"
+              className="p-2.5 rounded-xl border border-[#F97316] text-[#F97316] hover:bg-[#F97316]/5 transition-all"
               title="Export CSV"
             >
               <HiOutlineArrowDownTray size={20} />
@@ -303,27 +303,27 @@ const OrdersManager = () => {
       {/* Stats Strip */}
       <div className="flex flex-wrap gap-4">
         {STATUSES.map(status => (
-          <div key={status} className="bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3 flex items-center gap-3 min-w-[140px]">
+          <div key={status} className="bg-[#1a1a1a] border border-[#F97316]/15 rounded-xl px-4 py-3 flex items-center gap-3 min-w-[140px]">
             <div className={`w-2 h-2 rounded-full ${
-              status === 'pending' ? 'bg-yellow-500' : 
-              status === 'confirmed' ? 'bg-blue-500' :
-              status === 'preparing' ? 'bg-orange-500' :
-              status === 'delivered' ? 'bg-green-500' : 'bg-red-500'
+              status === 'pending' ? 'bg-[#F59E0B]' : 
+              status === 'confirmed' ? 'bg-[#3B82F6]' :
+              status === 'preparing' ? 'bg-[#F97316]' :
+              status === 'delivered' ? 'bg-[#10B981]' : 'bg-[#EF4444]'
             }`} />
             <div className="flex flex-col">
-               <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{status}</span>
-               <span className="text-lg font-bold text-white">{stats[status]}</span>
+               <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{status}</span>
+               <span className="text-lg font-bold text-white font-display">{stats[status]}</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Table */}
-      <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-white/5 text-left text-white/20 text-[10px] font-bold uppercase tracking-widest border-b border-white/5">
+              <tr className="bg-white/5 text-left text-white/40 text-[10px] font-bold uppercase tracking-widest border-b border-white/5">
                 <th className="px-8 py-4 w-12">#</th>
                 <th className="px-8 py-4">Customer</th>
                 <th className="px-8 py-4">Branch</th>
@@ -339,15 +339,22 @@ const OrdersManager = () => {
                 <tr><td colSpan="8" className="p-20"><Skeleton count={5} height="40px" /></td></tr>
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="p-20 text-center text-white/20">
-                    <div className="flex justify-center mb-4"><HiOutlineShoppingBag size={64} /></div>
-                    <p className="font-bold">No orders yet</p>
+                  <td colSpan="8" className="p-20 text-center">
+                    <div className="flex justify-center mb-4 text-6xl">🌴</div>
+                    <h3 className="text-2xl font-display font-bold text-white mb-2">No Orders Yet</h3>
+                    <p className="text-white/40 mb-8 max-w-sm mx-auto font-sans">Kokrobite Oasis orders will appear here when customers order.</p>
+                    <button 
+                      onClick={() => setShowAddModal(true)}
+                      className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-2 mx-auto font-sans"
+                    >
+                      <HiOutlinePlus /> Add First Order
+                    </button>
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map((order, idx) => (
-                  <tr key={order.id} className="hover:bg-white/[0.02] transition-colors group cursor-pointer" onClick={() => { setSelectedOrder(order); setShowDetail(true); }}>
-                    <td className="px-8 py-5 text-xs text-white/20 font-bold">
+                  <tr key={order.id} className="hover:bg-white/[0.03] transition-colors group cursor-pointer" onClick={() => { setSelectedOrder(order); setShowDetail(true); }}>
+                    <td className="px-8 py-5 text-xs text-white/40 font-bold">
                       {activeTab === 'WhatsApp' ? (idx + 1) : order.orderNumber.split('-').pop()}
                     </td>
                     <td className="px-8 py-5">
@@ -372,7 +379,7 @@ const OrdersManager = () => {
                     <td className="px-8 py-5 text-[10px] text-white/40 font-medium max-w-[200px] truncate">
                       {order.items.length} {order.items.length === 1 ? 'item' : 'items'} — {order.items.map(i => i.name).join(', ')}
                     </td>
-                    <td className="px-8 py-5 text-sm font-bold text-brand-orange">₵{order.totalAmount}</td>
+                    <td className="px-8 py-5 text-sm font-bold text-[#F97316]">₵{order.totalAmount}</td>
                     <td className="px-8 py-5" onClick={e => e.stopPropagation()}>
                        <select 
                          value={order.status}
@@ -387,8 +394,8 @@ const OrdersManager = () => {
                     </td>
                     <td className="px-8 py-5 text-right" onClick={e => e.stopPropagation()}>
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => { setSelectedOrder(order); setShowDetail(true); }} className="p-2 rounded-lg hover:bg-white/5 text-white/20 hover:text-white transition-all"><HiOutlineEye size={18} /></button>
-                        <button onClick={() => { setDeletingId(order.id); setShowConfirm(true); }} className="p-2 rounded-lg hover:bg-red-500/10 text-white/20 hover:text-red-500 transition-all"><HiOutlineTrash size={18} /></button>
+                        <button onClick={() => { setSelectedOrder(order); setShowDetail(true); }} className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all"><HiOutlineEye size={18} /></button>
+                        <button onClick={() => { setDeletingId(order.id); setShowConfirm(true); }} className="p-2 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-500 transition-all"><HiOutlineTrash size={18} /></button>
                       </div>
                     </td>
                   </tr>
@@ -400,12 +407,18 @@ const OrdersManager = () => {
       </div>
 
       {/* Order Detail Modal */}
-      <Modal isOpen={showDetail} onClose={() => setShowDetail(false)} title={`Order #${selectedOrder?.id?.slice(-6).toUpperCase()}`} size="lg">
+      <Modal 
+        isOpen={showDetail} 
+        onClose={() => setShowDetail(false)} 
+        title={<span className="font-display">Order <span className="text-[#F97316]">#{selectedOrder?.id?.slice(-6).toUpperCase()}</span></span>} 
+        size="lg" 
+        className="bg-[#1a1a1a] border border-[#F97316]/20"
+      >
         {selectedOrder && (
           <div className="space-y-8">
             <div className="flex justify-between items-start">
                <div>
-                 <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Placed On</p>
+                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Placed On</p>
                  <p className="text-white font-medium">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                </div>
                <div className="text-right">
@@ -415,40 +428,40 @@ const OrdersManager = () => {
                </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 p-6 bg-white/5 rounded-2xl border border-white/5">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 p-6 bg-[#1a1a1a] rounded-2xl border border-white/10">
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Customer</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Customer</p>
                 <p className="text-white font-bold">{activeTab === 'WhatsApp' ? selectedOrder.customerName : selectedOrder.customer?.name}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Phone</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Phone</p>
                 <p className="text-white font-bold">{activeTab === 'WhatsApp' ? selectedOrder.customerPhone : selectedOrder.customer?.phone}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Address</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Address</p>
                 <p className="text-white font-bold">{activeTab === 'WhatsApp' ? (selectedOrder.customerAddress || 'N/A') : (selectedOrder.deliveryAddress || 'Pickup')}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Branch</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Branch</p>
                 <p className="text-white font-bold">{selectedOrder.branch || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Source / Type</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Source / Type</p>
                 <div className="flex items-center gap-2 text-white font-bold">
                   {activeTab === 'WhatsApp' ? getSourceIcon(selectedOrder.source) : <HiOutlineGlobeAlt className="text-orange-400" />}
                   <span className="capitalize">{activeTab === 'WhatsApp' ? selectedOrder.source : selectedOrder.type}</span>
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Note</p>
+                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Note</p>
                 <p className="text-white text-xs italic">"{selectedOrder.note || 'No special instructions'}"</p>
               </div>
             </div>
 
             {selectedOrder.latitude && selectedOrder.longitude && (
               <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <HiOutlineGlobeAlt size={16} className="text-brand-orange" /> Delivery Location Map
+                <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2 font-display">
+                  <HiOutlineGlobeAlt size={16} className="text-[#F97316]" /> Delivery Location Map
                 </h4>
                 <div className="w-full h-64 rounded-2xl overflow-hidden border border-white/10 bg-white/5">
                    <iframe 
@@ -464,11 +477,11 @@ const OrdersManager = () => {
             )}
 
             <div>
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">Items Ordered</h4>
-              <div className="bg-white/5 rounded-2xl overflow-hidden">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4 font-display">Items Ordered</h4>
+              <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden border border-white/10">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-white/5 text-left text-white/20 text-[10px] font-bold uppercase tracking-widest">
+                    <tr className="bg-white/5 text-left text-white/40 text-[10px] font-bold uppercase tracking-widest">
                       <th className="px-6 py-3">Item</th>
                       <th className="px-6 py-3 text-center">Qty</th>
                       <th className="px-6 py-3 text-right">Unit</th>
@@ -481,12 +494,12 @@ const OrdersManager = () => {
                         <td className="px-6 py-4 text-white font-medium">{item.name}</td>
                         <td className="px-6 py-4 text-center text-white/60">{item.quantity}</td>
                         <td className="px-6 py-4 text-right text-white/60">₵{item.price}</td>
-                        <td className="px-6 py-4 text-right text-brand-orange font-bold">₵{(item.price * item.quantity).toFixed(2)}</td>
+                        <td className="px-6 py-4 text-right text-[#F97316] font-bold">₵{(item.price * item.quantity).toFixed(2)}</td>
                       </tr>
                     ))}
                     <tr className="bg-white/5">
                       <td colSpan="3" className="px-6 py-4 text-right font-bold text-white/40 uppercase tracking-widest">Total Amount</td>
-                      <td className="px-6 py-4 text-right text-2xl font-display font-bold text-brand-orange">₵{selectedOrder.totalAmount}</td>
+                      <td className="px-6 py-4 text-right text-2xl font-display font-bold text-[#F97316]">₵{selectedOrder.totalAmount}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -497,7 +510,7 @@ const OrdersManager = () => {
             <div>
                <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-8">Status Timeline</h4>
                <div className="flex items-center justify-between px-4 relative">
-                  <div className="absolute left-8 right-8 top-4 h-[2px] bg-white/5 -z-0" />
+                  <div className="absolute left-8 right-8 top-4 h-[2px] bg-white/[0.10] -z-0" />
                   {['pending', 'confirmed', 'preparing', 'delivered'].map((step, idx) => {
                     const steps = ['pending', 'confirmed', 'preparing', 'delivered'];
                     const currentIdx = steps.indexOf(selectedOrder.status);
@@ -507,8 +520,8 @@ const OrdersManager = () => {
                     return (
                       <div key={step} className="flex flex-col items-center gap-3 relative z-10">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
-                          isCompleted ? 'bg-[#EC4824] border-[#EC4824] text-white' : 'bg-[#111] border-white/10 text-white/10'
-                        }`}>
+                          isCompleted ? 'bg-[#F97316] border-[#F97316] text-white' : 'border-white/10 text-white/10'
+                        }`} style={!isCompleted ? { background: 'rgba(255,255,255,0.1)' } : {}}>
                           {isCompleted ? <HiOutlineCheckCircle size={18} /> : (idx + 1)}
                         </div>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isCompleted ? 'text-white' : 'text-white/20'}`}>
@@ -531,22 +544,22 @@ const OrdersManager = () => {
 
             <div className="flex gap-4 pt-4">
                <div className="flex-1 space-y-2">
-                 <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Update Status</label>
+                 <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1 font-sans">Update Status</label>
                  <div className="flex gap-2">
                    <select 
                      value={selectedOrder.status}
                      onChange={(e) => handleStatusChange(selectedOrder.id, e.target.value)}
-                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-orange"
+                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-[#F97316] font-sans"
                    >
                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                    </select>
                  </div>
                </div>
                <a 
-                 href={`https://wa.me/${selectedOrder.customerPhone.replace(/\D/g, '')}?text=Hello ${selectedOrder.customerName}, your Cookers Delight order is now ${selectedOrder.status}!`}
+                 href={`https://wa.me/${(activeTab === 'WhatsApp' ? selectedOrder.customerPhone : selectedOrder.customer?.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hello Kokrobite Oasis! I'd like to order:`)}`}
                  target="_blank"
                  rel="noopener noreferrer"
-                 className="flex-[1.5] bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-3 self-end"
+                 className="flex-[1.5] bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-3 self-end font-sans"
                >
                  <BsWhatsapp size={20} /> Message on WhatsApp
                </a>
@@ -560,48 +573,48 @@ const OrdersManager = () => {
         <form onSubmit={handleAddOrder} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Customer Name</label>
-              <input required value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" />
+              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Customer Name</label>
+              <input required value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Phone Number</label>
-              <input required value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" />
+              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Phone Number</label>
+              <input required value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Delivery Address (Optional)</label>
-            <input value={newOrder.customerAddress} onChange={e => setNewOrder({...newOrder, customerAddress: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange" />
+            <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Delivery Address (Optional)</label>
+            <input value={newOrder.customerAddress} onChange={e => setNewOrder({...newOrder, customerAddress: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
           </div>
 
           <div className="grid grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Branch</label>
-              <select value={newOrder.branch} onChange={e => setNewOrder({...newOrder, branch: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange">
+              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Branch</label>
+              <select value={newOrder.branch} onChange={e => setNewOrder({...newOrder, branch: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans">
                 {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Source</label>
-              <select value={newOrder.source} onChange={e => setNewOrder({...newOrder, source: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange">
+              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Source</label>
+              <select value={newOrder.source} onChange={e => setNewOrder({...newOrder, source: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans">
                 {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Initial Status</label>
-              <select value={newOrder.status} onChange={e => setNewOrder({...newOrder, status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-brand-orange">
+              <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Initial Status</label>
+              <select value={newOrder.status} onChange={e => setNewOrder({...newOrder, status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans">
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
 
           <div className="space-y-4">
-             <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">Items Builder</h4>
+             <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4 font-display">Items Builder</h4>
              <div className="space-y-3">
                 {newOrder.items.map((item, idx) => (
                   <div key={idx} className="flex gap-3 items-end">
                     <div className="flex-1 space-y-1">
-                       <label className="text-[8px] font-bold text-white/20 uppercase">Menu Item</label>
+                       <label className="text-[8px] font-bold text-white/20 uppercase font-sans">Menu Item</label>
                        <select 
                          value={item.menuItem} 
                          onChange={(e) => {
@@ -615,27 +628,27 @@ const OrdersManager = () => {
                            };
                            setNewOrder({...newOrder, items: newItems});
                          }}
-                         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none font-sans"
                        >
                          <option value="">Select Item...</option>
                          {menuItems.map(m => <option key={m.id} value={m.id}>{m.name} ({m.price})</option>)}
                        </select>
                     </div>
                     <div className="w-20 space-y-1">
-                       <label className="text-[8px] font-bold text-white/20 uppercase">Qty</label>
+                       <label className="text-[8px] font-bold text-white/20 uppercase font-sans">Qty</label>
                        <input type="number" min="1" value={item.quantity} onChange={(e) => {
                          const newItems = [...newOrder.items];
                          newItems[idx].quantity = parseInt(e.target.value) || 1;
                          setNewOrder({...newOrder, items: newItems});
-                       }} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                       }} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none font-sans" />
                     </div>
                     <div className="w-24 space-y-1">
-                       <label className="text-[8px] font-bold text-white/20 uppercase">Price (₵)</label>
+                       <label className="text-[8px] font-bold text-white/20 uppercase font-sans">Price (₵)</label>
                        <input type="number" value={item.price} onChange={(e) => {
                          const newItems = [...newOrder.items];
                          newItems[idx].price = parseFloat(e.target.value) || 0;
                          setNewOrder({...newOrder, items: newItems});
-                       }} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                       }} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none font-sans" />
                     </div>
                     <button type="button" onClick={() => setNewOrder({...newOrder, items: newOrder.items.filter((_, i) => i !== idx)})} className="p-2 mb-1 text-white/20 hover:text-red-500"><HiOutlineTrash size={18} /></button>
                   </div>
@@ -644,7 +657,7 @@ const OrdersManager = () => {
              <button 
                type="button"
                onClick={() => setNewOrder({...newOrder, items: [...newOrder.items, { menuItem: "", quantity: 1, price: 0, name: "" }]})}
-               className="text-brand-orange text-[10px] font-bold uppercase tracking-widest hover:underline flex items-center gap-1"
+               className="text-[#F97316] text-[10px] font-bold uppercase tracking-widest hover:underline flex items-center gap-1 font-sans"
              >
                <HiOutlinePlus size={14} /> Add Item
              </button>
@@ -652,14 +665,14 @@ const OrdersManager = () => {
 
           <div className="pt-6 border-t border-white/5 flex justify-between items-center">
              <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Estimated Total</p>
-                <p className="text-3xl font-display font-bold text-brand-orange">
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest font-sans">Estimated Total</p>
+                <p className="text-3xl font-display font-bold text-[#F97316]">
                   ₵{newOrder.items.reduce((sum, i) => sum + (i.price * i.quantity), 0).toFixed(2)}
                 </p>
              </div>
              <div className="flex gap-4">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-8 py-3 rounded-xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all">Cancel</button>
-                <button disabled={saving} type="submit" className="px-8 py-3 rounded-xl bg-[#EC4824] text-white font-bold hover:bg-[#EC4824]/90 transition-all flex items-center gap-2">
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-8 py-3 rounded-xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all font-sans">Cancel</button>
+                <button disabled={saving} type="submit" className="px-8 py-3 rounded-xl bg-[#F97316] text-white font-bold hover:bg-[#F97316]/90 transition-all flex items-center gap-2 font-sans">
                   {saving ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : "Create Order"}
                 </button>
              </div>

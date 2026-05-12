@@ -6,7 +6,8 @@ import {
   HiOutlinePlus, HiOutlineMinus, HiOutlineTrash, HiOutlineCheckCircle,
   HiOutlineRocketLaunch, HiOutlineTruck, HiOutlineBuildingStorefront,
   HiOutlineCurrencyDollar, HiOutlineArrowRight, HiOutlineArrowLeft,
-  HiOutlineStar, HiOutlineMagnifyingGlass, HiOutlineBanknotes, HiOutlineMap
+  HiOutlineStar, HiOutlineMagnifyingGlass, HiOutlineBanknotes, HiOutlineMap,
+  HiOutlineClock
 } from 'react-icons/hi2';
 import { toast } from 'react-hot-toast';
 import { getImgUrl } from '../../utils/image';
@@ -27,7 +28,7 @@ const PlaceOrder = () => {
   // Cart State
   const [cart, setCart] = useState([]);
   
-  // Order Details
+  // Kokrobite Oasis Order Details
   const [orderType, setOrderType] = useState('delivery'); // delivery | pickup
   const [deliveryAddress, setDeliveryAddress] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -68,11 +69,8 @@ const PlaceOrder = () => {
         ]);
         setMenu(menuRes.data);
         setBranches(branchRes.data);
-        const cats = ['All', ...new Set(menuRes.data.map(item => {
-          const c = item.category?.trim();
-          return c ? c.charAt(0).toUpperCase() + c.slice(1).toLowerCase() : 'Other';
-        }))];
-        setCategories(cats);
+        const fixedCats = ['All', 'Brunch', 'Cocktails', 'Mocktails', 'Platters', 'Pitchers', 'Juices', 'Kissed by Fire', 'Sides', 'Pizza', 'Burgers & Wraps', 'Shots', 'Slushys', 'Beers & Ciders', 'Soft Drinks'];
+        setCategories(fixedCats);
       } catch (err) {
         toast.error('Failed to load menu items');
       }
@@ -93,7 +91,7 @@ const PlaceOrder = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }, [cart]);
 
-  const deliveryFee = orderType === 'delivery' ? 15 : 0;
+  const deliveryFee = orderType === 'delivery' ? 30 : 0;
   const total = subtotal + deliveryFee;
   const pointsToEarn = Math.floor(total / 10);
 
@@ -145,6 +143,17 @@ const PlaceOrder = () => {
       };
       
       const res = await api.post('/customers/orders', payload);
+      
+      // WhatsApp Redirect
+      const message = `Hello Kokrobite Oasis! I'd like to order:\n\n` + 
+        cart.map(i => `- ${i.quantity}x ${i.name}`).join('\n') + 
+        `\n\nTotal: GHC ${total}\nType: ${orderType}\nPayment: ${paymentMethod}`;
+      
+      const whatsappUrl = `https://wa.me/233243379412?text=${encodeURIComponent(message)}`;
+      if (paymentMethod === 'momo') {
+        window.open(whatsappUrl, '_blank');
+      }
+
       setStep(4); // Success screen
       setCart([]);
       refreshCustomer();
@@ -178,7 +187,7 @@ const PlaceOrder = () => {
           <div className="flex items-center justify-between max-w-2xl mx-auto relative px-4 sm:px-12">
             {/* Connector Lines */}
             <div className="absolute left-[15%] right-[15%] top-1/2 -translate-y-1/2 h-1 bg-white/5 z-0">
-               <div className="h-full bg-brand-orange transition-all duration-500" style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }} />
+               <div className="h-full bg-[#F97316] transition-all duration-500" style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }} />
             </div>
             
             {[
@@ -188,9 +197,9 @@ const PlaceOrder = () => {
             ].map(s => (
               <div key={s.n} className="flex flex-col items-center gap-3 relative z-10">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                  step === s.n ? 'bg-brand-orange text-white shadow-xl shadow-brand-orange/30 scale-110' :
-                  step > s.n ? 'bg-green-500 text-white' : 'bg-[#1a1a1a] text-white/40 border border-white/10'
-                }`}>
+                  step === s.n ? 'bg-[#F97316] text-white shadow-xl shadow-[#F97316]/30 scale-110' :
+                  step > s.n ? 'bg-[#1C0A00] text-white' : 'bg-white/5 text-white/40 border border-white/10'
+                }`} style={step < s.n ? { background: 'rgba(255,255,255,0.20)' } : {}}>
                   {step > s.n ? <HiOutlineCheckCircle size={24} /> : <s.icon size={24} />}
                 </div>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${step >= s.n ? 'text-white' : 'text-white/20'}`}>
@@ -225,8 +234,8 @@ const PlaceOrder = () => {
                         <button 
                           key={cat}
                           onClick={() => setActiveCategory(cat)}
-                          className={`px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
-                            activeCategory === cat ? 'bg-brand-orange text-white shadow-lg' : 'bg-white/5 text-white/40 hover:text-white'
+                          className={`px-6 py-2.5 rounded-xl font-sans transition-all whitespace-nowrap ${
+                            activeCategory === cat ? 'bg-[#F97316] text-white shadow-lg' : 'bg-white/5 text-white/40 hover:text-white'
                           }`}
                         >
                           {cat}
@@ -240,14 +249,14 @@ const PlaceOrder = () => {
                         placeholder="Search menu..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full bg-[#141414] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-brand-orange transition-all"
+                        className="w-full bg-[#0C0A09] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-[#F97316] transition-all font-sans"
                       />
                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                    {filteredMenu.map(item => (
-                     <div key={item.id} className={`bg-[#141414] border-2 rounded-[2rem] overflow-hidden transition-all group ${getItemQuantity(item.id) > 0 ? 'border-brand-orange' : 'border-white/5'}`}>
+                     <div key={item.id} className={`bg-[#0C0A09] border-2 rounded-[2rem] overflow-hidden transition-all group ${getItemQuantity(item.id) > 0 ? 'border-[#F97316]' : 'border-white/5'}`}>
                          <div className="h-48 relative overflow-hidden bg-white/5">
                             <img 
                               src={item.image ? getImgUrl(item.image) : '/assets/placeholder.jpg'} 
@@ -265,15 +274,15 @@ const PlaceOrder = () => {
                            
                            <div className="flex items-center justify-between">
                               {getItemQuantity(item.id) > 0 ? (
-                                <div className="flex items-center gap-4 bg-brand-orange/10 rounded-2xl p-1 px-2 border border-brand-orange/20">
-                                   <button onClick={() => removeFromCart(item.id)} className="w-8 h-8 bg-brand-orange rounded-xl flex items-center justify-center text-white"><HiOutlineMinus /></button>
-                                   <span className="font-black text-brand-orange">{getItemQuantity(item.id)}</span>
-                                   <button onClick={() => addToCart(item)} className="w-8 h-8 bg-brand-orange rounded-xl flex items-center justify-center text-white"><HiOutlinePlus /></button>
+                                <div className="flex items-center gap-4 bg-[#F97316]/10 rounded-2xl p-1 px-2 border border-[#F97316]/20">
+                                   <button onClick={() => removeFromCart(item.id)} className="w-8 h-8 bg-[#F97316] rounded-xl flex items-center justify-center text-white"><HiOutlineMinus /></button>
+                                   <span className="font-bold text-[#F97316] font-sans">{getItemQuantity(item.id)}</span>
+                                   <button onClick={() => addToCart(item)} className="w-8 h-8 bg-[#F97316] rounded-xl flex items-center justify-center text-white"><HiOutlinePlus /></button>
                                 </div>
                               ) : (
                                 <button 
                                   onClick={() => addToCart(item)}
-                                  className="w-full bg-white/5 hover:bg-brand-orange py-3 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                                  className="w-full bg-white/5 hover:bg-[#F97316] py-3 rounded-2xl text-white font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 font-sans"
                                 >
                                   <HiOutlinePlus size={16} /> ADD TO ORDER
                                 </button>
@@ -295,7 +304,7 @@ const PlaceOrder = () => {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-8"
               >
-                <div className="flex bg-[#141414] border border-white/5 p-1.5 rounded-2xl w-full sm:w-max">
+                <div className="flex bg-[#0C0A09] border border-white/5 p-1.5 rounded-2xl w-full sm:w-max">
                    {[
                      { id: 'delivery', label: 'Delivery', icon: HiOutlineTruck },
                      { id: 'pickup', label: 'Pickup', icon: HiOutlineBuildingStorefront }
@@ -303,8 +312,8 @@ const PlaceOrder = () => {
                      <button 
                         key={t.id}
                         onClick={() => setOrderType(t.id)}
-                        className={`flex items-center gap-3 px-8 py-3 rounded-xl font-bold text-sm transition-all ${
-                          orderType === t.id ? 'bg-brand-orange text-white shadow-lg' : 'text-white/40 hover:text-white'
+                        className={`flex items-center gap-3 px-8 py-3 rounded-xl font-bold text-sm transition-all font-sans ${
+                          orderType === t.id ? 'bg-[#F97316] text-white shadow-lg' : 'text-white/40 hover:text-white'
                         }`}
                      >
                        <t.icon size={20} /> {t.label}
@@ -314,22 +323,22 @@ const PlaceOrder = () => {
 
                 {orderType === 'delivery' ? (
                   <div className="space-y-6">
-                     <h3 className="text-xl font-black text-white uppercase">Delivery Address</h3>
+                     <h3 className="text-xl font-display font-bold text-white uppercase">Delivery Address</h3>
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {customer?.addresses?.map(addr => (
                           <div 
                             key={addr.id} 
                             onClick={() => setDeliveryAddress(addr)}
-                            className={`p-6 bg-[#141414] rounded-2xl border-2 transition-all cursor-pointer relative group ${
-                              deliveryAddress?.id === addr.id ? 'border-brand-orange shadow-lg shadow-brand-orange/10' : 'border-white/5 hover:border-white/10'
+                            className={`p-6 bg-[#0C0A09] rounded-2xl border-2 transition-all cursor-pointer relative group ${
+                              deliveryAddress?.id === addr.id ? 'border-[#F97316] shadow-lg shadow-[#F97316]/10' : 'border-white/5 hover:border-white/10'
                             }`}
                           >
                              <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${deliveryAddress?.id === addr.id ? 'bg-brand-orange text-white' : 'bg-white/5 text-white/40'}`}>
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${deliveryAddress?.id === addr.id ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
                                    <HiOutlineMapPin size={18} />
                                 </div>
-                                <span className="font-bold text-sm">{addr.label}</span>
-                                {deliveryAddress?.id === addr.id && <HiOutlineCheckCircle className="ml-auto text-brand-orange" size={20} />}
+                                <span className="font-bold text-sm font-sans">{addr.label}</span>
+                                {deliveryAddress?.id === addr.id && <HiOutlineCheckCircle className="ml-auto text-[#F97316]" size={20} />}
                              </div>
                              <p className="text-xs text-white/40 leading-relaxed">{addr.address}, {addr.area}</p>
                           </div>
@@ -339,44 +348,55 @@ const PlaceOrder = () => {
                           className="p-6 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-3 text-white/40 hover:text-white hover:border-white/20 transition-all"
                         >
                            <HiOutlinePlus size={32} />
-                           <span className="font-bold text-xs uppercase tracking-widest">Add New Address</span>
+                           <span className="font-sans">Add New Address</span>
                         </button>
                      </div>
                   </div>
                 ) : (
                   <div className="space-y-6">
                      <h3 className="text-xl font-black text-white uppercase">Select Branch</h3>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {branches.map(branch => (
-                          <div 
-                            key={branch.id} 
-                            onClick={() => branch.isOpen && setSelectedBranch(branch)}
-                            className={`p-6 bg-[#141414] rounded-2xl border-2 transition-all relative ${
-                              !branch.isOpen ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer group'
-                            } ${
-                              selectedBranch?.id === branch.id ? 'border-brand-orange shadow-lg shadow-brand-orange/10' : 'border-white/5 hover:border-white/10'
-                            }`}
-                          >
-                             <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedBranch?.id === branch.id ? 'bg-brand-orange text-white' : 'bg-white/5 text-white/40'}`}>
-                                   <HiOutlineBuildingStorefront size={18} />
+                     <div className="grid grid-cols-1 gap-4">
+                        {[
+                          { id: 'el-1', name: 'East Legon', area: 'East Legon, Accra', landmark: 'Near the Police Station', hours: 'Tuesday–Sunday: 11AM – 11PM', monday: 'Closed' }
+                        ].map(branch => {
+                          const isMonday = new Date().getDay() === 1;
+                          return (
+                            <div 
+                              key={branch.id} 
+                              onClick={() => !isMonday && setSelectedBranch(branch)}
+                              className={`p-6 bg-[#0C0A09] rounded-2xl border-2 transition-all relative ${
+                                isMonday ? 'opacity-50 cursor-not-allowed border-red-500/50' : 'cursor-pointer group hover:border-white/10'
+                              } ${
+                                selectedBranch?.id === branch.id ? 'border-[#F97316] shadow-lg shadow-[#F97316]/10' : 'border-white/5'
+                              }`}
+                            >
+                               <div className="flex items-center gap-3 mb-4">
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedBranch?.id === branch.id ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
+                                     <HiOutlineBuildingStorefront size={20} />
+                                  </div>
+                                  <div>
+                                     <span className="font-display font-bold text-lg block">{branch.name}</span>
+                                     <span className="text-xs text-white/40 font-sans">{branch.area}</span>
+                                  </div>
+                                  {isMonday ? (
+                                     <span className="ml-auto text-[10px] bg-red-500/20 text-red-400 px-3 py-1 rounded-full uppercase font-bold font-sans">Closed (Monday)</span>
+                                  ) : (
+                                     <span className="ml-auto text-[10px] bg-green-500/20 text-green-400 px-3 py-1 rounded-full uppercase font-bold font-sans">Open Now</span>
+                                  )}
+                               </div>
+                               <div className="space-y-2 text-xs text-white/60 font-sans">
+                                  <p className="flex items-center gap-2"><HiOutlineMapPin size={14} className="text-[#F97316]" /> {branch.landmark}</p>
+                                  <p className="flex items-center gap-2"><HiOutlineClock size={14} className="text-[#F97316]" /> {branch.hours}</p>
                                 </div>
-                                <span className="font-bold text-sm">{branch.name}</span>
-                                {branch.isOpen ? (
-                                   <span className="ml-auto text-[8px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full uppercase font-bold">Open</span>
-                                ) : (
-                                   <span className="ml-auto text-[8px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full uppercase font-bold">Closed</span>
-                                )}
-                             </div>
-                             <p className="text-xs text-white/40">{branch.area}</p>
-                          </div>
-                        ))}
+                            </div>
+                          );
+                        })}
                      </div>
                   </div>
                 )}
 
-                <div className="space-y-6">
-                   <h3 className="text-xl font-black text-white uppercase">Payment Method</h3>
+                 <div className="space-y-6">
+                   <h3 className="text-xl font-display font-bold text-white uppercase">Payment Method</h3>
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
                         { id: 'cash', label: orderType === 'delivery' ? 'Cash on Delivery' : 'Pay at Branch', icon: HiOutlineBanknotes },
@@ -385,21 +405,24 @@ const PlaceOrder = () => {
                         <div 
                           key={p.id}
                           onClick={() => setPaymentMethod(p.id)}
-                          className={`p-6 bg-[#141414] rounded-2xl border-2 transition-all cursor-pointer group flex items-center gap-4 ${
-                            paymentMethod === p.id ? 'border-brand-orange' : 'border-white/5'
+                          className={`p-6 bg-[#0C0A09] rounded-2xl border-2 transition-all cursor-pointer group flex items-center gap-4 ${
+                            paymentMethod === p.id ? 'border-[#F97316]' : 'border-white/5'
                           }`}
                         >
-                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === p.id ? 'bg-brand-orange text-white' : 'bg-white/5 text-white/40'}`}>
+                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === p.id ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
                               <p.icon size={22} />
                            </div>
                            <div>
-                              <p className="font-bold text-sm">{p.label}</p>
-                              {p.id === 'momo' && <p className="text-[10px] text-brand-orange font-bold uppercase mt-0.5">Pay to: 0243379412</p>}
+                              <p className="font-bold text-sm font-sans">{p.label}</p>
+                              {p.id === 'momo' && <p className="text-[10px] text-[#F97316] font-bold uppercase mt-0.5 font-sans">Pay to: 0243379412</p>}
                            </div>
-                           {paymentMethod === p.id && <HiOutlineCheckCircle className="ml-auto text-brand-orange" size={20} />}
+                           {paymentMethod === p.id && <HiOutlineCheckCircle className="ml-auto text-[#F97316]" size={20} />}
                         </div>
                       ))}
                    </div>
+                   <p className="text-[10px] text-white/40 font-medium italic mt-2 ml-1">
+                     "Note: A 10% service charge applies to all dine-in orders"
+                   </p>
                 </div>
 
                 <div className="space-y-4">
@@ -408,7 +431,7 @@ const PlaceOrder = () => {
                      placeholder="Any allergies or special requests? (Optional)"
                      value={note}
                      onChange={e => setNote(e.target.value)}
-                     className="w-full bg-[#141414] border border-white/5 rounded-2xl p-6 text-sm text-white focus:border-brand-orange transition-all min-h-[120px] outline-none"
+                     className="w-full bg-[#0C0A09] border border-white/5 rounded-2xl p-6 text-sm text-white focus:border-[#F97316] transition-all min-h-[120px] outline-none font-sans"
                    />
                 </div>
               </motion.div>
@@ -423,20 +446,20 @@ const PlaceOrder = () => {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-8"
               >
-                <div className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
+                <div className="bg-[#0C0A09] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
                    <div className="flex justify-between items-center pb-6 border-b border-white/5">
-                      <h3 className="text-2xl font-black text-white tracking-tight uppercase">Order Summary</h3>
-                      <button onClick={() => setStep(1)} className="text-brand-orange text-xs font-bold uppercase hover:underline">Edit Items</button>
+                      <h3 className="text-2xl font-display font-bold text-white tracking-tight uppercase">Order Summary</h3>
+                      <button onClick={() => setStep(1)} className="text-[#F97316] text-xs font-bold uppercase hover:underline font-sans">Edit Items</button>
                    </div>
 
                    <div className="space-y-4">
                       {cart.map(item => (
                         <div key={item.id} className="flex justify-between items-center text-sm">
                            <div className="flex items-center gap-3">
-                              <span className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-xs font-black text-brand-orange">{item.quantity}x</span>
-                              <span className="font-bold text-white/80">{item.name}</span>
+                              <span className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-xs font-bold text-[#F97316] font-sans">{item.quantity}x</span>
+                              <span className="font-bold text-white/80 font-sans">{item.name}</span>
                            </div>
-                           <span className="font-bold text-white">₵{item.price * item.quantity}</span>
+                           <span className="font-bold text-white font-sans">₵{item.price * item.quantity}</span>
                         </div>
                       ))}
                    </div>
@@ -484,7 +507,7 @@ const PlaceOrder = () => {
                    <button 
                      onClick={handlePlaceOrder}
                      disabled={loading}
-                     className="flex-[2] bg-brand-orange hover:bg-brand-orange/90 text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                     className="flex-[2] bg-[#F97316] hover:bg-[#F97316]/90 text-white font-bold py-4 rounded-2xl shadow-xl shadow-[#F97316]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 font-sans"
                    >
                       {loading ? 'PROCESSING...' : (
                         <>
@@ -509,20 +532,21 @@ const PlaceOrder = () => {
                    <HiOutlineRocketLaunch size={48} />
                 </div>
                 <div>
-                   <h2 className="text-4xl font-black text-white tracking-tight uppercase mb-2">ORDER PLACED!</h2>
-                   <p className="text-white/40 font-medium italic">"Mouthwatering food is on its way to you."</p>
+                   <h2 className="text-4xl font-black text-white tracking-tight uppercase mb-2">Order Placed! 🌴</h2>
+                   <p className="text-white/40 font-medium italic">"Your Kokrobite Oasis order is confirmed"</p>
                 </div>
                 
-                <div className="bg-[#141414] border border-white/5 rounded-[2rem] p-8 space-y-4">
-                   <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Estimated Delivery Time</p>
-                   <p className="text-3xl font-black text-brand-orange">{orderType === 'delivery' ? '45 MINS' : '20 MINS'}</p>
-                   <p className="text-xs text-white/20">We'll notify you as soon as the kitchen starts preparing!</p>
+                <div className="bg-[#0C0A09] border border-white/5 rounded-[2rem] p-8 space-y-4">
+                   <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-sans">Estimated Delivery Time</p>
+                   <p className="text-3xl font-display font-bold text-[#F97316]">{orderType === 'delivery' ? '45 MINS' : '20 MINS'}</p>
+                   <p className="text-xs text-white/20 font-sans">We'll notify you as soon as the kitchen starts preparing!</p>
                 </div>
 
                 <div className="flex flex-col gap-4">
                    <button 
                      onClick={() => navigate('/portal/orders')}
-                     className="w-full bg-brand-orange text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 hover:scale-105 transition-all"
+                     className="w-full text-white font-black py-4 rounded-2xl shadow-xl transition-all"
+                     style={{ background: '#F97316', shadowColor: 'rgba(249,115,22,0.20)' }}
                    >
                      TRACK MY ORDER
                    </button>
@@ -543,9 +567,12 @@ const PlaceOrder = () => {
         {/* Right Column: Order Summary / Cart */}
         {step < 4 && (
           <div className="lg:col-span-4">
-            <div className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 sticky top-24">
-              <h3 className="text-lg font-black text-white mb-8 flex items-center gap-3">
-                <HiOutlineShoppingBag className="text-brand-orange" />
+            <div 
+              className="rounded-[2.5rem] p-8 sticky top-24"
+              style={{ background: '#1C0A00', border: '1px solid rgba(249,115,22,0.20)' }}
+            >
+              <h3 className="text-lg font-display font-bold text-white mb-8 flex items-center gap-3">
+                <HiOutlineShoppingBag className="text-[#F97316]" />
                 MY ORDER
               </h3>
 
@@ -585,7 +612,7 @@ const PlaceOrder = () => {
                  </div>
                  <div className="flex justify-between text-lg font-black uppercase tracking-tight pt-2">
                     <span className="text-white/60">Total</span>
-                    <span className="text-brand-orange font-black">₵{total}</span>
+                    <span className="font-black" style={{ color: '#F97316' }}>₵{total}</span>
                  </div>
               </div>
 
@@ -593,7 +620,8 @@ const PlaceOrder = () => {
                 <button 
                   disabled={cart.length === 0}
                   onClick={() => setStep(2)}
-                  className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 transition-all mt-8 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                  className="w-full text-white font-black py-4 rounded-2xl shadow-xl transition-all mt-8 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)', shadowColor: 'rgba(249,115,22,0.20)' }}
                 >
                   CONTINUE TO DELIVERY
                   <HiOutlineArrowRight />
@@ -603,7 +631,8 @@ const PlaceOrder = () => {
                 <button 
                   disabled={orderType === 'delivery' ? !deliveryAddress : !selectedBranch}
                   onClick={() => setStep(3)}
-                  className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 transition-all mt-8 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                  className="w-full text-white font-black py-4 rounded-2xl shadow-xl transition-all mt-8 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)', shadowColor: 'rgba(249,115,22,0.20)' }}
                 >
                   REVIEW ORDER
                   <HiOutlineArrowRight />
@@ -628,7 +657,7 @@ const PlaceOrder = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-[#141414] border border-white/10 rounded-[2.5rem] p-8 space-y-6"
+              className="relative w-full max-w-lg bg-[#0C0A09] border border-white/10 rounded-[2.5rem] p-8 space-y-6"
             >
                <h3 className="text-xl font-black text-white uppercase">Add New Address</h3>
                
@@ -639,7 +668,7 @@ const PlaceOrder = () => {
                         key={l}
                         onClick={() => setNewAddress({...newAddress, label: l})}
                         className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                          newAddress.label === l ? 'bg-brand-orange border-brand-orange text-white' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'
+                          newAddress.label === l ? 'bg-[#F97316] border-[#F97316] text-white' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'
                         }`}
                        >
                          {l}
@@ -653,7 +682,7 @@ const PlaceOrder = () => {
                         value={newAddress.address}
                         onChange={e => setNewAddress({...newAddress, address: e.target.value})}
                         placeholder="House number, street name..."
-                        className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-brand-orange outline-none transition-all"
+                        className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-[#F97316] outline-none transition-all"
                      />
                   </div>
 
@@ -665,7 +694,7 @@ const PlaceOrder = () => {
                           value={newAddress.area}
                           onChange={e => setNewAddress({...newAddress, area: e.target.value})}
                           placeholder="e.g. East Legon"
-                          className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-brand-orange outline-none transition-all"
+                          className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-[#F97316] outline-none transition-all"
                        />
                     </div>
                     <div className="space-y-2">
@@ -675,7 +704,7 @@ const PlaceOrder = () => {
                           value={newAddress.landmark}
                           onChange={e => setNewAddress({...newAddress, landmark: e.target.value})}
                           placeholder="e.g. Near KFC"
-                          className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-brand-orange outline-none transition-all"
+                          className="w-full bg-black/30 border border-white/5 rounded-xl p-4 text-sm focus:border-[#F97316] outline-none transition-all"
                        />
                     </div>
                   </div>
@@ -683,7 +712,7 @@ const PlaceOrder = () => {
                   <div className="pt-2">
                      <button 
                         onClick={detectLocation}
-                        className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-orange font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
+                        className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-[#F97316] font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
                      >
                         <HiOutlineMap size={18} />
                         {newAddress.latitude ? "Update Location" : "Detect My Location"}
@@ -691,7 +720,7 @@ const PlaceOrder = () => {
                   </div>
 
                   {newAddress.latitude && newAddress.longitude && (
-                     <div className="w-full h-32 rounded-xl overflow-hidden border border-brand-orange/30">
+                     <div className="w-full h-32 rounded-xl overflow-hidden border border-[#F97316]/30">
                         <iframe 
                            width="100%" 
                            height="100%" 
@@ -706,7 +735,7 @@ const PlaceOrder = () => {
 
                <div className="flex gap-4 pt-4">
                   <button onClick={() => setShowAddressForm(false)} className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-white/40 hover:text-white">Cancel</button>
-                  <button onClick={saveNewAddress} className="flex-1 bg-brand-orange text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20">SAVE ADDRESS</button>
+                  <button onClick={saveNewAddress} className="flex-1 bg-[#F97316] text-white font-black py-4 rounded-2xl shadow-xl shadow-[#F97316]/20">SAVE ADDRESS</button>
                </div>
             </motion.div>
           </div>

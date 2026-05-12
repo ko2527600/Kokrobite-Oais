@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CD Boat — Offline</title>
+  <title>KO Eats — Offline</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #111;
+      background: #1C0A00;
       color: white;
-      font-family: sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -20,18 +20,18 @@
       padding: 24px;
     }
     .emoji { font-size: 64px; }
-    h1 { 
-      font-size: 28px; 
+    h1 {
+      font-size: 28px;
       font-weight: 700;
-      color: #EC4824;
+      color: #F97316;
     }
     p { color: rgba(255,255,255,0.5); font-size: 15px; }
     button {
-      background: #EC4824;
+      background: #F97316;
       color: white;
       border: none;
       padding: 14px 32px;
-      border-radius: 4px;
+      border-radius: 8px;
       font-size: 14px;
       font-weight: 700;
       letter-spacing: .1em;
@@ -39,13 +39,14 @@
       cursor: pointer;
       margin-top: 8px;
     }
+    button:hover { background: #FB923C; }
   </style>
 </head>
 <body>
-  <div class="emoji">🍽️</div>
+  <div class="emoji">🌊</div>
   <h1>You're Offline</h1>
   <p>Please check your connection.<br/>
-     Your last orders are still available.</p>
+     Kokrobite Oasis vibes await you.</p>
   <button onclick="window.location.reload()">
     Try Again
   </button>

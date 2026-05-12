@@ -1,7 +1,7 @@
-# Project Status Report: Cookers Delight 🥘
+﻿# Project Status Report: Kokrobite Oasis 🥘
 
 ## 1. Project Overview
-Cookers Delight is a premium restaurant platform featuring a high-performance public website and a robust administrative dashboard. The project has recently undergone a major infrastructure upgrade, migrating from a legacy MongoDB setup to a modern, type-safe **Prisma + PostgreSQL** architecture.
+Kokrobite Oasis is a premium restaurant platform featuring a high-performance public website and a robust administrative dashboard. The project has recently undergone a major infrastructure upgrade, migrating from a legacy MongoDB setup to a modern, type-safe **Prisma + PostgreSQL** architecture.
 
 ---
 

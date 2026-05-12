@@ -78,14 +78,14 @@ define(['./workbox-8d0d8005'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "/index.html",
-    "revision": "0.ahrtl4aalpg"
+    "revision": "0.9au3hhq11d8"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/index.html"), {
     allowlist: [/^\/$/],
     denylist: [/^\/api/, /^\/uploads/]
   }));
-  workbox.registerRoute(/^http:\/\/localhost:5000\/api\/.*/i, new workbox.NetworkFirst({
+  workbox.registerRoute(/^https?:\/\/(localhost:5000|kokrobite-oasis-api\.onrender\.com)\/api\/.*/i, new workbox.NetworkFirst({
     "cacheName": "api-cache",
     "networkTimeoutSeconds": 10,
     plugins: [new workbox.ExpirationPlugin({

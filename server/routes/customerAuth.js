@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -37,7 +37,7 @@ router.post("/register", async (req, res) => {
       data: {
         customerId: customer.id,
         type: "welcome",
-        title: "Welcome to Cookers Delight! 🎉",
+        title: "Welcome to Kokrobite Oasis! 🎉",
         message: "You've earned 50 welcome loyalty points. Start ordering to earn more!",
         read: false
       }
@@ -60,7 +60,7 @@ router.post("/register", async (req, res) => {
       { expiresIn: "30d" }
     );
 
-    res.cookie("cd_customer_token", token, {
+    res.cookie("ko_customer_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -110,7 +110,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: tokenExpiry }
     );
 
-    res.cookie("cd_customer_token", token, {
+    res.cookie("ko_customer_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -179,7 +179,7 @@ router.post("/google", async (req, res) => {
         data: {
           customerId: customer.id,
           type: "welcome",
-          title: "Welcome to Cookers Delight! 🎉",
+          title: "Welcome to Kokrobite Oasis! 🎉",
           message: "You've earned 50 welcome loyalty points. Start ordering to earn more!",
           read: false
         }
@@ -202,7 +202,7 @@ router.post("/google", async (req, res) => {
       { expiresIn: "30d" }
     );
 
-    res.cookie("cd_customer_token", token, {
+    res.cookie("ko_customer_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -219,7 +219,7 @@ router.post("/google", async (req, res) => {
 // @desc    Logout customer & clear cookie
 // @access  Public
 router.post("/logout", (req, res) => {
-  res.clearCookie("cd_customer_token", {
+  res.clearCookie("ko_customer_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"

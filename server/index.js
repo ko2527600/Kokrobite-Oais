@@ -1,4 +1,4 @@
-import dotenv from "dotenv"
+﻿import dotenv from "dotenv"
 dotenv.config()
 import express from "express"
 import cors from "cors"
@@ -110,7 +110,7 @@ app.use("/api/admin/feedback", adminFeedbackRoutes)
 // ─── ROOT ───
 app.get("/", (req, res) => {
   res.json({ 
-    message: "Cookers Delight API is running 🍽️",
+    message: "Kokrobite Oasis API is running 🍽️",
     version: "1.0.0",
     status: "ok"
   })

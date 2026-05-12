@@ -52,8 +52,7 @@ const MyReviews = () => {
     setSubmitting(true);
     try {
       await api.post('/customers/reviews', formData);
-      toast.success('Review submitted! It will appear once approved by admin.');
-      toast('You will earn 10 points when approved! ⭐', { icon: '🎁' });
+      toast.success('Review submitted! 🌴 You earned 10 Oasis Points');
       setShowModal(false);
       fetchData();
     } catch (err) {
@@ -80,12 +79,13 @@ const MyReviews = () => {
       {/* Header */}
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">My Reviews</h2>
-          <p className="text-white/40 text-sm font-medium mt-1">Share your experience and earn loyalty points.</p>
+          <h2 className="text-3xl font-display font-bold text-white tracking-tight uppercase">My Reviews</h2>
+          <p className="text-white/40 text-sm font-sans font-medium mt-1">Share your experience and earn loyalty points.</p>
         </div>
         <button 
           onClick={() => setShowModal(true)}
-          className="bg-brand-orange text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-brand-orange/20"
+          className="text-white px-8 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-[#F97316]/20"
+          style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
         >
            <HiOutlinePlus size={20} /> Write a Review
         </button>
@@ -97,20 +97,20 @@ const MyReviews = () => {
           <motion.div 
             key={review.id}
             layout
-            className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 space-y-6 relative group hover:bg-white/[0.02] transition-all"
+            className="bg-[#0C0A09] border border-white/5 rounded-[2.5rem] p-8 space-y-6 relative group hover:bg-white/[0.02] transition-all"
           >
              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-1 text-yellow-400">
+                <div className="flex items-center gap-1">
                    {[...Array(5)].map((_, i) => (
-                      <HiStar key={i} size={18} className={i < review.rating ? 'text-yellow-400' : 'text-white/10'} />
+                      <HiStar key={i} size={18} className={i < review.rating ? 'text-[#F97316]' : 'text-white/10'} />
                    ))}
                 </div>
                 {review.status === 'approved' ? (
-                   <span className="flex items-center gap-1.5 text-[8px] bg-green-500/10 text-green-400 px-3 py-1 rounded-full font-black uppercase tracking-[0.2em]">
+                   <span className="flex items-center gap-1.5 text-[8px] bg-[#F97316]/20 text-[#F97316] px-3 py-1 rounded-full font-black uppercase tracking-[0.2em] shadow-sm">
                       <HiOutlineCheckCircle /> Published
                    </span>
                 ) : (
-                   <span className="flex items-center gap-1.5 text-[8px] bg-yellow-500/10 text-yellow-400 px-3 py-1 rounded-full font-black uppercase tracking-[0.2em]">
+                   <span className="flex items-center gap-1.5 text-[8px] bg-white/5 text-white/40 px-3 py-1 rounded-full font-black uppercase tracking-[0.2em]">
                       <HiOutlineClock /> Pending Approval
                    </span>
                 )}
@@ -118,7 +118,7 @@ const MyReviews = () => {
 
              <div className="space-y-4">
                 <div>
-                   <p className="text-xs font-black text-brand-orange uppercase tracking-widest mb-1">{review.menuItem?.name || 'General Experience'}</p>
+                   <p className="text-xs font-bold text-[#F97316] uppercase tracking-widest mb-1">{review.menuItem?.name || 'General Experience'}</p>
                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">{review.branch?.name || 'Any Branch'}</p>
                 </div>
                 <p className="text-sm text-white/60 leading-relaxed italic">"{review.comment}"</p>
@@ -132,14 +132,17 @@ const MyReviews = () => {
              </div>
           </motion.div>
         )) : (
-          <div className="col-span-full bg-[#141414] border border-white/5 p-24 rounded-[3rem] text-center space-y-6">
-             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10">
-                <HiOutlineChatBubbleLeftEllipsis size={40} />
+          <div className="col-span-full bg-[#0C0A09] border border-white/5 p-24 rounded-[3rem] text-center space-y-6">
+             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10 text-4xl">
+                ⭐
              </div>
              <div>
-                <p className="text-white/40 font-bold max-w-xs mx-auto mb-6">You haven't shared any reviews yet. Every review helps us grow and earns you 10 points!</p>
-                <button onClick={() => setShowModal(true)} className="text-brand-orange font-bold text-xs hover:underline uppercase tracking-widest">Share your first review</button>
+                <h3 className="text-xl font-display font-bold text-white mb-2">No Reviews Yet</h3>
+                <p className="text-white/40 text-sm max-w-xs mx-auto font-sans">Share your Kokrobite Oasis experience with others</p>
              </div>
+             <button onClick={() => setShowModal(true)} className="inline-flex bg-[#F97316] text-white font-black px-8 py-3 rounded-xl text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-[#F97316]/20">
+                + Write Your First Review
+             </button>
           </div>
         )}
       </div>
@@ -157,9 +160,9 @@ const MyReviews = () => {
                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-               className="relative w-full max-w-xl bg-[#141414] border border-white/10 rounded-[3rem] p-10 overflow-hidden"
+               className="relative w-full max-w-xl bg-[#0C0A09] border border-white/10 rounded-[3rem] p-10 overflow-hidden"
              >
-                <h3 className="text-2xl font-black text-white uppercase mb-8">Share Your Experience</h3>
+                <h3 className="text-2xl font-display font-bold text-white uppercase mb-8">Share Your Experience</h3>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                    <div className="grid grid-cols-2 gap-4">
@@ -169,7 +172,7 @@ const MyReviews = () => {
                            required
                            value={formData.menuItemId}
                            onChange={e => setFormData({...formData, menuItemId: e.target.value})}
-                           className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-brand-orange outline-none text-white appearance-none"
+                           className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none text-white appearance-none font-sans"
                          >
                             <option value="">Select Item</option>
                             {menuItems.map(item => (
@@ -179,10 +182,10 @@ const MyReviews = () => {
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Branch (Optional)</label>
-                         <select 
+                          <select 
                            value={formData.branchId}
                            onChange={e => setFormData({...formData, branchId: e.target.value})}
-                           className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-brand-orange outline-none text-white appearance-none"
+                           className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none text-white appearance-none font-sans"
                          >
                             <option value="">Any Branch</option>
                             {branches.map(branch => (
@@ -196,11 +199,11 @@ const MyReviews = () => {
                       <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1 text-center block mb-2">Rating</label>
                       <div className="flex justify-center gap-3">
                          {[1, 2, 3, 4, 5].map(star => (
-                           <button 
+                            <button 
                              key={star}
                              type="button"
                              onClick={() => setFormData({...formData, rating: star})}
-                             className={`p-2 transition-all hover:scale-125 ${formData.rating >= star ? 'text-yellow-400' : 'text-white/10'}`}
+                             className={`p-2 transition-all hover:scale-125 ${formData.rating >= star ? 'text-[#F97316]' : 'text-[#F97316]/20'}`}
                            >
                              <HiStar size={36} />
                            </button>
@@ -211,10 +214,10 @@ const MyReviews = () => {
                    <div className="space-y-2">
                       <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Your Comment</label>
                       <textarea 
-                        required
-                        value={formData.comment}
-                        onChange={e => setFormData({...formData, comment: e.target.value})}
-                        className="w-full bg-black/30 border border-white/10 rounded-2xl p-6 text-sm focus:border-brand-orange outline-none h-40"
+                         required
+                         value={formData.comment}
+                         onChange={e => setFormData({...formData, comment: e.target.value})}
+                         className="w-full bg-black/30 border border-white/10 rounded-2xl p-6 text-sm focus:border-[#F97316] outline-none h-40 font-sans"
                         placeholder="Tell us what you liked about the meal! (Min 20 characters)"
                       />
                       <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest text-right">
@@ -224,17 +227,18 @@ const MyReviews = () => {
 
                    <div className="flex gap-4 pt-4">
                       <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest">Cancel</button>
-                      <button 
-                        type="submit" 
-                        disabled={submitting} 
-                        className="flex-[2] bg-brand-orange text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        {submitting ? 'SUBMITTING...' : (
-                          <>
-                            POST REVIEW <HiOutlineArrowRight />
-                          </>
-                        )}
-                      </button>
+                       <button 
+                         type="submit" 
+                         disabled={submitting} 
+                         className="flex-[2] text-white font-bold py-4 rounded-2xl shadow-xl shadow-[#F97316]/20 disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                         style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)' }}
+                       >
+                         {submitting ? 'SUBMITTING...' : (
+                           <>
+                             POST REVIEW <HiOutlineArrowRight />
+                           </>
+                         )}
+                       </button>
                    </div>
                 </form>
              </motion.div>

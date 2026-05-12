@@ -78,11 +78,11 @@ const OrderDetail = () => {
         >
           <HiOutlineArrowLeft size={20} />
         </button>
-        <h2 className="text-2xl font-black text-white tracking-tight uppercase">Order Details</h2>
+        <h2 className="text-2xl font-display font-bold text-white tracking-tight uppercase">Order Details</h2>
       </div>
 
       {/* Tracker Section */}
-      <section className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 lg:p-12 overflow-hidden relative">
+      <section className="bg-[#0C0A09] border border-white/5 rounded-[2.5rem] p-8 lg:p-12 overflow-hidden relative">
          {/* Success Background Effect */}
          {order.status === 'delivered' && (
            <div className="absolute inset-0 bg-green-500/5 pointer-events-none" />
@@ -91,7 +91,7 @@ const OrderDetail = () => {
          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12 relative z-10">
             <div>
                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">Order Number</p>
-               <h3 className="text-3xl font-black text-white tracking-tight">{order.orderNumber}</h3>
+               <h3 className="text-3xl font-display font-bold text-white tracking-tight">{order.orderNumber}</h3>
                <p className="text-xs text-white/40 mt-1">{new Date(order.createdAt).toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' })}</p>
             </div>
             <div className="flex flex-col items-end gap-2">
@@ -105,28 +105,28 @@ const OrderDetail = () => {
          </div>
 
          {!isCancelled ? (
-           <div className="relative pt-4 pb-12 px-4 sm:px-12 z-10">
-              <div className="absolute top-[26px] left-[10%] right-[10%] h-1 bg-white/5">
-                 <div 
-                   className="h-full bg-brand-orange transition-all duration-1000 shadow-[0_0_15px_rgba(236,72,36,0.5)]" 
-                   style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }} 
-                 />
-              </div>
-              <div className="flex justify-between items-center relative">
-                 {steps.map((s, i) => (
-                   <div key={s} className="flex flex-col items-center gap-4">
-                      <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-                        i <= currentStepIndex ? 'bg-brand-orange border-brand-orange text-white scale-110 shadow-lg shadow-brand-orange/40' : 'bg-[#141414] border-white/10 text-white/20'
-                      }`}>
-                        {i < currentStepIndex ? <HiOutlineCheckCircle size={18} /> : <div className={`w-2 h-2 rounded-full ${i === currentStepIndex ? 'bg-white animate-ping' : 'bg-current'}`} />}
-                      </div>
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${i <= currentStepIndex ? 'text-white' : 'text-white/20'}`}>
-                         {s}
-                      </span>
-                   </div>
-                 ))}
-              </div>
-           </div>
+            <div className="relative pt-4 pb-12 px-4 sm:px-12 z-10">
+               <div className="absolute top-[26px] left-[10%] right-[10%] h-1 bg-white/[0.10]">
+                  <div 
+                    className="h-full bg-[#F97316] transition-all duration-1000 shadow-[0_0_15px_rgba(249,115,22,0.5)]" 
+                    style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }} 
+                  />
+               </div>
+               <div className="flex justify-between items-center relative">
+                  {steps.map((s, i) => (
+                    <div key={s} className="flex flex-col items-center gap-4">
+                       <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                         i <= currentStepIndex ? 'bg-[#F97316] border-[#F97316] text-white scale-110 shadow-lg shadow-[#F97316]/40' : 'bg-[#0C0A09] border-white/10 text-white/20'
+                       }`} style={i > currentStepIndex ? { background: 'rgba(255,255,255,0.15)' } : {}}>
+                         {i < currentStepIndex ? <HiOutlineCheckCircle size={18} /> : <div className={`w-2 h-2 rounded-full ${i === currentStepIndex ? 'bg-white animate-ping' : 'bg-current'}`} />}
+                       </div>
+                       <span className={`text-[10px] font-black uppercase tracking-widest ${i <= currentStepIndex ? 'text-white' : 'text-white/20'}`}>
+                          {s}
+                       </span>
+                    </div>
+                  ))}
+               </div>
+            </div>
          ) : (
            <div className="py-12 flex flex-col items-center gap-4 text-red-500">
               <HiOutlineXCircle size={48} className="animate-bounce" />
@@ -140,9 +140,9 @@ const OrderDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
          
          {/* Items & Bill */}
-         <section className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
-            <h4 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-3">
-               <HiOutlineShoppingBag className="text-brand-orange" />
+         <section className="bg-[#0C0A09] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
+            <h4 className="text-lg font-display font-bold text-white uppercase tracking-tight flex items-center gap-3">
+               <HiOutlineShoppingBag className="text-[#F97316]" />
                Items Ordered
             </h4>
             
@@ -154,27 +154,27 @@ const OrderDetail = () => {
                           <img src={item.menuItem?.image} alt="" className="w-full h-full object-cover" />
                        </div>
                        <div>
-                          <p className="font-bold text-white/80 text-sm">{item.menuItem?.name || item.name}</p>
+                          <p className="font-bold text-white/80 text-sm font-sans">{item.menuItem?.name || item.name}</p>
                           <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Qty: {item.quantity} x ₵{item.price}</p>
                        </div>
                     </div>
-                    <span className="font-black text-white">₵{item.price * item.quantity}</span>
+                    <span className="font-bold text-white font-sans">₵{item.price * item.quantity}</span>
                  </div>
                ))}
             </div>
 
             <div className="pt-8 border-t border-white/5 space-y-3">
-               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/40">
+               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/40 font-sans">
                   <span>Subtotal</span>
-                  <span>₵{order.totalAmount - (order.type === 'delivery' ? 15 : 0)}</span>
+                  <span>₵{order.totalAmount - (order.type === 'delivery' ? 30 : 0)}</span>
                </div>
                {order.type === 'delivery' && (
-                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/40">
+                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/40 font-sans">
                     <span>Delivery Fee</span>
-                    <span>₵15</span>
+                    <span>₵30</span>
                  </div>
                )}
-               <div className="flex justify-between text-2xl font-black uppercase tracking-tight text-brand-orange pt-2">
+               <div className="flex justify-between text-2xl font-display font-bold uppercase tracking-tight text-[#F97316] pt-2">
                   <span>Total</span>
                   <span>₵{order.totalAmount}</span>
                </div>
@@ -191,9 +191,9 @@ const OrderDetail = () => {
 
          {/* Logistics & Support */}
          <div className="space-y-8">
-            <section className="bg-[#141414] border border-white/5 rounded-[2.5rem] p-8 space-y-6">
-               <h4 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-3">
-                  {order.type === 'delivery' ? <HiOutlineTruck className="text-brand-orange" /> : <HiOutlineBuildingStorefront className="text-brand-orange" />}
+            <section className="bg-[#0C0A09] border border-white/5 rounded-[2.5rem] p-8 space-y-6">
+               <h4 className="text-lg font-display font-bold text-white uppercase tracking-tight flex items-center gap-3">
+                  {order.type === 'delivery' ? <HiOutlineTruck className="text-[#F97316]" /> : <HiOutlineBuildingStorefront className="text-[#F97316]" />}
                   {order.type === 'delivery' ? 'Delivery Details' : 'Pickup Details'}
                </h4>
                
@@ -202,16 +202,16 @@ const OrderDetail = () => {
                      <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">
                         {order.type === 'delivery' ? 'Shipping Address' : 'Branch Location'}
                      </p>
-                     <p className="font-bold text-white text-sm">{order.deliveryAddress || order.branch}</p>
+                     <p className="font-bold text-white text-sm font-sans">{order.deliveryAddress || order.branch}</p>
                   </div>
                   <div className="flex flex-col gap-1">
                      <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">Payment Method</p>
-                     <p className="font-bold text-white text-sm capitalize">{order.paymentMethod} ({order.paymentStatus})</p>
+                     <p className="font-bold text-white text-sm capitalize font-sans">{order.paymentMethod} ({order.paymentStatus})</p>
                   </div>
                   {order.note && (
                     <div className="flex flex-col gap-1">
                        <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">Special Note</p>
-                       <p className="text-xs text-white/40 italic leading-relaxed">"{order.note}"</p>
+                       <p className="text-xs text-white/40 italic leading-relaxed font-sans">"{order.note}"</p>
                     </div>
                   )}
                </div>
@@ -232,16 +232,21 @@ const OrderDetail = () => {
 
                {order.status === 'delivered' && (
                  <button 
-                    className="w-full bg-brand-orange text-white font-black py-4 rounded-2xl shadow-xl shadow-brand-orange/20 hover:scale-105 transition-all text-xs uppercase tracking-widest"
+                    className="w-full bg-[#F97316] text-white font-black py-4 rounded-2xl shadow-xl shadow-[#F97316]/20 hover:scale-105 transition-all text-xs uppercase tracking-widest"
                  >
                     RATE THIS MEAL
                  </button>
                )}
 
-               <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                  <HiOutlineReceiptPercent size={18} className="text-brand-orange" />
+               <a 
+                 href={`https://wa.me/233243379412?text=Hello Kokrobite Oasis! I need help with my order ${order.orderNumber}`}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+               >
+                  <HiOutlineReceiptPercent size={18} className="text-[#F97316]" />
                   NEED HELP? CONTACT SUPPORT
-               </button>
+               </a>
             </section>
          </div>
 

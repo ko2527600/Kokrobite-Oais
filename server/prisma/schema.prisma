@@ -23,7 +23,7 @@ model MenuItem {
   name        String
   description String
   price       String
-  category    String
+  category    Category
   image       String
   available   Boolean     @default(true)
   featured    Boolean     @default(false)
@@ -80,6 +80,7 @@ model Branch {
   address   String?
   phone     String?
   whatsapp  String?
+  openingHours String?
   isOpen    Boolean  @default(true)
   order     Int      @default(0)
   createdAt DateTime @default(now())
@@ -110,7 +111,8 @@ model Announcement {
 
 model SiteConfig {
   id             String   @id @default("default")
-  restaurantName String   @default("Cookers Delight")
+  restaurantName String   @default("Kokrobite Oasis")
+  tagline        String?  @default("beach bliss. good food. pure vibes")
   phone          String?
   whatsapp       String?
   instagram      String?
@@ -295,4 +297,20 @@ enum FeedbackStatus {
   under_review
   resolved
   dismissed
+}
+enum Category {
+  Brunch
+  Cocktails
+  Mocktails
+  Platters
+  Pitchers
+  Juices
+  KissedByFire
+  Sides
+  Pizza
+  BurgersWraps
+  Shots
+  Slushys
+  BeersAndCiders
+  SoftDrinks
 }

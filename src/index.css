@@ -1,28 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --color-brand-burgundy: #872735;
-  --color-brand-orange: #EC4824;
-  --color-brand-black: #111111;
+  --color-brand-primary:   #F97316;
+  --color-brand-secondary: #FB923C;
+  --color-brand-accent:    #F59E0B;
+  --color-brand-cream:     #FFF7ED;
+  --color-brand-dark:      #1C0A00;
+  --color-brand-sand:      #FDE68A;
+  --color-brand-green:     #16A34A;
+  --color-brand-bg:        #0C0A09;
+  --color-brand-orange:    #F97316;
 
-  --font-display: "Cormorant Garamond", serif;
-  --font-body: "Syne", sans-serif;
+  --font-display: "Playfair Display", serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+}
+
+:root {
+  --primary:   #F97316;
+  --secondary: #FB923C;
+  --accent:    #F59E0B;
+  --cream:     #FFF7ED;
+  --dark:      #1C0A00;
+  --sand:      #FDE68A;
+  --green:     #16A34A;
+  --bg:        #0C0A09;
+  --white:     #FFFFFF;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply bg-brand-black text-white font-body overflow-x-hidden;
+    @apply bg-brand-bg text-white font-body overflow-x-hidden;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
     padding: 0;
-    cursor: none; /* Hide default cursor on desktop */
   }
-  
+
   @media (max-width: 1024px) {
     body {
       cursor: auto;
@@ -31,20 +49,24 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
+    font-family: 'Playfair Display', serif;
   }
 }
 
 @layer utilities {
+  .font-display { font-family: 'Playfair Display', serif !important; }
+  .font-body    { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+
   .glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
-  
+
   .glass-dark {
     @apply bg-black/40 backdrop-blur-xl border border-white/10;
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-burgundy;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-brand-accent;
   }
 
   .grain-overlay {
@@ -60,15 +82,9 @@
   }
 
   /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-brand-black;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-brand-orange rounded-full;
-  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
 }
 
 /* Marquee Animation */
@@ -104,27 +120,17 @@
 }
 
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(236, 72, 36, 0.4); }
-  70% { box-shadow: 0 0 0 15px rgba(236, 72, 36, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(236, 72, 36, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+  70%  { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 18s linear infinite;
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
-}
+.animate-spin-slow  { animation: spin-slow 18s linear infinite; }
+.animate-float      { animation: float 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s infinite; }
 
 /* Scroll Snap for categories */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

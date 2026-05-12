@@ -1,10 +1,10 @@
-import jwt from "jsonwebtoken";
+﻿import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 
 export default async (req, res, next) => {
   try {
     // 1. Try cookie first
-    let token = req.cookies?.cd_admin_token;
+    let token = req.cookies?.ko_admin_token;
 
     // 2. Fall back to Authorization header
     if (!token) {
@@ -33,7 +33,7 @@ export default async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res.clearCookie("cd_admin_token");
+    res.clearCookie("ko_admin_token");
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

@@ -1,11 +1,11 @@
-# 🥘 Cookers Delight - Authentic West African Cuisine
+﻿# 🥘 Kokrobite Oasis - Authentic West African Cuisine
 
 [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 
-Cookers Delight is a premium, modern restaurant website dedicated to showcasing the rich culinary heritage of Ghana and West Africa. Built with performance and user experience in mind, it offers a seamless journey from browsing to ordering.
+Kokrobite Oasis is a premium, modern restaurant website dedicated to showcasing the rich culinary heritage of Ghana and West Africa. Built with performance and user experience in mind, it offers a seamless journey from browsing to ordering.
 
 ---
 
@@ -82,12 +82,12 @@ Cookers Delight is a premium, modern restaurant website dedicated to showcasing 
 ## 📞 Contact & Support
 
 For inquiries or custom catering orders, reach out via:
-- **WhatsApp**: [+233 24 337 9412](https://wa.me/233243379412)
-- **Instagram**: [@cookersdelight](https://instagram.com/cookersdelight)
+- **WhatsApp**: [+233 24 337 9412](https://wa.me/UPDATE_WITH_KO_WHATSAPP)
+- **Instagram**: [@kokrobiteoasis](https://instagram.com/kokrobiteoasis)
 
 ---
 
 <div align="center">
   <p>Made with ❤️ for the love of West African Food</p>
-  <p>© 2026 Cookers Delight. All rights reserved.</p>
+  <p>© 2026 Kokrobite Oasis. All rights reserved.</p>
 </div>

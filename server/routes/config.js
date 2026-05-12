@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 const router = express.Router();
 import prisma from "../lib/prisma.js";
 import auth from "../middleware/auth.js";
@@ -13,13 +13,13 @@ router.get("/", async (req, res) => {
       config = await prisma.siteConfig.create({
         data: {
           id: "default",
-          restaurantName: "Cookers Delight",
+          restaurantName: "Kokrobite Oasis",
           phone: "+233 00 000 0000",
           whatsapp: "+233 00 000 0000",
-          instagram: "cookersdelight",
-          facebook: "cookersdelight",
+          instagram: "kokrobiteoasis",
+          facebook: "kokrobiteoasis",
           openingHours: "Mon-Sat: 10AM - 11PM",
-          email: "info@cookersdelight.com"
+          email: "info@kokrobiteoasis.com"
         }
       });
     }

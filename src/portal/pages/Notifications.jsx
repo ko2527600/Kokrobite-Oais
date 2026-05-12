@@ -40,12 +40,12 @@ const NotificationItem = ({ notification, onRead, onDelete }) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       onClick={() => !notification.read && onRead(notification.id)}
-      className={`p-6 bg-[#141414] border-2 rounded-[2rem] transition-all relative group cursor-pointer ${
-        !notification.read ? 'border-brand-orange bg-brand-orange/[0.02]' : 'border-white/5 hover:border-white/10'
+      className={`p-6 bg-[#0C0A09] border-2 rounded-[2rem] transition-all relative group cursor-pointer ${
+        !notification.read ? 'border-white/5 border-l-[#F97316] bg-[#F97316]/[0.06]' : 'border-white/5 hover:border-white/10'
       }`}
     >
        {!notification.read && (
-         <div className="absolute top-6 right-6 w-2 h-2 bg-brand-orange rounded-full animate-pulse" />
+         <div className="absolute top-6 right-6 w-2 h-2 bg-[#F97316] rounded-full animate-pulse" />
        )}
        
        <div className="flex gap-6">
@@ -129,16 +129,16 @@ const Notifications = () => {
       <div className="flex justify-between items-end">
         <div>
            <div className="flex items-center gap-3 mb-1">
-              <h2 className="text-3xl font-black text-white tracking-tight uppercase">Notifications</h2>
+              <h2 className="text-3xl font-display font-bold text-white tracking-tight uppercase">Notifications</h2>
               {unreadCount > 0 && (
-                <span className="bg-brand-orange text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{unreadCount} New</span>
+                <span className="bg-[#F97316] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{unreadCount} New</span>
               )}
            </div>
-           <p className="text-white/40 text-sm font-medium">Updates on your orders and account activity.</p>
+           <p className="text-white/40 text-sm font-sans font-medium">Updates on your orders and account activity.</p>
         </div>
         <button 
           onClick={markAllRead}
-          className="text-brand-orange text-[10px] font-black uppercase tracking-widest hover:underline"
+          className="text-[#F97316] text-[10px] font-bold uppercase tracking-widest hover:underline"
         >
           Mark all as read
         </button>
@@ -158,10 +158,15 @@ const Notifications = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-[#141414] border border-white/5 p-24 rounded-[3rem] text-center space-y-4"
+              className="bg-[#0C0A09] border border-white/5 p-24 rounded-[3rem] text-center space-y-6"
             >
-               <HiOutlineBell size={48} className="mx-auto text-white/5" />
-               <p className="text-white/20 font-black uppercase tracking-[0.2em] text-sm">No notifications yet</p>
+               <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10 text-4xl">
+                  🔔
+               </div>
+               <div>
+                  <h3 className="text-xl font-display font-bold text-white mb-2">No Notifications Yet</h3>
+                  <p className="text-white/40 text-sm max-w-xs mx-auto font-sans">Your Kokrobite Oasis updates will appear here</p>
+               </div>
             </motion.div>
           )}
         </AnimatePresence>
