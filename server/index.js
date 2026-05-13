@@ -38,7 +38,7 @@ import adminDriverRoutes from "./routes/adminDrivers.js"
 import chatRoutes from "./routes/chat.js"
 
 import { createServer } from "http"
-import { initSocket } from "./lib/socket.js"
+import { Server } from "socket.io"
 import { globalLimiter } from "./middleware/security.js"
 
 const __filename = fileURLToPath(import.meta.url)
@@ -58,8 +58,33 @@ const allowedOrigins = [
 
 const isVercel = (url) => url && (url.endsWith(".vercel.app") || url.includes("vercel.app"))
 
-// Initialize Socket.io
-initSocket(httpServer, allowedOrigins)
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CLIENT_URL || allowedOrigins,
+    credentials: true
+  }
+})
+
+// Make io available in routes
+app.set("io", io)
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id)
+
+  socket.on("join_order", (orderId) => {
+    socket.join(`order_${orderId}`)
+    console.log(`Joined room: order_${orderId}`)
+  })
+
+  socket.on("update_location", async (data) => {
+    const { driverId, lat, lng } = data
+    socket.broadcast.emit("driver_location_update", { driverId, lat, lng })
+  })
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id)
+  })
+})
 
 // ─── MIDDLEWARE ───
 app.use(globalLimiter)
@@ -103,10 +128,8 @@ app.use("/uploads", express.static(
   path.join(__dirname, "uploads")
 ))
 
-// ─── HEALTH (mount first — always responds) ───
-app.use("/api/health", healthRoutes)
-
 // ─── API ROUTES ───
+app.use("/api/health", healthRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/menu", menuRoutes)
 app.use("/api/orders", orderRoutes)
@@ -126,12 +149,14 @@ app.use("/api/admin/customers", adminCustomerRoutes)
 app.use("/api/admin/customer-orders", adminCustomerOrderRoutes)
 app.use("/api/admin/feedback", adminFeedbackRoutes)
 app.use("/api/admin/drivers", adminDriverRoutes)
-app.use("/api/delivery", deliveryRoutes)
 app.use("/api/payments", paymentRoutes)
+app.use("/api/chat", chatRoutes)
+
+// Driver routes
 app.use("/api/drivers/auth", driverAuthRoutes)
 app.use("/api/drivers/orders", driverOrderRoutes)
-app.use("/api/drivers", driverEarningsRoutes)
-app.use("/api/chat", chatRoutes)
+app.use("/api/drivers/earnings", driverEarningsRoutes)
+app.use("/api/drivers", deliveryRoutes)
 
 // ─── ROOT ───
 app.get("/", (req, res) => {

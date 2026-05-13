@@ -130,6 +130,14 @@ router.patch("/:id/approve", async (req, res) => {
       data: { isApproved: !driver.isApproved }
     })
 
+    const io = req.app.get("io")
+    io.emit("driver_status_update", {
+      driverId: id,
+      name: updated.name,
+      status: updated.status,
+      isApproved: updated.isApproved
+    })
+
     const { password, ...safeDriver } = updated
     res.json(safeDriver)
   } catch (err) {
@@ -147,6 +155,14 @@ router.patch("/:id/suspend", async (req, res) => {
     const updated = await prisma.driver.update({
       where: { id },
       data: { isActive: !driver.isActive }
+    })
+
+    const io = req.app.get("io")
+    io.emit("driver_status_update", {
+      driverId: id,
+      name: updated.name,
+      status: updated.status,
+      isActive: updated.isActive
     })
 
     const { password, ...safeDriver } = updated

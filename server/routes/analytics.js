@@ -22,7 +22,10 @@ router.get("/summary", auth, async (req, res) => {
       customerRevenueAgg,
       newCustomersToday,
       recentCustomerOrdersList,
-      newFeedback
+      newFeedback,
+      pendingDrivers,
+      deliveringDrivers,
+      onlineDrivers
     ] = await Promise.all([
       prisma.order.count(),
       prisma.order.aggregate({ _sum: { totalAmount: true } }),
@@ -39,7 +42,10 @@ router.get("/summary", auth, async (req, res) => {
         include: { items: true, customer: { select: { name: true } } },
         take: 5
       }),
-      prisma.feedback.count({ where: { status: "new" } })
+      prisma.feedback.count({ where: { status: "new" } }),
+      prisma.driver.count({ where: { isApproved: false } }),
+      prisma.driver.count({ where: { status: "delivering" } }),
+      prisma.driver.count({ where: { status: "online" } })
     ]);
 
     const totalRevenue = revAgg._sum.totalAmount || 0;
@@ -143,7 +149,10 @@ router.get("/summary", auth, async (req, res) => {
       totalCustomerRevenue: customerRevenueAgg._sum.totalAmount || 0,
       newCustomersToday,
       recentCustomerOrders: recentCustomerOrdersList,
-      newFeedback
+      newFeedback,
+      pendingDrivers,
+      deliveringDrivers,
+      onlineDrivers
     });
   } catch (err) {
     console.error("Analytics Error:", err);

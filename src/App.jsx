@@ -34,6 +34,7 @@ import CustomersManager from "./admin/pages/CustomersManager"
 import DriversManager from "./admin/pages/DriversManager"
 import FeedbackManager from "./admin/pages/FeedbackManager"
 import Settings from "./admin/pages/Settings"
+import LiveTracking from "./admin/pages/LiveTracking"
 
 // Portal Pages
 import CustomerLayout from "./portal/CustomerLayout"
@@ -81,6 +82,7 @@ export default function App() {
                     <Route path="announcements" element={<AnnouncementsManager />} />
                     <Route path="customers" element={<CustomersManager />} />
                     <Route path="drivers" element={<DriversManager />} />
+                    <Route path="live" element={<LiveTracking />} />
                     <Route path="feedback" element={<FeedbackManager />} />
                     <Route path="settings" element={<Settings />} />
                   </Route>
@@ -115,21 +117,23 @@ export default function App() {
           } />
 
           {/* ── DELIVERY DRIVER ROUTES ── */}
-          <Route path="/delivery/login" element={<DriverLogin />} />
           <Route path="/delivery/register" element={<DriverRegister />} />
-          <Route path="/delivery" element={
+          <Route path="/delivery/*" element={
             <DeliveryProvider>
-              <DeliveryProtectedRoute />
+              <Routes>
+                <Route path="login" element={<DriverLogin />} />
+                <Route element={<DeliveryProtectedRoute />}>
+                  <Route element={<DeliveryLayout />}>
+                    <Route index element={<Navigate to="/delivery/dashboard" replace />} />
+                    <Route path="dashboard" element={<DriverDashboard />} />
+                    <Route path="active" element={<ActiveDelivery />} />
+                    <Route path="earnings" element={<DriverEarnings />} />
+                    <Route path="profile" element={<DriverProfile />} />
+                  </Route>
+                </Route>
+              </Routes>
             </DeliveryProvider>
-          }>
-            <Route element={<DeliveryLayout />}>
-              <Route index element={<Navigate to="/delivery/dashboard" replace />} />
-              <Route path="dashboard" element={<DriverDashboard />} />
-              <Route path="active" element={<ActiveDelivery />} />
-              <Route path="earnings" element={<DriverEarnings />} />
-              <Route path="profile" element={<DriverProfile />} />
-            </Route>
-          </Route>
+          } />
 
           {/* ── CATCH ALL ── */}
           <Route path="*" element={

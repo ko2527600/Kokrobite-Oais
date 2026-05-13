@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Send, User, Truck, Building2, X, Phone } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import api from "../../api/axios"
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2"
 import { toast } from "react-hot-toast"
-
-// Note: Ensure your socket instance is accessible. 
-// If not, we might need a custom hook or use the global one.
 import { io } from "socket.io-client"
 
 export default function ChatWindow({ orderId, currentUser, onClose }) {
+  if (!currentUser) return null;
+
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState("")
   const [loading, setLoading] = useState(true)

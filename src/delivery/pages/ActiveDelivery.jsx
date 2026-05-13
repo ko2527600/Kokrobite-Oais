@@ -7,12 +7,16 @@ import {
   CheckCircle2, Clock, Loader2, XCircle, ChevronRight
 } from "lucide-react"
 import { toast } from "react-hot-toast"
+import ChatWindow from "../../components/Chat/ChatWindow"
+import { useDelivery } from "../DeliveryContext"
 
 export default function ActiveDelivery() {
+  const { driver } = useDelivery()
   const [delivery, setDelivery] = useState(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showChat, setShowChat] = useState(false)
   const [todayEarnings, setTodayEarnings] = useState(0)
   const navigate = useNavigate()
 

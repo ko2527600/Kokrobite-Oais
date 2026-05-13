@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   HiOutlineShoppingBag, HiOutlineArrowLeft, HiOutlineClock,
   HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineTruck,
   HiOutlineBuildingStorefront, HiOutlineStar, HiOutlineReceiptPercent,
   HiOutlineShieldExclamation, HiOutlineExclamationTriangle, HiOutlineChatBubbleLeftRight,
-  HiOutlinePhone
+  HiOutlinePhone, HiOutlineDevicePhoneMobile
 } from 'react-icons/hi2';
 import { toast } from 'react-hot-toast';
+import { io } from "socket.io-client";
 import api from '../../api/axios';
 import OrderStatusBadge from '../components/OrderStatusBadge';
 import ChatWindow from '../../components/Chat/ChatWindow';
@@ -25,11 +26,18 @@ const OrderDetail = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportForm, setReportForm] = useState({ reason: '', comment: '' });
   const [submittingReport, setSubmittingReport] = useState(false);
+  const [driver, setDriver] = useState(null);
+  const [driverLocation, setDriverLocation] = useState(null);
+
+  const SOCKET_URL = import.meta.env.VITE_API_URL?.replace("/api", "");
 
   const fetchOrder = async () => {
     try {
       const res = await api.get(`/customers/orders/${id}`);
       setOrder(res.data);
+      if (res.data.delivery?.driver) {
+        setDriver(res.data.delivery.driver);
+      }
     } catch (err) {
       toast.error('Failed to load order details');
       navigate('/portal/orders');
@@ -40,14 +48,28 @@ const OrderDetail = () => {
 
   useEffect(() => {
     fetchOrder();
-    // Refresh status if active
-    const interval = setInterval(() => {
-      if (order && !['delivered', 'cancelled'].includes(order.status)) {
-        fetchOrder();
+    
+    // Socket connection
+    if (!id) return;
+    const socket = io(SOCKET_URL, { withCredentials: true });
+    socket.emit("join_order", id);
+
+    socket.on("order_update", (data) => {
+      setOrder(prev => prev ? ({ ...prev, status: data.status }) : null);
+      if (data.driver) {
+        setDriver(data.driver);
       }
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [id, order?.status]);
+      toast.success(`Order Status: ${data.status}`);
+    });
+
+    socket.on("driver_location", (data) => {
+      setDriverLocation({ lat: data.lat, lng: data.lng });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [id]);
 
   const handleCancel = async () => {
     if (!window.confirm("Are you sure you want to cancel this order? This will also reverse any loyalty points earned.")) return;
@@ -233,9 +255,18 @@ const OrderDetail = () => {
                      </p>
                      <p className="font-bold text-white text-sm font-sans">{order.deliveryAddress || order.branch}</p>
                   </div>
-                  <div className="flex flex-col gap-1">
-                     <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">Payment Method</p>
-                     <p className="font-bold text-white text-sm capitalize font-sans">{order.paymentMethod} ({order.paymentStatus})</p>
+                  <div className="flex flex-col gap-2">
+                     <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">Payment Info</p>
+                     <div className="flex items-center gap-3">
+                        <p className="font-bold text-white text-sm capitalize font-sans">{order.paymentMethod}</p>
+                        {(() => {
+                           const s = order.paymentStatus;
+                           if (s === 'paid') return <span className="px-3 py-1 bg-green-500/10 text-[#10B981] text-[10px] font-bold rounded-full uppercase tracking-widest">Paid ✅</span>;
+                           if (s === 'pending') return <span className="px-3 py-1 bg-blue-500/10 text-[#3B82F6] text-[10px] font-bold rounded-full uppercase tracking-widest">Processing...</span>;
+                           if (s === 'failed') return <span className="px-3 py-1 bg-red-500/10 text-[#EF4444] text-[10px] font-bold rounded-full uppercase tracking-widest">Failed</span>;
+                           return <span className="px-3 py-1 bg-amber-500/10 text-[#F59E0B] text-[10px] font-bold rounded-full uppercase tracking-widest">Awaiting Payment</span>;
+                        })()}
+                     </div>
                   </div>
                   {order.note && (
                     <div className="flex flex-col gap-1">
@@ -257,6 +288,13 @@ const OrderDetail = () => {
                    Your Rider
                 </h4>
                 
+                {driverLocation && (
+                   <div className="absolute top-8 right-8 flex items-center gap-2 bg-[#F97316]/10 border border-[#F97316]/20 px-3 py-1.5 rounded-full">
+                      <div className="w-2 h-2 bg-[#F97316] rounded-full animate-ping" />
+                      <span className="text-[9px] font-bold text-[#F97316] uppercase tracking-widest">Live Location On</span>
+                   </div>
+                )}
+                
                 <div className="flex items-center gap-6 relative z-10">
                    <div className="w-16 h-16 rounded-3xl bg-white/5 overflow-hidden border border-white/10">
                       {order.delivery.driver.avatar ? (
@@ -268,10 +306,13 @@ const OrderDetail = () => {
                       )}
                    </div>
                    <div className="flex-1">
-                      <p className="text-xl font-display font-bold text-white leading-tight">{order.delivery.driver.name}</p>
+                      <p className="text-xl font-display font-bold text-white leading-tight">{driver?.name || order.delivery.driver.name}</p>
                       <p className="text-xs text-white/40 font-medium uppercase tracking-widest mt-1">
-                         {order.delivery.driver.vehicleType} • {order.delivery.driver.vehicleNumber}
+                         {driver?.vehicleType || order.delivery.driver.vehicleType} • {driver?.vehicleNumber || order.delivery.driver.vehicleNumber}
                       </p>
+                      {driverLocation && (
+                        <p className="text-[10px] text-[#F97316] font-bold mt-2 animate-pulse">📍 Driver location updating live...</p>
+                      )}
                    </div>
                    <a 
                      href={`tel:${order.delivery.driver.phone}`}
@@ -283,7 +324,10 @@ const OrderDetail = () => {
 
                 <div className="pt-4 flex gap-3">
                    <button 
-                     onClick={() => setShowChat(true)}
+                     onClick={() => {
+                      if (!customer) return toast.error('Session loading, please wait...');
+                      setShowChat(true);
+                    }}
                      className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                    >
                       <HiOutlineChatBubbleLeftRight size={14} /> Chat
@@ -300,16 +344,35 @@ const OrderDetail = () => {
 
             <section className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 flex flex-col gap-4">
                <h4 className="text-sm font-black text-white uppercase tracking-widest">Actions</h4>
-               
                {order.status === 'pending' && (
-                 <button 
-                   onClick={handleCancel}
-                   disabled={cancelling}
-                   className="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-black py-4 rounded-2xl transition-all border border-red-500/20 text-xs uppercase tracking-widest"
-                 >
-                    {cancelling ? 'CANCELLING...' : 'CANCEL ORDER'}
-                 </button>
-               )}
+                  <div className="space-y-3">
+                    {order.paymentStatus === 'unpaid' && (order.paymentMethod === 'momo' || order.paymentMethod === 'hubtel') && (
+                      <button 
+                        onClick={async () => {
+                          try {
+                            const res = await api.post('/payments/initiate', {
+                              orderId: order.id,
+                              phoneNumber: customer.phone || ''
+                            });
+                            if (res.data?.checkoutUrl) window.location.href = res.data.checkoutUrl;
+                          } catch (err) {
+                            toast.error("Failed to initiate payment");
+                          }
+                        }}
+                        className="w-full bg-[#F97316]/10 border border-[#F97316]/20 text-[#F97316] font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                      >
+                         <HiOutlineDevicePhoneMobile size={18} /> Pay Now with MoMo 📱
+                      </button>
+                    )}
+                    <button 
+                      onClick={handleCancel}
+                      disabled={cancelling}
+                      className="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-black py-4 rounded-2xl transition-all border border-red-500/20 text-xs uppercase tracking-widest"
+                    >
+                       {cancelling ? 'CANCELLING...' : 'CANCEL ORDER'}
+                    </button>
+                  </div>
+                )}
 
                {order.status === 'delivered' && (
                  <button 
@@ -321,7 +384,7 @@ const OrderDetail = () => {
 
                {order.status !== 'cancelled' && (
                  <button 
-                   onClick={() => setShowChat(true)}
+                   onClick={() => { if (!customer) return toast.error('Session loading, please wait...'); setShowChat(true); }}
                    className="w-full bg-[#F97316]/10 hover:bg-[#F97316] text-[#F97316] hover:text-white font-black py-4 rounded-2xl transition-all border border-[#F97316]/20 text-xs uppercase tracking-widest flex items-center justify-center gap-2"
                  >
                    CHAT WITH RIDER / SUPPORT
@@ -344,8 +407,8 @@ const OrderDetail = () => {
 
       {/* ── CHAT OVERLAY ── */}
       <AnimatePresence>
-        {showChat && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        {showChat && customer && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowChat(false)}

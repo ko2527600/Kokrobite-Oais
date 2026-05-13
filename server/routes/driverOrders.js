@@ -1,7 +1,7 @@
 import express from "express"
 import prisma from "../lib/prisma.js"
 import driverAuth from "../middleware/driverAuth.js"
-import { getIO } from "../lib/socket.js"
+// Removed static socket import
 
 const router = express.Router()
 
@@ -143,7 +143,7 @@ router.post("/:id/accept", async (req, res) => {
       }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${id}`).emit("order_update", {
       status: "preparing",
       driver: {
@@ -193,7 +193,7 @@ router.post("/:id/pickup", async (req, res) => {
       }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${id}`).emit("order_update", { status: "delivering" })
 
     res.json({ message: "Pickup confirmed" })
@@ -257,7 +257,7 @@ router.post("/:id/deliver", async (req, res) => {
       }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${id}`).emit("order_update", { status: "delivered" })
 
     res.json({ message: "Delivery confirmed" })

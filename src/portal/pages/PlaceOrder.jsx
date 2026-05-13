@@ -7,7 +7,7 @@ import {
   HiOutlineRocketLaunch, HiOutlineTruck, HiOutlineBuildingStorefront,
   HiOutlineCurrencyDollar, HiOutlineArrowRight, HiOutlineArrowLeft,
   HiOutlineStar, HiOutlineMagnifyingGlass, HiOutlineBanknotes, HiOutlineMap,
-  HiOutlineClock
+  HiOutlineClock, HiOutlineShieldExclamation
 } from 'react-icons/hi2';
 import { toast } from 'react-hot-toast';
 import { getImgUrl } from '../../utils/image';
@@ -34,6 +34,7 @@ const PlaceOrder = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash'); // cash | momo
   const [note, setNote] = useState('');
+  const [momoPhone, setMomoPhone] = useState(customer?.phone || '');
   
   // Address Form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -122,6 +123,7 @@ const PlaceOrder = () => {
   const handlePlaceOrder = async () => {
     if (orderType === 'delivery' && !deliveryAddress) return toast.error('Please select a delivery address');
     if (orderType === 'pickup' && !selectedBranch) return toast.error('Please select a branch for pickup');
+    if ((paymentMethod === 'momo' || paymentMethod === 'hubtel') && !momoPhone) return toast.error('Please enter your phone number for payment');
 
     setLoading(true);
     try {
@@ -142,29 +144,25 @@ const PlaceOrder = () => {
         longitude: orderType === 'delivery' && deliveryAddress ? deliveryAddress.longitude : null
       };
       
-      const res = await api.post('/customers/orders', payload);
-      const orderId = res.data.id;
+      const orderRes = await api.post('/customers/orders', payload);
+      const order = orderRes.data;
       
-      // HUBTEL INTEGRATION
-      if (paymentMethod === 'momo') {
+      if (paymentMethod === 'momo' || paymentMethod === 'hubtel') {
         try {
-          const hubtelRes = await api.post('/payments/create-hubtel-checkout', {
-            orderId: orderId,
-            totalAmount: total,
-            name: customer.name,
-            email: customer.email,
-            phone: customer.phone || ''
+          const paymentRes = await api.post('/payments/initiate', {
+            orderId: order.id,
+            phoneNumber: momoPhone
           });
 
-          if (hubtelRes.data.checkoutUrl) {
-            // Redirect to Hubtel
-            window.location.href = hubtelRes.data.checkoutUrl;
-            return; // Don't proceed to success screen yet, Hubtel will redirect back
+          if (paymentRes.data?.checkoutUrl) {
+            window.location.href = paymentRes.data.checkoutUrl;
+            return;
+          } else {
+            toast.error("Payment initiation failed");
           }
         } catch (hubtelErr) {
-          console.error('Hubtel Checkout Error:', hubtelErr);
-          toast.error('Order placed, but failed to initiate payment. Please contact support.');
-          // Even if payment fail initiation, order is in DB as 'unpaid'
+          console.error('Hubtel Initiation Error:', hubtelErr);
+          toast.error('Order placed, but failed to initiate payment. Please retry from order details.');
         }
       }
 
@@ -413,27 +411,56 @@ const PlaceOrder = () => {
                    <h3 className="text-xl font-display font-bold text-white uppercase">Payment Method</h3>
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
-                        { id: 'cash', label: orderType === 'delivery' ? 'Cash on Delivery' : 'Pay at Branch', icon: HiOutlineBanknotes },
-                        { id: 'momo', label: 'Mobile Money', icon: HiOutlineCurrencyDollar }
+                        { id: 'cash', label: 'Cash on Delivery/Pickup', icon: HiOutlineBanknotes, desc: "Pay when you receive your order" },
+                        { id: 'momo', label: 'Mobile Money (MoMo)', icon: HiOutlineCurrencyDollar, desc: "Pay securely with MTN, Vodafone, or AirtelTigo" },
+                        { id: 'hubtel', label: 'Hubtel Pay', icon: HiOutlineShieldExclamation, desc: "Pay online via Hubtel secure checkout" }
                       ].map(p => (
-                        <div 
-                          key={p.id}
-                          onClick={() => setPaymentMethod(p.id)}
-                          className={`p-6 bg-[#0C0A09] rounded-2xl border-2 transition-all cursor-pointer group flex items-center gap-4 ${
-                            paymentMethod === p.id ? 'border-[#F97316]' : 'border-white/5'
-                          }`}
-                        >
-                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === p.id ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
-                              <p.icon size={22} />
-                           </div>
-                           <div>
-                              <p className="font-bold text-sm font-sans">{p.label}</p>
-                              {p.id === 'momo' && <p className="text-[10px] text-[#F97316] font-bold uppercase mt-0.5 font-sans">Pay to: UPDATE_WITH_REAL_KO_WHATSAPP</p>}
-                           </div>
-                           {paymentMethod === p.id && <HiOutlineCheckCircle className="ml-auto text-[#F97316]" size={20} />}
+                        <div key={p.id} className="space-y-4">
+                          <div 
+                            onClick={() => setPaymentMethod(p.id)}
+                            className={`p-6 bg-[#0C0A09] rounded-2xl border-2 transition-all cursor-pointer group flex items-center gap-4 ${
+                              paymentMethod === p.id ? 'border-[#F97316]' : 'border-white/5'
+                            }`}
+                          >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === p.id ? 'bg-[#F97316] text-white' : 'bg-white/5 text-white/40'}`}>
+                                <p.icon size={22} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-sm font-sans">{p.label}</p>
+                                <p className="text-[10px] text-white/40 font-medium font-sans">{p.desc}</p>
+                            </div>
+                            {paymentMethod === p.id && <HiOutlineCheckCircle className="ml-auto text-[#F97316]" size={20} />}
+                          </div>
+                          
+                          {paymentMethod === 'momo' && p.id === 'momo' && (
+                            <div className="pl-6 space-y-4 animate-in fade-in slide-in-from-top-2">
+                               <div className="flex gap-2">
+                                  {['MTN MoMo', 'Vodafone Cash', 'AirtelTigo'].map(net => (
+                                    <span key={net} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-white/40 uppercase tracking-widest">{net}</span>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                    </div>
+
+                   {(paymentMethod === 'momo' || paymentMethod === 'hubtel') && (
+                     <div className="mt-6 p-6 bg-white/5 border border-white/10 rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-4">
+                        <div className="space-y-1.5">
+                           <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">MoMo Phone Number</label>
+                           <input 
+                              type="tel" 
+                              placeholder="024 XXX XXXX"
+                              value={momoPhone}
+                              onChange={e => setMomoPhone(e.target.value)}
+                              className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all font-sans"
+                           />
+                           <p className="text-[10px] text-white/20 ml-1">Enter the number to debit</p>
+                        </div>
+                     </div>
+                   )}
+ </div>
                    <p className="text-[10px] text-white/40 font-medium italic mt-2 ml-1">
                      "Note: A 10% service charge applies to all dine-in orders"
                    </p>

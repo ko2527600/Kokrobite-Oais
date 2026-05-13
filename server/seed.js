@@ -312,6 +312,26 @@ async function main() {
   }})
   console.log("✅ Site config created")
 
+  // ─── TEST DRIVER ───
+  await prisma.driver.create({ data: {
+    name: "Test Driver",
+    phone: "+233201234567",
+    password: bcrypt.hashSync("Driver1234!", 10),
+    vehicleType: "Motorcycle",
+    vehicleNumber: "GR-1234-22",
+    licenseNumber: "DL-12345678",
+    type: "freelance",
+    isApproved: true,
+    isActive: true,
+    status: "offline",
+    rating: 4.8,
+    totalRatings: 12,
+    totalDeliveries: 45,
+    totalEarnings: 900,
+    todayEarnings: 60
+  }})
+  console.log("✅ Test driver created")
+
   console.log("\n🌴 Kokrobite Oasis database seeded successfully!")
   console.log("📧 Admin: admin@kokrobiteoasis.com")
   console.log("🔑 Password: KokrobiteAdmin2026!")

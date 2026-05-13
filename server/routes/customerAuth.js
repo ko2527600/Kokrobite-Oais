@@ -13,45 +13,55 @@ router.post("/register", async (req, res) => {
     const { name, email, password, phone } = req.body;
 
     const existingCustomer = await prisma.customer.findUnique({ where: { email } });
-    if (existingCustomer) {
+    if (existingCustomer && existingCustomer.password) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const customer = await prisma.customer.create({
-      data: {
-        name,
-        email,
-        phone,
-        password: hashedPassword,
-        isVerified: true,
-        loyaltyPoints: 50,
-      },
-      omit: { password: true }
-    });
+    let customer;
+    if (existingCustomer) {
+      // Upgrade existing Google account with a password
+      customer = await prisma.customer.update({
+        where: { id: existingCustomer.id },
+        data: { password: hashedPassword },
+        omit: { password: true }
+      });
+    } else {
+      // Create new account
+      customer = await prisma.customer.create({
+        data: {
+          name,
+          email,
+          phone,
+          password: hashedPassword,
+          isVerified: true,
+          loyaltyPoints: 50,
+        },
+        omit: { password: true }
+      });
+      
+      // Welcome rewards only for brand new accounts
+      await prisma.notification.create({
+        data: {
+          customerId: customer.id,
+          type: "welcome",
+          title: "Welcome to Kokrobite Oasis! 🎉",
+          message: "You've earned 50 welcome loyalty points. Start ordering to earn more!",
+          read: false
+        }
+      });
 
-    // Create welcome notification
-    await prisma.notification.create({
-      data: {
-        customerId: customer.id,
-        type: "welcome",
-        title: "Welcome to Kokrobite Oasis! 🎉",
-        message: "You've earned 50 welcome loyalty points. Start ordering to earn more!",
-        read: false
-      }
-    });
-
-    // Add loyalty history entry
-    await prisma.loyaltyHistory.create({
-      data: {
-        customerId: customer.id,
-        points: 50,
-        type: "credit",
-        description: "Welcome bonus points"
-      }
-    });
+      await prisma.loyaltyHistory.create({
+        data: {
+          customerId: customer.id,
+          points: 50,
+          type: "credit",
+          description: "Welcome bonus points"
+        }
+      });
+    }
 
     const cookieMaxAge = 30 * 24 * 60 * 60 * 1000; // Default 30 days for registration
     const token = jwt.sign(
@@ -62,9 +72,10 @@ router.post("/register", async (req, res) => {
 
     res.cookie("ko_customer_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: cookieMaxAge
+      secure: true,
+      sameSite: "none",
+      maxAge: cookieMaxAge,
+      path: "/"
     });
 
     res.json({ token, customer });
@@ -90,7 +101,9 @@ router.post("/login", async (req, res) => {
     }
 
     if (!customer.password) {
-      return res.status(401).json({ message: "This account uses Google Sign-In. Please use the Google button to login." });
+      return res.status(401).json({ 
+        message: "This account uses Google Sign-In. Please use the Google button, or 'Register' with the same email to set a password." 
+      });
     }
 
     const isMatch = await bcrypt.compare(password, customer.password);
@@ -116,9 +129,10 @@ router.post("/login", async (req, res) => {
 
     res.cookie("ko_customer_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: cookieMaxAge
+      secure: true,
+      sameSite: "none",
+      maxAge: cookieMaxAge,
+      path: "/"
     });
 
     res.json({ token, customer: updatedCustomer });
@@ -208,9 +222,10 @@ router.post("/google", async (req, res) => {
 
     res.cookie("ko_customer_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: cookieMaxAge
+      secure: true,
+      sameSite: "none",
+      maxAge: cookieMaxAge,
+      path: "/"
     });
 
     res.json({ token, customer, isNewUser });
@@ -225,8 +240,9 @@ router.post("/google", async (req, res) => {
 router.post("/logout", (req, res) => {
   res.clearCookie("ko_customer_token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    secure: true,
+    sameSite: "none",
+    path: "/"
   });
   return res.json({ message: "Logged out" });
 });

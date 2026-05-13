@@ -47,25 +47,31 @@ export const validate = (schema) => (req, res, next) => {
 export const orderSchema = z.object({
   body: z.object({
     type: z.enum(['delivery', 'pickup']),
-    branch: z.string().optional(),
-    deliveryAddress: z.string().optional(),
-    deliveryArea: z.string().optional(),
-    deliveryLandmark: z.string().optional(),
+    branch: z.string().nullable().optional(),
+    deliveryAddress: z.string().nullable().optional(),
+    deliveryArea: z.string().nullable().optional(),
+    deliveryLandmark: z.string().nullable().optional(),
     items: z.array(z.object({
       name: z.string(),
       price: z.union([z.number(), z.string()]),
       quantity: z.number().positive(),
+      menuItemId: z.string().optional(),
     })).min(1),
     paymentMethod: z.string(),
-    note: z.string().optional(),
+    totalAmount: z.number().optional(),
+    note: z.string().nullable().optional(),
     latitude: z.union([z.number(), z.null()]).optional(),
     longitude: z.union([z.number(), z.null()]).optional(),
   }).refine((data) => {
-    if (data.type === 'delivery' && !data.deliveryAddress) return false;
-    if (data.type === 'pickup' && !data.branch) return false;
+    if (data.type === 'delivery') {
+      return !!data.deliveryAddress && data.deliveryAddress.trim().length > 0;
+    }
+    if (data.type === 'pickup') {
+      return !!data.branch && data.branch.trim().length > 0;
+    }
     return true;
   }, {
-    message: "Delivery address is required for delivery, and branch for pickup",
+    message: "Delivery address is required for delivery, and branch name for pickup",
     path: ["type"]
   }),
 });

@@ -2,7 +2,7 @@ import express from "express"
 import prisma from "../lib/prisma.js"
 import driverAuth from "../middleware/driverAuth.js"
 import customerAuth from "../middleware/customerAuth.js"
-import { getIO } from "../lib/socket.js"
+// Removed static socket import
 
 const router = express.Router()
 
@@ -132,7 +132,7 @@ router.patch("/status", driverAuth, async (req, res) => {
       data: { status }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.emit("driver_status_update", {
       driverId: req.driver.id,
       name: req.driver.name,
@@ -176,7 +176,7 @@ router.patch("/location", driverAuth, async (req, res) => {
     })
 
     if (active) {
-      const io = getIO()
+      const io = req.app.get("io")
       io.to(`order_${active.orderId}`).emit("driver_location", { lat, lng })
     }
 

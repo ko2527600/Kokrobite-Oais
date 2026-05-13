@@ -9,7 +9,9 @@ api.interceptors.request.use((config) => {
   const adminToken = localStorage.getItem("ko_admin_token")
   const customerToken = localStorage.getItem("ko_customer_token")
   const driverToken = localStorage.getItem("ko_driver_token")
+  
   const token = adminToken || customerToken || driverToken
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -19,31 +21,21 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only handle 401 if it's not the initial session check
-    const isMeCheck = error.config.url.includes('/auth/me');
-    const isLoginCheck = error.config.url.includes('/login') || error.config.url.includes('/google');
+    if (error.response?.status === 401) {
+      localStorage.removeItem("ko_admin_token")
+      localStorage.removeItem("ko_admin_user")
+      localStorage.removeItem("ko_customer_token")
+      localStorage.removeItem("ko_customer_user")
+      localStorage.removeItem("ko_driver_token")
+      localStorage.removeItem("ko_driver_user")
 
-    if (error.response?.status === 401 && !isMeCheck && !isLoginCheck) {
-      const hasToken = localStorage.getItem("ko_admin_token") || 
-                       localStorage.getItem("ko_customer_token") ||
-                       localStorage.getItem("ko_driver_token");
-      
-      if (hasToken) {
-        localStorage.removeItem("ko_admin_token");
-        localStorage.removeItem("ko_admin_user");
-        localStorage.removeItem("ko_customer_token");
-        localStorage.removeItem("ko_customer_user");
-        localStorage.removeItem("ko_driver_token");
-        localStorage.removeItem("ko_driver_user");
-        
-        const path = window.location.pathname;
-        if (path.startsWith("/admin") && path !== "/admin/login") {
-          window.location.href = "/admin/login";
-        } else if (path.startsWith("/portal") && path !== "/portal/login") {
-          window.location.href = "/portal/login";
-        } else if (path.startsWith("/delivery") && path !== "/delivery/login") {
-          window.location.href = "/delivery/login";
-        }
+      const path = window.location.pathname
+      if (path.startsWith("/admin")) {
+        window.location.href = "/admin/login"
+      } else if (path.startsWith("/portal")) {
+        window.location.href = "/portal/login"
+      } else if (path.startsWith("/delivery")) {
+        window.location.href = "/delivery/login"
       }
     }
     return Promise.reject(error)

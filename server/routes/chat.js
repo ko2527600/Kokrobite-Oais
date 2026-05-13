@@ -1,9 +1,7 @@
+import jwt from "jsonwebtoken"
 import express from "express"
 import prisma from "../lib/prisma.js"
 import { getIO } from "../lib/socket.js"
-import adminAuth from "../middleware/auth.js"
-import customerAuth from "../middleware/customerAuth.js"
-import driverAuth from "../middleware/driverAuth.js"
 
 const router = express.Router()
 
@@ -17,17 +15,31 @@ const getRequester = (req) => {
 
 // Flexible middleware to allow any of the 3 roles
 const anyAuth = async (req, res, next) => {
-  // Try each auth check
-  try { await new Promise((resolve) => adminAuth(req, res, resolve)) } catch (e) {}
-  if (req.user) return next()
+  const token = req.cookies?.ko_admin_token || 
+                req.cookies?.ko_customer_token || 
+                req.cookies?.ko_driver_token ||
+                (req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.split(" ")[1] : null);
 
-  try { await new Promise((resolve) => customerAuth(req, res, resolve)) } catch (e) {}
-  if (req.customer) return next()
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
 
-  try { await new Promise((resolve) => driverAuth(req, res, resolve)) } catch (e) {}
-  if (req.driver) return next()
-
-  return res.status(401).json({ message: "Unauthorized" })
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    if (decoded.role === "admin") {
+      const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+      if (user) { req.user = user; return next(); }
+    } else if (decoded.role === "customer") {
+      const customer = await prisma.customer.findUnique({ where: { id: decoded.id } });
+      if (customer) { req.customer = customer; return next(); }
+    } else if (decoded.role === "driver") {
+      const driver = await prisma.driver.findUnique({ where: { id: decoded.id } });
+      if (driver) { req.driver = driver; return next(); }
+    }
+    
+    return res.status(401).json({ message: "Unauthorized" });
+  } catch (e) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 }
 
 // @route   GET /api/chat/:orderId

@@ -1,154 +1,335 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { Phone, Lock, User, Truck, Hash, CreditCard, ArrowLeft, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { 
+  HiOutlineArrowLeft, HiOutlineEye, HiOutlineEyeSlash, 
+  HiOutlineCheckCircle, HiOutlineClock, HiOutlineBellAlert
+} from "react-icons/hi2"
 import api from "../../api/axios"
 import { toast } from "react-hot-toast"
 
 export default function DriverRegister() {
+  const [step, setStep] = useState(1) // 1: Form, 2: Success
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     password: "",
+    confirmPassword: "",
+    type: "freelance",
     vehicleType: "Motorcycle",
     vehicleNumber: "",
-    licenseNumber: "",
-    type: "freelance"
+    licenseNumber: ""
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const navigate = useNavigate()
+
+  const passwordStrength = (pwd) => {
+    if (!pwd) return 0
+    if (pwd.length < 5) return 1
+    if (pwd.length < 8) return 2
+    return 3
+  }
+
+  const strength = passwordStrength(formData.password)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters")
+      return
+    }
+
+    if (!termsAccepted) {
+      setError("Please accept the terms and conditions")
+      return
+    }
+
     setLoading(true)
     try {
-      await api.post("/drivers/auth/register", formData)
-      toast.success("Registration successful! Awaiting admin approval.")
-      navigate("/delivery/login")
+      await api.post("/drivers/auth/register", {
+        name: formData.name,
+        phone: formData.phone,
+        password: formData.password,
+        type: formData.type,
+        vehicleType: formData.vehicleType,
+        vehicleNumber: formData.vehicleNumber,
+        licenseNumber: formData.licenseNumber
+      })
+      setStep(2)
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed")
+      if (err.response?.status === 400 && err.response?.data?.message?.includes("already registered")) {
+        setError("Phone number already registered. Try logging in instead.")
+      } else {
+        setError(err.response?.data?.message || "Registration failed. Please try again.")
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
-  return (
-    <div className="min-h-screen bg-[#0C0A09] flex flex-col items-center justify-center p-6 py-12">
-      <div className="w-full max-w-[440px] space-y-8">
-        
-        {/* HEADER */}
-        <div className="text-center space-y-2">
-          <Link to="/delivery/login" className="inline-flex items-center gap-2 text-white/20 hover:text-[#F97316] transition-colors text-xs uppercase tracking-widest font-bold mb-4">
-            <ArrowLeft size={14} /> Back to Login
-          </Link>
-          <h1 className="text-4xl font-['Playfair_Display'] text-white">Join the Fleet</h1>
-          <p className="text-[13px] text-white/40 font-['Plus_Jakarta_Sans']">Register as a KO Rider and start earning</p>
-        </div>
-
-        {/* FORM */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-[#1a1a1a] border border-white/5 rounded-[2rem] p-8 space-y-5 shadow-2xl">
+  if (step === 2) {
+    return (
+      <div className="min-h-screen bg-[#0C0A09] flex flex-col items-center justify-center p-6 text-center">
+        <motion.div 
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="w-full max-w-[440px]"
+        >
+          <div className="w-20 h-20 bg-[#10B981]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <HiOutlineCheckCircle className="text-[#10B981]" size={48} />
+          </div>
+          <h2 className="text-3xl font-display font-bold text-white mb-6">Application Submitted!</h2>
+          
+          <div className="bg-[#10B981]/10 border border-[#10B981]/20 rounded-2xl p-6 mb-8 text-left">
+            <p className="text-white/60 text-sm leading-relaxed mb-6">
+              Your driver application has been received. The Kokrobite Oasis management team will review your details and approve your account within 24 hours.
+            </p>
             
-            {/* Personal Info */}
-            <div className="space-y-4">
-              <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest border-b border-white/5 pb-2">Personal Details</p>
-              
-              <InputGroup label="Full Name" icon={<User size={18}/>}>
-                <input name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" required className="input-field" />
-              </InputGroup>
-
-              <InputGroup label="Phone Number" icon={<Phone size={18}/>}>
-                <input name="phone" value={formData.phone} onChange={handleChange} placeholder="+233 XX XXX XXXX" required className="input-field" />
-              </InputGroup>
-
-              <InputGroup label="Password" icon={<Lock size={18}/>}>
-                <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required className="input-field" />
-              </InputGroup>
-            </div>
-
-            {/* Vehicle Info */}
-            <div className="space-y-4 pt-4">
-              <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest border-b border-white/5 pb-2">Vehicle & License</p>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest ml-1">Vehicle Type</label>
-                  <select name="vehicleType" value={formData.vehicleType} onChange={handleChange} className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-orange-500 outline-none appearance-none">
-                    <option value="Motorcycle">Motorcycle</option>
-                    <option value="Bicycle">Bicycle</option>
-                    <option value="Car">Car</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest ml-1">Work Type</label>
-                  <select name="type" value={formData.type} onChange={handleChange} className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-orange-500 outline-none appearance-none">
-                    <option value="freelance">Freelance</option>
-                    <option value="inhouse">In-house</option>
-                  </select>
-                </div>
-              </div>
-
-              <InputGroup label="Vehicle Number" icon={<Hash size={18}/>}>
-                <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleChange} placeholder="GW-1234-24" required className="input-field" />
-              </InputGroup>
-
-              <InputGroup label="License Number" icon={<CreditCard size={18}/>}>
-                <input name="licenseNumber" value={formData.licenseNumber} onChange={handleChange} placeholder="LICENSE-XXXXX" required className="input-field" />
-              </InputGroup>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-4">What happens next:</p>
+            <div className="space-y-3">
+              <StepItem icon={<HiOutlineCheckCircle className="text-[#10B981]" />} text="Application received" />
+              <StepItem icon={<HiOutlineClock className="text-[#F59E0B]" />} text="Management review (24hrs)" />
+              <StepItem icon={<HiOutlineBellAlert className="text-white/20" />} text="You receive approval notification" />
             </div>
           </div>
 
           <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white font-bold uppercase tracking-[0.2em] py-4 rounded-2xl shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95 transition-transform"
+            onClick={() => navigate("/delivery/login")}
+            className="w-full bg-[#F97316] text-white font-bold py-4 rounded-xl hover:bg-[#F97316]/90 transition-all shadow-xl shadow-[#F97316]/20"
           >
-            {loading ? <Loader2 className="animate-spin" /> : "Submit Application 🚀"}
+            Back to Login
           </button>
-        </form>
+        </motion.div>
+      </div>
+    )
+  }
 
-        <p className="text-center text-xs text-white/30 leading-relaxed">
-          By registering, you agree to Kokrobite Oasis driver terms. Your application will be reviewed by management within 24-48 hours.
+  return (
+    <div className="min-h-screen bg-[#0C0A09] flex flex-col items-center p-6 py-10">
+      <div className="w-full max-w-[440px]">
+        {/* TOP SECTION */}
+        <Link to="/delivery/login" className="inline-flex items-center gap-2 text-white/30 hover:text-[#F97316] transition-all text-[10px] uppercase font-bold tracking-widest mb-10">
+          <HiOutlineArrowLeft size={14} /> Back to Login
+        </Link>
+
+        <div className="text-center mb-10">
+          <span className="text-5xl block mb-4">🛵</span>
+          <h1 className="text-4xl font-display italic font-bold text-white mb-1">KO Rider</h1>
+          <p className="text-white/30 text-xs">by Kokrobite Oasis</p>
+          <p className="text-[#F97316] text-[10px] font-bold uppercase tracking-[0.2em] mt-3">Join our delivery team</p>
+        </div>
+
+        <div className="h-px bg-[#F97316]/15 w-full mb-10" />
+
+        <h2 className="text-3xl font-display font-bold text-white mb-2">Create Driver Account</h2>
+        <p className="text-white/40 text-sm leading-relaxed mb-10">
+          Fill in your details below. Your account will be reviewed before you can start delivering.
         </p>
 
-      </div>
+        <form onSubmit={handleSubmit} className="space-y-8 pb-10">
+          {/* SECTION 1: PERSONAL INFO */}
+          <div className="space-y-6">
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Personal Information</p>
+            
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>
+              <input 
+                required type="text" placeholder="John Mensah"
+                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
+                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+              />
+            </div>
 
-      <style>{`
-        .input-field {
-          width: 100%;
-          background: rgba(0,0,0,0.2);
-          border: 1px solid rgba(255,255,255,0.05);
-          border-radius: 0.75rem;
-          padding: 0.75rem 1rem 0.75rem 2.75rem;
-          font-size: 0.875rem;
-          color: white;
-          transition: all 0.2s;
-          outline: none;
-        }
-        .input-field:focus {
-          border-color: #F97316;
-          background: rgba(0,0,0,0.3);
-          box-shadow: 0 0 0 4px rgba(249,115,22,0.1);
-        }
-      `}</style>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Phone Number</label>
+              <input 
+                required type="tel" placeholder="+233 XX XXX XXXX"
+                value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
+                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+              />
+              <p className="text-[10px] text-white/20 ml-1">This will be your login ID</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Password</label>
+              <div className="relative">
+                <input 
+                  required type={showPassword ? "text" : "password"} placeholder="••••••••"
+                  value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})}
+                  className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+                />
+                <button 
+                  type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-all"
+                >
+                  {showPassword ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}
+                </button>
+              </div>
+              <div className="flex gap-1 mt-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className={`h-1 flex-1 rounded-full ${
+                    i <= strength ? (strength === 1 ? 'bg-[#EF4444]' : strength === 2 ? 'bg-[#F59E0B]' : 'bg-[#10B981]') : 'bg-white/5'
+                  }`} />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Confirm Password</label>
+              <div className="relative">
+                <input 
+                  required type={showConfirmPassword ? "text" : "password"} placeholder="••••••••"
+                  value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
+                  className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+                />
+                <button 
+                  type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-all"
+                >
+                  {showConfirmPassword ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}
+                </button>
+              </div>
+              {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                <p className="text-[10px] text-[#10B981] font-bold mt-1.5 flex items-center gap-1">
+                   <HiOutlineCheckCircle /> Passwords match
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="h-px bg-white/5 w-full" />
+
+          {/* SECTION 2: VEHICLE INFO */}
+          <div className="space-y-6">
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Vehicle Information</p>
+            
+            <div className="space-y-2.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">I am a...</label>
+              <div className="grid grid-cols-2 gap-3">
+                <SelectionCard 
+                  title="In-House" icon="🏢" sub="Employed by KO" 
+                  selected={formData.type === 'inhouse'} 
+                  onClick={() => setFormData({...formData, type: 'inhouse'})} 
+                />
+                <SelectionCard 
+                  title="Freelance" icon="🚀" sub="Contractor" 
+                  selected={formData.type === 'freelance'} 
+                  onClick={() => setFormData({...formData, type: 'freelance'})} 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Vehicle Type</label>
+              <select 
+                value={formData.vehicleType} onChange={e => setFormData({...formData, vehicleType: e.target.value})}
+                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all appearance-none"
+              >
+                <option value="Motorcycle">🏍️ Motorcycle</option>
+                <option value="Car">🚗 Car</option>
+                <option value="Bicycle">🚲 Bicycle</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">
+                Vehicle Registration Number <span className="text-white/20">(Optional)</span>
+              </label>
+              <input 
+                type="text" placeholder="GR-1234-22"
+                value={formData.vehicleNumber} onChange={e => setFormData({...formData, vehicleNumber: e.target.value})}
+                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">
+                Driver's License Number <span className="text-white/20">(Optional)</span>
+              </label>
+              <input 
+                type="text" placeholder="DL-XXXXXXXX"
+                value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value})}
+                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="h-px bg-white/5 w-full" />
+
+          {/* SECTION 3: TERMS */}
+          <div className="flex items-start gap-3">
+            <input 
+              type="checkbox" required
+              checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-white/10 bg-white/5 accent-[#F97316]"
+            />
+            <p className="text-white/50 text-xs leading-relaxed">
+              I agree to the Kokrobite Oasis Driver Terms and Conditions
+            </p>
+          </div>
+
+          {/* ERROR DISPLAY */}
+          <AnimatePresence>
+            {error && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="bg-[#EF4444]/10 border border-[#EF4444]/20 rounded-xl p-4"
+              >
+                <p className="text-[#EF4444] text-sm text-center font-medium">{error}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button 
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white font-bold uppercase tracking-widest text-sm py-4 rounded-xl shadow-2xl shadow-[#F97316]/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting...</>
+            ) : "Submit Application 🛵"}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
 
-function InputGroup({ label, icon, children }) {
+function SelectionCard({ title, icon, sub, selected, onClick }) {
   return (
-    <div className="space-y-1.5 relative">
-      <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest ml-1">{label}</label>
-      <div className="relative">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20">
-          {icon}
-        </div>
-        {children}
-      </div>
+    <button 
+      type="button" onClick={onClick}
+      className={`p-4 rounded-xl border text-left transition-all ${
+        selected 
+          ? 'bg-[#F97316]/10 border-[#F97316]' 
+          : 'bg-[#1a1a1a] border-white/5 hover:border-white/10'
+      }`}
+    >
+      <p className="text-white text-sm font-semibold mb-0.5">{icon} {title}</p>
+      <p className="text-[10px] text-white/40">{sub}</p>
+    </button>
+  )
+}
+
+function StepItem({ icon, text }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-5 h-5 flex items-center justify-center shrink-0">{icon}</div>
+      <p className="text-white/60 text-xs font-medium">{text}</p>
     </div>
   )
 }

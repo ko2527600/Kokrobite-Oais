@@ -1,136 +1,220 @@
-import express from "express"
+import { Router } from "express"
 import axios from "axios"
-import crypto from "crypto"
 import prisma from "../lib/prisma.js"
-import auth from "../middleware/auth.js"
-import { getIO } from "../lib/socket.js"
+import customerAuth from "../middleware/customerAuth.js"
 
-const router = express.Router()
+const router = Router()
 
-// ─── HUBTEL AUTH HELPER ───
-const getHubtelAuthHeader = () => {
-  const auth = Buffer.from(
+const HUBTEL_BASE = "https://api.hubtel.com/v1/merchantaccount"
+
+function getHubtelHeaders() {
+  const credentials = Buffer.from(
     `${process.env.HUBTEL_CLIENT_ID}:${process.env.HUBTEL_CLIENT_SECRET}`
   ).toString("base64")
-  return `Basic ${auth}`
-}
-
-// ─── WEBHOOK SECURITY HELPERS (Using Database instead of Redis) ───
-const secureWebhook = async (orderId, amount) => {
-  const clientReference = crypto.randomBytes(10).toString("hex")
-  await prisma.hubtelTransaction.create({
-    data: {
-      orderId,
-      amount,
-      clientReference,
-      status: "pending"
-    }
-  })
-  return clientReference
-}
-
-const verifyWebhook = async (clientReference) => {
-  const transaction = await prisma.hubtelTransaction.findUnique({
-    where: { clientReference }
-  })
   
-  if (!transaction || transaction.status !== "pending") {
-    return { success: false }
+  return {
+    "Authorization": `Basic ${credentials}`,
+    "Content-Type": "application/json"
   }
-
-  return { success: true, orderId: transaction.orderId }
 }
 
-// ─── INITIATE HUBTEL CHECKOUT ───
-router.post("/create-hubtel-checkout", auth, async (req, res) => {
+// ─── POST /api/payments/initiate (customerAuth) ───
+router.post("/initiate", customerAuth, async (req, res) => {
   try {
-    const { orderId, totalAmount, name, email, phone } = req.body
+    const { orderId, phoneNumber } = req.body
 
-    // 1. Generate security reference
-    const clientReference = await secureWebhook(orderId, parseFloat(totalAmount))
-
-    // 2. Prepare Hubtel Payload
-    const payload = {
-      merchantAccountNumber: process.env.HUBTEL_MERCHANT_ACCOUNT_NUMBER,
-      totalAmount: parseFloat(totalAmount),
-      title: "Kokrobite Oasis Order",
-      description: `Payment for Order #${orderId}`,
-      callbackUrl: `${process.env.BACKEND_URL}/api/payments/hubtel-webhook`,
-      returnUrl: `${process.env.FRONTEND_URL}/portal/order-success`,
-      cancellationUrl: `${process.env.FRONTEND_URL}/portal/order-cancel`,
-      payeeName: name || req.customer?.name,
-      payeeEmail: email || req.customer?.email || "",
-      payeeMobileNumber: phone || req.customer?.phone || "",
-      clientReference: clientReference,
+    if (!orderId || !phoneNumber) {
+      return res.status(400).json({
+        message: "Order ID and phone number are required"
+      })
     }
 
-    // 3. Call Hubtel API
+    // Find the order
+    const order = await prisma.customerOrder.findFirst({
+      where: {
+        id: orderId,
+        customerId: req.customer.id
+      },
+      include: { items: true }
+    })
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found"
+      })
+    }
+
+    if (order.paymentStatus === "paid") {
+      return res.status(400).json({
+        message: "Order already paid"
+      })
+    }
+
+    // Build Hubtel payment request
+    const paymentData = {
+      totalAmount: order.totalAmount,
+      description: `Kokrobite Oasis Order ${order.orderNumber}`,
+      callbackUrl: process.env.HUBTEL_CALLBACK_URL,
+      returnUrl: `${process.env.CLIENT_URL}/portal/orders/${order.id}`,
+      cancellationUrl: `${process.env.CLIENT_URL}/portal/orders/${order.id}`,
+      merchantAccountNumber: process.env.HUBTEL_MERCHANT_ACCOUNT,
+      clientReference: order.id,
+      customerPhoneNumber: phoneNumber.replace("+", "").replace(/\s/g, ""),
+      customerEmail: req.customer.email || "",
+      customerName: req.customer.name,
+    }
+
+    // Call Hubtel API
     const response = await axios.post(
-      process.env.HUBTEL_ONLINE_CHECKOUT_URL,
-      payload,
-      {
-        headers: {
-          Authorization: getHubtelAuthHeader(),
-          "Content-Type": "application/json",
-        },
-      }
+      `${HUBTEL_BASE}/receive-money`,
+      paymentData,
+      { headers: getHubtelHeaders() }
     )
 
-    if (response.data && response.data.responseCode === "0000") {
-      return res.json({ checkoutUrl: response.data.data.checkoutUrl })
-    }
+    if (response.data?.status === "Success") {
+      // Update order payment status
+      await prisma.customerOrder.update({
+        where: { id: orderId },
+        data: { 
+          paymentStatus: "pending",
+          paymentMethod: "momo"
+        }
+      })
 
-    throw new Error(`Hubtel API error: ${JSON.stringify(response.data)}`)
+      return res.json({
+        message: "Payment initiated",
+        checkoutUrl: response.data.data?.checkoutDirectUrl,
+        clientReference: order.id,
+        data: response.data
+      })
+    } else {
+      return res.status(400).json({
+        message: "Payment initiation failed",
+        error: response.data
+      })
+    }
   } catch (err) {
-    console.error("Hubtel Checkout Error:", err.message)
-    res.status(500).json({ message: "Failed to initiate payment via Hubtel" })
+    console.error("Hubtel error:", err.message)
+    return res.status(500).json({
+      message: "Payment service error",
+      error: err.message
+    })
   }
 })
 
-// ─── HUBTEL WEBHOOK ───
-router.post("/hubtel-webhook", async (req, res) => {
+// ─── POST /api/payments/callback (NO auth) ───
+router.post("/callback", async (req, res) => {
   try {
-    const { ClientReference, Status, Amount, TransactionId, Description } = req.body
+    const { Data, ResponseCode, Status } = req.body
 
-    // 1. Verify the webhook
-    const verification = await verifyWebhook(ClientReference)
-    if (!verification.success) {
-      console.warn("Unauthorized or duplicate Hubtel webhook:", ClientReference)
-      return res.status(401).json({ status: "error", message: "Invalid reference" })
+    console.log("Hubtel callback:", JSON.stringify(req.body, null, 2))
+
+    if (ResponseCode === "0000" && Status === "Success") {
+      const orderId = Data?.ClientReference
+
+      if (orderId) {
+        // Update order as paid
+        const order = await prisma.customerOrder.update({
+          where: { id: orderId },
+          data: {
+            paymentStatus: "paid",
+            status: "confirmed"
+          },
+          include: { customer: true }
+        })
+
+        // Notify customer
+        await prisma.notification.create({
+          data: {
+            customerId: order.customerId,
+            type: "order_confirmed",
+            title: "Payment Confirmed! ✅",
+            message: `Your payment of GHC ${order.totalAmount} for order ${order.orderNumber} was successful. Your order is confirmed!`,
+            data: { 
+              orderId: order.id,
+              orderNumber: order.orderNumber
+            }
+          }
+        })
+
+        // Emit socket event
+        const io = req.app.get("io")
+        if (io) {
+          io.to(`order_${orderId}`).emit("payment_confirmed", {
+            orderId,
+            status: "confirmed"
+          })
+        }
+
+        console.log(`✅ Payment confirmed for order: ${order.orderNumber}`)
+      }
+    } else {
+      console.log("Payment failed:", req.body)
+      
+      const orderId = Data?.ClientReference
+      if (orderId) {
+        await prisma.customerOrder.update({
+          where: { id: orderId },
+          data: { paymentStatus: "failed" }
+        })
+      }
     }
 
-    const orderId = verification.orderId
+    // Always return 200 to Hubtel
+    return res.status(200).json({ message: "Callback received" })
+  } catch (err) {
+    console.error("Callback error:", err.message)
+    return res.status(200).json({ message: "Callback received" })
+  }
+})
 
-    // 2. Update Transaction Record
-    await prisma.hubtelTransaction.update({
-      where: { clientReference: ClientReference },
-      data: {
-        status: Status,
-        transactionId: TransactionId,
-        description: Description
+// ─── GET /api/payments/status/:orderId (customerAuth) ───
+router.get("/status/:orderId", customerAuth, async (req, res) => {
+  try {
+    const order = await prisma.customerOrder.findFirst({
+      where: {
+        id: req.params.orderId,
+        customerId: req.customer.id
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        totalAmount: true,
+        paymentStatus: true,
+        paymentMethod: true,
+        status: true
       }
     })
 
-    // 3. Handle Success
-    if (Status === "Success") {
-      console.log(`✅ Hubtel Payment Success: Order ${orderId}`)
-      
-      await prisma.customerOrder.update({
-        where: { id: orderId },
-        data: { paymentStatus: "paid" }
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found"
       })
-
-      // Notify via Socket.io
-      const io = getIO()
-      io.emit("payment_success", { orderId })
-    } else {
-      console.log(`❌ Hubtel Payment ${Status}: Order ${orderId}`)
     }
 
-    return res.status(200).json({ status: "success" })
+    return res.json(order)
   } catch (err) {
-    console.error("Hubtel Webhook Error:", err.message)
-    return res.status(500).json({ status: "error" })
+    return res.status(500).json({
+      message: err.message
+    })
+  }
+})
+
+// ─── POST /api/payments/verify (customerAuth) ───
+router.post("/verify", customerAuth, async (req, res) => {
+  try {
+    const { clientReference } = req.body
+
+    const response = await axios.get(
+      `${HUBTEL_BASE}/transactions/check-status?clientReference=${clientReference}&merchantAccountNumber=${process.env.HUBTEL_MERCHANT_ACCOUNT}`,
+      { headers: getHubtelHeaders() }
+    )
+
+    return res.json(response.data)
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message
+    })
   }
 })
 
