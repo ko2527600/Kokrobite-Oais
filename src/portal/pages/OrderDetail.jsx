@@ -4,7 +4,9 @@ import { motion } from 'motion/react';
 import { 
   HiOutlineShoppingBag, HiOutlineArrowLeft, HiOutlineClock,
   HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineTruck,
-  HiOutlineBuildingStorefront, HiOutlineStar, HiOutlineReceiptPercent
+  HiOutlineBuildingStorefront, HiOutlineStar, HiOutlineReceiptPercent,
+  HiOutlineShieldExclamation, HiOutlineExclamationTriangle, HiOutlineChatBubbleLeftRight,
+  HiOutlinePhone
 } from 'react-icons/hi2';
 import { toast } from 'react-hot-toast';
 import api from '../../api/axios';
@@ -20,6 +22,9 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportForm, setReportForm] = useState({ reason: '', comment: '' });
+  const [submittingReport, setSubmittingReport] = useState(false);
 
   const fetchOrder = async () => {
     try {
@@ -55,6 +60,26 @@ const OrderDetail = () => {
       toast.error(err.response?.data?.message || 'Failed to cancel order');
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleReportIssue = async () => {
+    if (!reportForm.reason) return toast.error("Please select a reason");
+    setSubmittingReport(true);
+    try {
+      await api.post("/customers/orders/reports", {
+        driverId: order.delivery.driver.id,
+        orderId: order.id,
+        customerId: customer.id,
+        ...reportForm
+      });
+      toast.success("Issue reported. Management will investigate.");
+      setShowReportModal(false);
+      setReportForm({ reason: '', comment: '' });
+    } catch (err) {
+      toast.error("Failed to submit report");
+    } finally {
+      setSubmittingReport(false);
     }
   };
 
@@ -221,6 +246,58 @@ const OrderDetail = () => {
                </div>
             </section>
 
+            {/* Driver Info Card */}
+            {order.delivery?.driver && (
+              <section className="bg-gradient-to-br from-[#1C0A00] to-[#111111] border border-[#F97316]/20 rounded-[2.5rem] p-8 space-y-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                   <HiOutlineTruck size={80} />
+                </div>
+                <h4 className="text-lg font-display font-bold text-white uppercase tracking-tight flex items-center gap-3">
+                   <HiOutlineShieldExclamation className="text-[#F97316]" />
+                   Your Rider
+                </h4>
+                
+                <div className="flex items-center gap-6 relative z-10">
+                   <div className="w-16 h-16 rounded-3xl bg-white/5 overflow-hidden border border-white/10">
+                      {order.delivery.driver.avatar ? (
+                        <img src={order.delivery.driver.avatar} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#F97316]">
+                           {order.delivery.driver.name.charAt(0)}
+                        </div>
+                      )}
+                   </div>
+                   <div className="flex-1">
+                      <p className="text-xl font-display font-bold text-white leading-tight">{order.delivery.driver.name}</p>
+                      <p className="text-xs text-white/40 font-medium uppercase tracking-widest mt-1">
+                         {order.delivery.driver.vehicleType} • {order.delivery.driver.vehicleNumber}
+                      </p>
+                   </div>
+                   <a 
+                     href={`tel:${order.delivery.driver.phone}`}
+                     className="p-4 bg-[#F97316] text-white rounded-2xl shadow-lg shadow-[#F97316]/20 hover:scale-110 transition-all"
+                   >
+                      <HiOutlinePhone size={20} />
+                   </a>
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                   <button 
+                     onClick={() => setShowChat(true)}
+                     className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                   >
+                      <HiOutlineChatBubbleLeftRight size={14} /> Chat
+                   </button>
+                   <button 
+                     onClick={() => setShowReportModal(true)}
+                     className="flex-1 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                   >
+                      <HiOutlineExclamationTriangle size={14} /> Report Issue
+                   </button>
+                </div>
+              </section>
+            )}
+
             <section className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 flex flex-col gap-4">
                <h4 className="text-sm font-black text-white uppercase tracking-widest">Actions</h4>
                
@@ -279,6 +356,70 @@ const OrderDetail = () => {
               currentUser={customer} 
               onClose={() => setShowChat(false)} 
             />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── REPORT MODAL ── */}
+      <AnimatePresence>
+        {showReportModal && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowReportModal(false)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
+              className="relative w-full max-w-lg bg-[#1a1a1a] rounded-[2.5rem] border border-white/10 p-8 shadow-2xl"
+            >
+              <h2 className="text-2xl font-display font-bold text-white mb-2">Report Delivery Issue</h2>
+              <p className="text-white/40 text-sm mb-6">We take your safety and satisfaction seriously. Please describe what happened.</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Reason</label>
+                  <select 
+                    value={reportForm.reason}
+                    onChange={e => setReportForm({ ...reportForm, reason: e.target.value })}
+                    className="w-full bg-[#0C0A09] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#F97316] outline-none appearance-none"
+                  >
+                    <option value="">Select a reason...</option>
+                    <option value="Rude behavior">Rude behavior</option>
+                    <option value="Late delivery">Late delivery</option>
+                    <option value="Damaged food">Damaged food</option>
+                    <option value="Incomplete order">Incomplete order</option>
+                    <option value="Unsafe driving">Unsafe driving</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Comments</label>
+                  <textarea 
+                    value={reportForm.comment}
+                    onChange={e => setReportForm({ ...reportForm, comment: e.target.value })}
+                    rows="4"
+                    placeholder="Provide more details..."
+                    className="w-full bg-[#0C0A09] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#F97316] outline-none resize-none font-sans"
+                  />
+                </div>
+                <div className="pt-4 flex gap-3">
+                  <button 
+                    onClick={() => setShowReportModal(false)}
+                    className="flex-1 py-4 rounded-2xl bg-white/5 text-white/60 font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+                  >
+                    CANCEL
+                  </button>
+                  <button 
+                    onClick={handleReportIssue}
+                    disabled={submittingReport}
+                    className="flex-1 py-4 rounded-2xl bg-red-500 text-white font-black text-xs uppercase tracking-widest hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
+                  >
+                    {submittingReport ? 'SUBMITTING...' : 'SUBMIT REPORT'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

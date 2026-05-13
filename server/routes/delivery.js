@@ -1,12 +1,13 @@
 import express from "express"
 import prisma from "../lib/prisma.js"
 import auth from "../middleware/auth.js"
+import driverAuth from "../middleware/driverAuth.js"
 import { getIO } from "../lib/socket.js"
 
 const router = express.Router()
 
 // ─── GET AVAILABLE ORDERS ───
-router.get("/available-orders", auth, async (req, res) => {
+router.get("/available-orders", driverAuth, async (req, res) => {
   try {
     const orders = await prisma.customerOrder.findMany({
       where: {
@@ -28,25 +29,21 @@ router.get("/available-orders", auth, async (req, res) => {
 })
 
 // ─── ACCEPT ORDER ───
-router.post("/accept-order/:orderId", auth, async (req, res) => {
+router.post("/accept-order/:orderId", driverAuth, async (req, res) => {
   try {
     const { orderId } = req.params
-    const driver = await prisma.driver.findUnique({
-      where: { userId: req.user.id }
-    })
-
-    if (!driver) return res.status(403).json({ message: "Driver profile not found" })
+    const driverId = req.driver.id
 
     const order = await prisma.customerOrder.update({
       where: { id: orderId },
       data: {
-        driverId: driver.id,
+        driverId: driverId,
         deliveryStatus: "ACCEPTED"
       }
     })
 
     const io = getIO()
-    io.to(`order_${orderId}`).emit("order_status", { status: "ACCEPTED", driverId: driver.id })
+    io.to(`order_${orderId}`).emit("order_status", { status: "ACCEPTED", driverId: driverId })
 
     res.json(order)
   } catch (err) {
@@ -55,7 +52,7 @@ router.post("/accept-order/:orderId", auth, async (req, res) => {
 })
 
 // ─── PICKUP ORDER ───
-router.post("/pickup-order/:orderId", auth, async (req, res) => {
+router.post("/pickup-order/:orderId", driverAuth, async (req, res) => {
   try {
     const { orderId } = req.params
     const order = await prisma.customerOrder.update({
@@ -73,7 +70,7 @@ router.post("/pickup-order/:orderId", auth, async (req, res) => {
 })
 
 // ─── COMPLETE ORDER ───
-router.post("/complete-order/:orderId", auth, async (req, res) => {
+router.post("/complete-order/:orderId", driverAuth, async (req, res) => {
   try {
     const { orderId } = req.params
     const order = await prisma.customerOrder.update({
@@ -81,21 +78,21 @@ router.post("/complete-order/:orderId", auth, async (req, res) => {
       data: { 
         deliveryStatus: "DELIVERED",
         status: "delivered",
-        paymentStatus: "paid" // Assuming payment is confirmed on delivery
+        paymentStatus: "paid"
       }
     })
 
     // Update driver earnings
     await prisma.driver.update({
-      where: { id: order.driverId },
-      data: { totalEarnings: { increment: order.deliveryFee } }
+      where: { id: req.driver.id },
+      data: { totalEarnings: { increment: order.deliveryFee || 20 } }
     })
 
     // Create payout record
     await prisma.payout.create({
       data: {
-        driverId: order.driverId,
-        amount: order.deliveryFee,
+        driverId: req.driver.id,
+        amount: order.deliveryFee || 20,
         type: "cash_collection",
         description: `Earnings for order ${order.orderNumber}`
       }
@@ -111,26 +108,18 @@ router.post("/complete-order/:orderId", auth, async (req, res) => {
 })
 
 // ─── UPDATE LOCATION ───
-router.post("/update-location", auth, async (req, res) => {
+router.post("/update-location", driverAuth, async (req, res) => {
   try {
     const { latitude, longitude } = req.body
-    const driver = await prisma.driver.findUnique({
-      where: { userId: req.user.id }
-    })
-
-    if (!driver) return res.status(403).json({ message: "Driver profile not found" })
+    const driverId = req.driver.id
 
     await prisma.driver.update({
-      where: { id: driver.id },
+      where: { id: driverId },
       data: { currentLatitude: latitude, currentLongitude: longitude }
     })
 
-    await prisma.deliverySession.create({
-      data: { driverId: driver.id, latitude, longitude }
-    })
-
     const io = getIO()
-    io.to(`driver_${driver.id}`).emit("location_updated", { latitude, longitude })
+    io.to(`driver_${driverId}`).emit("location_updated", { latitude, longitude })
 
     res.json({ success: true })
   } catch (err) {

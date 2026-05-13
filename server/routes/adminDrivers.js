@@ -98,8 +98,13 @@ router.get("/:id", async (req, res) => {
         _count: {
           select: {
             deliveries: true,
-            ratings: true
+            ratings: true,
+            reports: true
           }
+        },
+        reports: {
+          orderBy: { createdAt: "desc" },
+          take: 50
         }
       }
     })
@@ -213,5 +218,59 @@ router.patch("/:id/reset-earnings", async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 })
+
+// ─── ADD STRIKE ───
+router.patch("/:id/add-strike", async (req, res) => {
+  try {
+    const { id } = req.params
+    const driver = await prisma.driver.update({
+      where: { id },
+      data: { strikes: { increment: 1 } }
+    })
+    
+    // Auto-suspend if strikes reach 3
+    if (driver.strikes >= 3 && driver.isActive) {
+      await prisma.driver.update({
+        where: { id },
+        data: { isActive: false }
+      })
+    }
+    
+    res.json({ message: "Strike added", strikes: driver.strikes, isActive: driver.isActive })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── RESET STRIKES ───
+router.patch("/:id/reset-strikes", async (req, res) => {
+  try {
+    const { id } = req.params
+    await prisma.driver.update({
+      where: { id },
+      data: { strikes: 0 }
+    })
+    res.json({ message: "Strikes reset" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── GET ALL REPORTS ───
+router.get("/all/reports", async (req, res) => {
+  try {
+    const reports = await prisma.driverReport.findMany({
+      include: {
+        driver: { select: { name: true, phone: true } },
+        order: { select: { orderNumber: true } }
+      },
+      orderBy: { createdAt: "desc" }
+    })
+    res.json(reports)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 
 export default router

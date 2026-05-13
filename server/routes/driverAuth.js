@@ -135,11 +135,11 @@ router.post("/logout", (req, res) => {
 // ─── UPDATE PROFILE ───
 router.put("/profile", driverAuth, async (req, res) => {
   try {
-    const { name, vehicleType, vehicleNumber, avatar } = req.body
+    const { name, vehicleType, vehicleNumber, avatar, vehicleImage } = req.body
 
     const updatedDriver = await prisma.driver.update({
       where: { id: req.driver.id },
-      data: { name, vehicleType, vehicleNumber, avatar }
+      data: { name, vehicleType, vehicleNumber, avatar, vehicleImage }
     })
 
     const { password: _, ...driverWithoutPassword } = updatedDriver

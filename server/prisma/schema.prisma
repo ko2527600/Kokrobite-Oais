@@ -18,16 +18,86 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model CustomerOrderItem {
-  id         String        @id @default(cuid())
+model Customer {
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  password        String?
+  googleId        String?           @unique
+  avatar          String?
+  phone           String?
+  isVerified      Boolean           @default(false)
+  isActive        Boolean           @default(true)
+  loyaltyPoints   Int               @default(0)
+  totalOrders     Int               @default(0)
+  totalSpent      Float             @default(0)
+  lastLoginAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  CustomerAddress CustomerAddress[]
+  orders          CustomerOrder[]
+  reviews         CustomerReview[]
+  Feedback        Feedback[]
+  LoyaltyHistory  LoyaltyHistory[]
+  notifications   Notification[]
+}
+
+model CustomerOrder {
+  id                String              @id @default(cuid())
+  customerId        String
+  orderNumber       String              @unique
+  type              OrderType           @default(delivery)
+  branch            String?
+  deliveryAddress   String?
+  deliveryArea      String?
+  deliveryLandmark  String?
+  subtotal          Float
+  deliveryFee       Float               @default(0)
+  totalAmount       Float
+  status            OrderStatus         @default(pending)
+  paymentMethod     String              @default("cash")
+  paymentStatus     String              @default("unpaid")
+  note              String?
+  estimatedTime     String?
+  cancelReason      String?
+  rating            Int?
+  ratingComment     String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  latitude          Float?
+  longitude         Float?
+  deliveryStatus    DeliveryStatus      @default(PENDING)
+  chatMessages      ChatMessage[]
+  customer          Customer            @relation(fields: [customerId], references: [id])
+  CustomerOrderItem CustomerOrderItem[]
+   delivery          DriverDelivery?
+  reports           DriverReport[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
   orderId    String
-  menuItemId String?
+  menuItemId String
   name       String
-  price      Float
-  quantity   Int
-  image      String?
-  subtotal   Float
-  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  price      String
+  quantity   Int      @default(1)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model MenuItem {
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  price       String
+  category    Category
+  image       String
+  available   Boolean     @default(true)
+  featured    Boolean     @default(false)
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
 }
 
 model CustomerReview {
@@ -58,60 +128,6 @@ model Notification {
   customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
-model LoyaltyHistory {
-  id          String   @id @default(cuid())
-  customerId  String
-  points      Int
-  type        String
-  description String
-  createdAt   DateTime @default(now())
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-}
-
-
-model MenuItem {
-  id          String      @id @default(uuid())
-  name        String
-  description String
-  price       String
-  category    Category
-  image       String
-  available   Boolean     @default(true)
-  featured    Boolean     @default(false)
-  order       Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderItems  OrderItem[]
-}
-
-model Order {
-  id              String      @id @default(uuid())
-  customerName    String
-  customerPhone   String?
-  customerAddress String?
-  branch          String?
-  totalAmount     Float
-  status          String      @default("pending")
-  note            String?
-  source          String?     @default("web")
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  latitude        Float?
-  longitude       Float?
-  items           OrderItem[]
-}
-
-model OrderItem {
-  id         String   @id @default(uuid())
-  orderId    String
-  menuItemId String
-  name       String
-  price      String
-  quantity   Int      @default(1)
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-}
-
 model GalleryItem {
   id        String   @id @default(uuid())
   url       String
@@ -124,18 +140,18 @@ model GalleryItem {
 }
 
 model Branch {
-  id        String   @id @default(uuid())
-  name      String
-  area      String?
-  landmark  String?
-  address   String?
-  phone     String?
-  whatsapp  String?
+  id           String   @id @default(uuid())
+  name         String
+  area         String?
+  landmark     String?
+  address      String?
+  phone        String?
+  whatsapp     String?
   openingHours String?
-  isOpen    Boolean  @default(true)
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isOpen       Boolean  @default(true)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Review {
@@ -149,15 +165,192 @@ model Review {
   updatedAt DateTime @updatedAt
 }
 
-model Announcement {
+model Driver {
+  id              String            @id @default(cuid())
+  name            String
+  email           String?           @unique
+  phone           String            @unique
+  password        String
+  avatar          String?
+  type            DriverType        @default(freelance)
+  status          DriverStatus      @default(offline)
+  vehicleType     String?
+  vehicleNumber   String?
+  licenseNumber   String?
+  isApproved      Boolean           @default(false)
+  isActive        Boolean           @default(true)
+  rating          Float             @default(0)
+  totalRatings    Int               @default(0)
+  totalDeliveries Int               @default(0)
+  totalEarnings   Float             @default(0)
+  todayEarnings   Float             @default(0)
+  currentLat      Float?
+  currentLng      Float?
+  lastLocationAt  DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  vehicleImage    String?
+  sessions        DeliverySession[]
+  deliveries      DriverDelivery[]
+  ratings         DriverRating[]
+  payouts         Payout[]
+  reports         DriverReport[]
+  strikes         Int               @default(0)
+}
+
+model DriverDelivery {
+  id            String        @id @default(cuid())
+  driverId      String
+  orderId       String        @unique
+  acceptedAt    DateTime?
+  pickedUpAt    DateTime?
+  deliveredAt   DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?
+  deliveryFee   Float         @default(30)
+  driverEarning Float         @default(0)
+  distance      Float?
+  duration      Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  driver        Driver        @relation(fields: [driverId], references: [id])
+  order         CustomerOrder @relation(fields: [orderId], references: [id])
+}
+
+model DriverRating {
+  id         String   @id @default(cuid())
+  driverId   String
+  customerId String
+  orderId    String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  driver     Driver   @relation(fields: [driverId], references: [id])
+}
+
+model DeliverySession {
   id        String   @id @default(uuid())
+  driverId  String
+  timestamp DateTime @default(now())
+  lat       Float
+  lng       Float
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+model Payout {
+  id          String   @id @default(uuid())
+  driverId    String
+  amount      Float
+  type        String   @default("cash_collection")
+  description String?
+  createdAt   DateTime @default(now())
+  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+model HubtelTransaction {
+  id              String   @id @default(cuid())
+  orderId         String
+  clientReference String   @unique
+  amount          Float
+  status          String   @default("pending")
+  transactionId   String?
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ChatMessage {
+  id         String        @id @default(cuid())
+  orderId    String
+  senderId   String
+  senderRole String
+  message    String
+  read       Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Announcement {
+  id        String   @id
   text      String
   link      String?
   bgColor   String   @default("#F97316")
   textColor String   @default("#ffffff")
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
+}
+
+model CustomerAddress {
+  id         String   @id
+  customerId String
+  label      String   @default("Home")
+  address    String
+  area       String?
+  landmark   String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  latitude   Float?
+  longitude  Float?
+  Customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model CustomerOrderItem {
+  id            String        @id
+  orderId       String
+  menuItemId    String?
+  name          String
+  price         Float
+  quantity      Int
+  image         String?
+  subtotal      Float
+  CustomerOrder CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id         String           @id
+  customerId String
+  rating     Int
+  category   FeedbackCategory @default(general)
+  title      String
+  message    String
+  screenshot String?
+  deviceInfo String?
+  appVersion String?
+  status     FeedbackStatus   @default(new)
+  adminNote  String?
+  resolvedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime
+  Customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyHistory {
+  id          String   @id
+  customerId  String
+  points      Int
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+  Customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String      @id
+  customerName    String
+  customerPhone   String?
+  customerAddress String?
+  branch          String?
+  totalAmount     Float
+  status          String      @default("pending")
+  note            String?
+  source          String?     @default("web")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime
+  latitude        Float?
+  longitude       Float?
+  items           OrderItem[]
 }
 
 model SiteConfig {
@@ -171,123 +364,24 @@ model SiteConfig {
   email          String?
   openingHours   String?
   address        String?
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime
 }
 
-model Customer {
-  id             String            @id @default(cuid())
-  name           String
-  email          String            @unique
-  password       String?
-  googleId       String?           @unique
-  avatar         String?
-  phone          String?
-  isVerified     Boolean           @default(false)
-  isActive       Boolean           @default(true)
-  loyaltyPoints  Int               @default(0)
-  totalOrders    Int               @default(0)
-  totalSpent     Float             @default(0)
-  lastLoginAt    DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  addresses      CustomerAddress[]
-  orders         CustomerOrder[]
-  reviews        CustomerReview[]
-  feedbacks      Feedback[]
-  loyaltyHistory LoyaltyHistory[]
-  notifications  Notification[]
-}
-
-model Feedback {
-  id         String           @id @default(cuid())
-  customerId String
-  rating     Int
-  category   FeedbackCategory @default(general)
-  title      String
-  message    String
-  screenshot String?
-  deviceInfo String?
-  appVersion String?
-  status     FeedbackStatus   @default(new)
-  adminNote  String?
-  resolvedAt DateTime?
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
-}
-
-model CustomerAddress {
-  id         String   @id @default(cuid())
-  customerId String
-  label      String   @default("Home")
-  address    String
-  area       String?
-  landmark   String?
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  latitude   Float?
-  longitude  Float?
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-}
-
-model CustomerOrder {
-  id               String              @id @default(cuid())
-  customerId       String
-  orderNumber      String              @unique
-  type             OrderType           @default(delivery)
-  branch           String?
-  deliveryAddress  String?
-  deliveryArea     String?
-  deliveryLandmark String?
-  subtotal         Float
-  deliveryFee      Float               @default(0)
-  totalAmount      Float
-  status           OrderStatus         @default(pending)
-  deliveryStatus   DeliveryStatus      @default(PENDING)
-  paymentMethod    String              @default("cash")
-  paymentStatus    String              @default("unpaid")
-  note             String?
-  estimatedTime    String?
-  cancelReason     String?
-  rating           Int?
-  ratingComment    String?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  latitude         Float?
-  longitude        Float?
-  customer         Customer            @relation(fields: [customerId], references: [id])
-  items            CustomerOrderItem[]
-  delivery         DriverDelivery?
-  messages         ChatMessage[]
-}
-
-
-model DeliverySession {
-  id        String   @id @default(cuid())
-  driverId  String
-  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  lat       Float
-  lng       Float
-  timestamp DateTime @default(now())
-}
-
-model Payout {
-  id          String   @id @default(cuid())
-  driverId    String
-  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  amount      Float
-  type        String   @default("cash_collection") // cash_collection or bank_transfer
-  description String?
-  createdAt   DateTime @default(now())
-}
-
-enum OrderStatus {
-  pending
-  confirmed
-  preparing
-  ready
-  delivered
-  cancelled
+enum Category {
+  Brunch
+  Cocktails
+  Mocktails
+  Platters
+  Pitchers
+  Juices
+  KissedByFire
+  Sides
+  Pizza
+  BurgersWraps
+  Shots
+  Slushys
+  BeersAndCiders
+  SoftDrinks
 }
 
 enum DeliveryStatus {
@@ -298,23 +392,16 @@ enum DeliveryStatus {
   CANCELLED
 }
 
-enum OrderType {
-  delivery
-  pickup
+enum DriverStatus {
+  online
+  offline
+  delivering
 }
 
-enum NotificationType {
-  order_placed
-  order_confirmed
-  order_preparing
-  order_ready
-  order_delivered
-  order_cancelled
-  review_approved
-  promotion
-  welcome
+enum DriverType {
+  inhouse
+  freelance
 }
-
 
 enum FeedbackCategory {
   general
@@ -333,115 +420,41 @@ enum FeedbackStatus {
   resolved
   dismissed
 }
-enum Category {
-  Brunch
-  Cocktails
-  Mocktails
-  Platters
-  Pitchers
-  Juices
-  KissedByFire
-  Sides
-  Pizza
-  BurgersWraps
-  Shots
-  Slushys
-  BeersAndCiders
-  SoftDrinks
+
+enum NotificationType {
+  order_placed
+  order_confirmed
+  order_preparing
+  order_delivered
+  order_cancelled
+  review_approved
+  promotion
+  welcome
+  order_ready
 }
 
-enum DriverStatus {
-  online
-  offline
-  delivering
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  delivered
+  cancelled
+  ready
 }
 
-enum DriverType {
-  inhouse
-  freelance
+enum OrderType {
+  delivery
+  pickup
 }
 
-model Driver {
-  id              String          @id @default(cuid())
-  name            String
-  email           String?         @unique
-  phone           String          @unique
-  password        String
-  avatar          String?
-  type            DriverType      @default(freelance)
-  status          DriverStatus    @default(offline)
-  vehicleType     String?
-  vehicleNumber   String?
-  licenseNumber   String?
-  isApproved      Boolean         @default(false)
-  isActive        Boolean         @default(true)
-  rating          Float           @default(0)
-  totalRatings    Int             @default(0)
-  totalDeliveries Int             @default(0)
-  totalEarnings   Float           @default(0)
-  todayEarnings   Float           @default(0)
-  currentLat      Float?
-  currentLng      Float?
-  lastLocationAt  DateTime?
-  lastLoginAt     DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  deliveries      DriverDelivery[]
-  ratings         DriverRating[]
-  sessions        DeliverySession[]
-  payouts         Payout[]
-}
-
-model DriverDelivery {
-  id              String        @id @default(cuid())
-  driver          Driver        @relation(fields: [driverId], references: [id])
-  driverId        String
-  order           CustomerOrder @relation(fields: [orderId], references: [id])
-  orderId         String        @unique
-  acceptedAt      DateTime?
-  pickedUpAt      DateTime?
-  deliveredAt     DateTime?
-  cancelledAt     DateTime?
-  cancelReason    String?
-  deliveryFee     Float         @default(30)
-  driverEarning   Float         @default(0)
-  distance        Float?
-  duration        Int?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-}
-
-model DriverRating {
+model DriverReport {
   id          String   @id @default(cuid())
   driver      Driver   @relation(fields: [driverId], references: [id])
   driverId    String
-  customerId  String
+  order       CustomerOrder @relation(fields: [orderId], references: [id])
   orderId     String
-  rating      Int
+  customerId  String
+  reason      String   // e.g., 'Rude behavior', 'Late delivery', 'Damaged food'
   comment     String?
   createdAt   DateTime @default(now())
 }
-
-model HubtelTransaction {
-  id               String   @id @default(cuid())
-  orderId          String
-  clientReference  String   @unique
-  amount           Float
-  status           String   @default("pending")
-  transactionId    String?
-  description      String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-}
-
-model ChatMessage {
-  id         String        @id @default(cuid())
-  orderId    String
-  senderId   String
-  senderRole String        // 'customer', 'driver', 'admin'
-  message    String
-  read       Boolean       @default(false)
-  createdAt  DateTime      @default(now())
-  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-}
-

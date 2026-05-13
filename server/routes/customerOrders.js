@@ -44,7 +44,23 @@ router.get("/:id", async (req, res) => {
   try {
     const order = await prisma.customerOrder.findUnique({
       where: { id: req.params.id },
-      include: { items: true }
+      include: { 
+        items: true,
+        delivery: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+                phone: true,
+                vehicleType: true,
+                vehicleNumber: true
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!order || order.customerId !== req.customer.id) {
@@ -224,6 +240,36 @@ router.post("/:id/rate", async (req, res) => {
     });
 
     res.json(updatedOrder);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// @route   POST /api/customers/orders/reports
+// @desc    Log an incident report for a driver
+router.post("/reports", async (req, res) => {
+  try {
+    const { driverId, orderId, reason, comment } = req.body;
+    
+    // Verify the order belongs to the customer
+    const order = await prisma.customerOrder.findUnique({
+      where: { id: orderId }
+    });
+    
+    if (!order || order.customerId !== req.customer.id) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const report = await prisma.driverReport.create({
+      data: {
+        driverId,
+        orderId,
+        customerId: req.customer.id,
+        reason,
+        comment
+      }
+    });
+    res.status(201).json(report);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -18,6 +18,10 @@ export default async function driverAuth(req, res, next) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     
+    if (decoded.role !== "driver") {
+      return res.status(401).json({ message: "Invalid token role" })
+    }
+
     const driver = await prisma.driver.findUnique({
       where: { id: decoded.id },
       select: {

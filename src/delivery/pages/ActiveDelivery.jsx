@@ -31,6 +31,33 @@ export default function ActiveDelivery() {
     fetchActive()
   }, [])
 
+  // Geolocation Tracking
+  useEffect(() => {
+    if (!delivery || delivery.deliveredAt) return
+
+    let watchId = null
+    if ("geolocation" in navigator) {
+      watchId = navigator.geolocation.watchPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords
+          try {
+            await api.post("/delivery/update-location", { latitude, longitude })
+          } catch (err) {
+            console.error("Failed to update location", err)
+          }
+        },
+        (error) => {
+          console.error("Geolocation error:", error)
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      )
+    }
+
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId)
+    }
+  }, [delivery?.id, delivery?.deliveredAt])
+
   const handlePickup = async () => {
     setUpdating(true)
     try {
