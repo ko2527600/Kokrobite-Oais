@@ -1,4 +1,4 @@
-﻿# 🥘 Kokrobite Oasis - Authentic West African Cuisine
+# 🥘 Kokrobite Oasis - Authentic West African Cuisine
 
 [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
@@ -36,15 +36,26 @@ Kokrobite Oasis is a premium, modern restaurant website dedicated to showcasing 
 - **Branch Locator**: Easy access to contact and location details for all our branches.
 - **Catering Services**: Dedicated section for booking events, weddings, and corporate gatherings.
 
+### 🚴‍♂️ Rider Ecosystem & Delivery
+- **Driver Portal**: Dedicated mobile-first interface for riders to manage orders, view earnings, and update profiles.
+- **Real-time Tracking**: Live order status updates (Pending → Preparing → Delivering → Arrived) with WebSocket integration.
+- **Earnings Dashboard**: Detailed financial breakdown for riders with daily/total earnings tracking.
+
+### 🛡️ Oversight & Discipline System
+- **Strike Management**: Automated strike-based accountability system (3 strikes = automatic suspension).
+- **Incident Reporting**: Integrated customer-to-management reporting system to log behavior and performance issues.
+- **Admin Audit Trail**: Comprehensive management dashboard to review rider history, ratings, and disciplinary logs.
+
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18, TypeScript, Vite
+- **Frontend**: React 18, Vite, Framer Motion
+- **Backend**: Node.js, Express, Prisma ORM
+- **Database**: PostgreSQL (Neon.tech)
+- **Real-time**: Socket.io for live tracking
+- **Security**: JWT Authentication, Zod Validation, Rate Limiting
 - **Styling**: Tailwind CSS, Vanilla CSS
-- **Animations**: Framer Motion (Motion for React)
-- **Icons**: React Icons (Phosphor, Heroicons, Bootstrap)
-- **Deployment**: Optimized for Vercel/Netlify
 
 ---
 
@@ -58,8 +69,8 @@ Kokrobite Oasis is a premium, modern restaurant website dedicated to showcasing 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/ko2527600/cooker-s-delight-.git
-   cd cooker-s-delight-
+   git clone https://github.com/ko2527600/Kokrobite-Oais.git
+   cd Kokrobite-Oais
    ```
 
 2. **Install dependencies**
