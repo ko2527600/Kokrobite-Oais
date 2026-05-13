@@ -52,7 +52,7 @@ const PORT = process.env.PORT || 5000
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
-  "https://cooker-s-delight.vercel.app",
+  "https://kokrobite-oasis.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean)
 
