@@ -9,13 +9,17 @@ import {
 import { toast } from 'react-hot-toast';
 import api from '../../api/axios';
 import OrderStatusBadge from '../components/OrderStatusBadge';
+import ChatWindow from '../../components/Chat/ChatWindow';
+import { useCustomer } from '../CustomerContext';
 
 const OrderDetail = () => {
+  const { customer } = useCustomer();
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   const fetchOrder = async () => {
     try {
@@ -238,8 +242,17 @@ const OrderDetail = () => {
                  </button>
                )}
 
+               {order.status !== 'cancelled' && (
+                 <button 
+                   onClick={() => setShowChat(true)}
+                   className="w-full bg-[#F97316]/10 hover:bg-[#F97316] text-[#F97316] hover:text-white font-black py-4 rounded-2xl transition-all border border-[#F97316]/20 text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                 >
+                   CHAT WITH RIDER / SUPPORT
+                 </button>
+               )}
+
                <a 
-                 href={`https://wa.me/233243379412?text=Hello Kokrobite Oasis! I need help with my order ${order.orderNumber}`}
+                 href={`https://wa.me/UPDATE_WITH_REAL_KO_WHATSAPP?text=Hello Kokrobite Oasis! I need help with my order ${order.orderNumber}`}
                  target="_blank"
                  rel="noopener noreferrer"
                  className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
@@ -251,6 +264,24 @@ const OrderDetail = () => {
          </div>
 
       </div>
+
+      {/* ── CHAT OVERLAY ── */}
+      <AnimatePresence>
+        {showChat && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowChat(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <ChatWindow 
+              orderId={id} 
+              currentUser={customer} 
+              onClose={() => setShowChat(false)} 
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

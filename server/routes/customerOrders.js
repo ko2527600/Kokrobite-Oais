@@ -2,13 +2,14 @@ import express from "express";
 const router = express.Router();
 import prisma from "../lib/prisma.js";
 import customerAuth from "../middleware/customerAuth.js";
+import { validate, orderSchema } from "../middleware/security.js";
 
 // Helper — generate order number
 function generateOrderNumber() {
   const date = new Date();
   const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
   const random = Math.floor(1000 + Math.random() * 9000);
-  return `CD-${dateStr}-${random}`;
+  return `KO-${dateStr}-${random}`;
 }
 
 // Helper — calculate loyalty points earned
@@ -58,23 +59,12 @@ router.get("/:id", async (req, res) => {
 
 // @route   POST /api/customers/orders
 // @desc    Create a new order
-router.post("/", async (req, res) => {
+router.post("/", validate(orderSchema), async (req, res) => {
   try {
     const { 
       type, branch, deliveryAddress, deliveryArea, deliveryLandmark, 
       items, paymentMethod, note, latitude, longitude
     } = req.body;
-
-    // Validate
-    if (type === "delivery" && !deliveryAddress) {
-      return res.status(400).json({ message: "Delivery address required" });
-    }
-    if (type === "pickup" && !branch) {
-      return res.status(400).json({ message: "Please select a branch" });
-    }
-    if (!items || items.length === 0) {
-      return res.status(400).json({ message: "Order must contain at least one item" });
-    }
 
     // Calculate
     const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);

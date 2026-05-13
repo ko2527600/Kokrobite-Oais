@@ -104,9 +104,9 @@ const Settings = () => {
     if (/[0-9]/.test(pass)) score++;
     if (/[^A-Za-z0-9]/.test(pass)) score++;
 
-    if (score < 3) return { label: "Weak", color: "bg-red-500", width: "33%" };
-    if (score < 5) return { label: "Fair", color: "bg-yellow-500", width: "66%" };
-    return { label: "Strong", color: "bg-green-500", width: "100%" };
+    if (score < 3) return { label: "Weak", color: "bg-[#EF4444]", width: "33%" };
+    if (score < 5) return { label: "Fair", color: "bg-[#F59E0B]", width: "66%" };
+    return { label: "Strong", color: "bg-[#10B981]", width: "100%" };
   };
 
   const strength = getStrength(passwords.new);
@@ -116,15 +116,15 @@ const Settings = () => {
       <h1 className="text-3xl font-display font-bold text-white">Settings</h1>
 
       {/* Account Settings */}
-      <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
-        <div className="p-8 border-b border-white/5">
+      <div className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.20)] overflow-hidden">
+        <div className="p-8 border-b border-[#F97316]/[0.08]">
           <h3 className="text-xl font-display font-bold text-white flex items-center gap-3">
             <HiOutlineUser className="text-[#F97316]" /> Account Settings
           </h3>
         </div>
         <div className="p-8 space-y-8">
            <div className="flex flex-col items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-[#F97316] flex items-center justify-center text-2xl font-bold text-white">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#F97316] to-[#FB923C] flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-[#F97316]/20">
                 {admin.name.charAt(0)}
               </div>
               <button disabled className="text-[10px] font-bold text-white/20 uppercase tracking-widest cursor-not-allowed">Upload Photo</button>
@@ -134,27 +134,26 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Display Name</label>
-                   <input value={admin.name} onChange={e => setAdmin({ ...admin, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
+                   <input value={admin.name} onChange={e => setAdmin({ ...admin, name: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 font-sans transition-all" placeholder="Enter name" />
                 </div>
                 <div className="space-y-2 opacity-50">
                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Email (Immutable)</label>
-                   <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Email (Immutable)</label>
-                   <input disabled value={admin.email} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white/40 cursor-not-allowed font-sans" />
+                   <input disabled value={admin.email} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white/40 cursor-not-allowed font-sans" />
                 </div>
               </div>
-              <button type="submit" className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105 font-sans">
+              <button type="submit" className="bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#F97316]/20 transition-all hover:scale-[1.02] active:scale-95 font-sans">
                 {loading.profile ? "Updating..." : "Save Changes"}
               </button>
            </form>
 
-           <div className="h-[1px] bg-white/5" />
+           <div className="h-[1px] bg-[#F97316]/[0.08]" />
 
            <form onSubmit={handlePasswordSave} className="space-y-6">
               <h4 className="text-lg font-display font-bold text-white">Change Password</h4>
               <div className="space-y-4">
                  <div className="relative">
                     <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">Current Password</label>
-                    <input required type={showPass.current ? "text" : "password"} value={passwords.current} onChange={e => setPasswords({ ...passwords, current: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none focus:border-[#F97316] font-sans" />
+                    <input required type={showPass.current ? "text" : "password"} value={passwords.current} onChange={e => setPasswords({ ...passwords, current: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
                     <button type="button" onClick={() => setShowPass({ ...showPass, current: !showPass.current })} className="absolute right-4 bottom-3.5 text-white/20">
                       {showPass.current ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
                     </button>
@@ -162,8 +161,8 @@ const Settings = () => {
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
-                       <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2">New Password</label>
-                       <input required type={showPass.new ? "text" : "password"} value={passwords.new} onChange={e => setPasswords({ ...passwords, new: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                       <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">New Password</label>
+                       <input required type={showPass.new ? "text" : "password"} value={passwords.new} onChange={e => setPasswords({ ...passwords, new: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
                        <button type="button" onClick={() => setShowPass({ ...showPass, new: !showPass.new })} className="absolute right-4 bottom-3.5 text-white/20">
                          {showPass.new ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
                        </button>
@@ -173,15 +172,15 @@ const Settings = () => {
                        <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-40">{strength.label}</p>
                     </div>
                     <div>
-                       <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2">Confirm New Password</label>
-                       <input required type="password" value={passwords.confirm} onChange={e => setPasswords({ ...passwords, confirm: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                       <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">Confirm New Password</label>
+                       <input required type="password" value={passwords.confirm} onChange={e => setPasswords({ ...passwords, confirm: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
                        {passwords.new && passwords.confirm && passwords.new === passwords.confirm && (
-                         <p className="text-[8px] font-bold text-green-500 uppercase tracking-widest mt-2">✓ Passwords match</p>
+                         <p className="text-[8px] font-bold text-[#10B981] uppercase tracking-widest mt-2">✓ Passwords match</p>
                        )}
                     </div>
                  </div>
               </div>
-              <button type="submit" className="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all">
+              <button type="submit" className="bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#F97316]/20 transition-all hover:scale-[1.02] active:scale-95 font-sans">
                  {loading.pass ? "Processing..." : "Update Password"}
               </button>
            </form>
@@ -189,60 +188,60 @@ const Settings = () => {
       </div>
 
       {/* Business Information */}
-      <div className="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
-        <div className="p-8 border-b border-white/5">
+      <div className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.20)] overflow-hidden">
+        <div className="p-8 border-b border-[#F97316]/[0.08]">
           <h3 className="text-xl font-display font-bold text-white flex items-center gap-3">
             <HiOutlineBuildingOffice2 className="text-[#F97316]" /> Business Information
           </h3>
-          <p className="text-xs text-white/20 font-bold uppercase tracking-widest mt-1 ml-9">This updates info shown across the website</p>
+          <p className="text-xs text-white/20 font-bold uppercase tracking-widest mt-1 ml-9">This updates info shown across KO Eats portal</p>
         </div>
         <form onSubmit={handleConfigSave} className="p-8 space-y-6">
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Restaurant Name</label>
-                 <input value={config.restaurantName} onChange={e => setConfig({ ...config, restaurantName: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.restaurantName} onChange={e => setConfig({ ...config, restaurantName: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="Kokrobite Oasis" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Tagline</label>
-                 <input value={config.tagline} onChange={e => setConfig({ ...config, tagline: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.tagline} onChange={e => setConfig({ ...config, tagline: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="beach bliss. good food. pure vibes" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Phone Number</label>
-                 <input value={config.phone} onChange={e => setConfig({ ...config, phone: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.phone} onChange={e => setConfig({ ...config, phone: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="UPDATE_WITH_REAL_PHONE" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">WhatsApp</label>
-                 <input value={config.whatsapp} onChange={e => setConfig({ ...config, whatsapp: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.whatsapp} onChange={e => setConfig({ ...config, whatsapp: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="UPDATE_WITH_REAL_WHATSAPP" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Instagram Handle</label>
                  <div className="relative">
-                    <span className="absolute left-5 top-3.5 text-white/20">@</span>
-                    <input value={config.instagram} onChange={e => setConfig({ ...config, instagram: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-5 py-3 text-white outline-none" />
+                    <span className="absolute left-4 top-3.5 text-white/20 font-sans">@</span>
+                    <input value={config.instagram} onChange={e => setConfig({ ...config, instagram: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg pl-10 pr-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="kokrobite.oasis" />
                  </div>
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Facebook Page</label>
-                 <input value={config.facebook} onChange={e => setConfig({ ...config, facebook: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.facebook} onChange={e => setConfig({ ...config, facebook: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="kokrobiteoasis" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Opening Hours</label>
-                 <input value={config.openingHours} onChange={e => setConfig({ ...config, openingHours: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.openingHours} onChange={e => setConfig({ ...config, openingHours: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="Tuesday–Sunday: 11:00 AM – 11:00 PM" />
               </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Contact Email</label>
-                 <input value={config.email} onChange={e => setConfig({ ...config, email: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white outline-none" />
+                 <input value={config.email} onChange={e => setConfig({ ...config, email: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="hello@kokrobiteoasis.com" />
               </div>
            </div>
-           <button type="submit" className="bg-[#F97316] text-white px-8 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105">
+           <button type="submit" className="bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#F97316]/20 transition-all hover:scale-[1.02] active:scale-95 font-sans">
               {loading.config ? "Saving..." : "Save Business Profile"}
            </button>
         </form>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-red-500/[0.03] border border-red-500/20 rounded-2xl overflow-hidden p-8">
-        <h3 className="text-xl font-bold text-red-500 flex items-center gap-3 mb-6">
+      <div className="bg-[#EF4444]/[0.03] border border-[#EF4444]/20 rounded-2xl overflow-hidden p-8">
+        <h3 className="text-xl font-display font-bold text-[#EF4444] flex items-center gap-3 mb-6">
           <HiOutlineExclamationTriangle /> Danger Zone
         </h3>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -252,7 +251,7 @@ const Settings = () => {
            </div>
            <button 
             onClick={() => setShowConfirm(true)}
-            className="px-6 py-3 border border-red-500/40 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm whitespace-nowrap"
+            className="px-6 py-3 border border-[#EF4444]/30 text-[#EF4444] font-bold rounded-xl hover:bg-[#EF4444]/10 transition-all text-sm whitespace-nowrap"
            >
              Clear All Orders
            </button>
@@ -264,7 +263,7 @@ const Settings = () => {
         onClose={() => setShowConfirm(false)} 
         onConfirm={handleClearOrders}
         title="Clear All Orders"
-        message="This will permanently delete ALL orders from the database. This cannot be undone. Are you absolutely sure?"
+        message="This will permanently delete ALL Kokrobite Oasis orders. This cannot be undone. Are you absolutely sure?"
         danger={true}
         confirmLabel="Yes, Delete Everything"
       />

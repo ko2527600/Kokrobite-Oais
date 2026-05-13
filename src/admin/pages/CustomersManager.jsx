@@ -147,12 +147,12 @@ export default function CustomersManager() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Customers', value: stats.totalCustomers, icon: HiOutlineUsers, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: 'New Today', value: stats.newToday, icon: HiOutlineCheckCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
-          { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: HiOutlineCurrencyDollar, color: 'text-[#F97316]', bg: 'bg-[#F97316]/10' },
-          { label: 'Avg Order Value', value: formatCurrency(stats.avgOrderValue), icon: HiOutlineShoppingBag, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+          { label: 'Total Customers', value: stats.totalCustomers, icon: HiOutlineUsers, color: 'text-[#F97316]', bg: 'bg-[#F97316]/10' },
+          { label: 'New Today', value: stats.newToday, icon: HiOutlineCheckCircle, color: 'text-[#FB923C]', bg: 'bg-[#FB923C]/10' },
+          { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: HiOutlineCurrencyDollar, color: 'text-[#10B981]', bg: 'bg-[#10B981]/10' },
+          { label: 'Avg Order Value', value: formatCurrency(stats.avgOrderValue), icon: HiOutlineShoppingBag, color: 'text-[#F59E0B]', bg: 'bg-[#F59E0B]/10' },
         ].map((stat, i) => (
-          <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4">
+          <div key={i} className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-xl p-4 flex items-center gap-4">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stat.bg} ${stat.color}`}>
               <stat.icon size={24} />
             </div>
@@ -202,7 +202,7 @@ export default function CustomersManager() {
       <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-white/80">
-            <thead className="bg-white/5 text-white/60 text-xs uppercase font-medium">
+            <thead className="bg-white/5 text-white/40 text-xs uppercase font-medium">
               <tr>
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Contact</th>
@@ -220,17 +220,25 @@ export default function CustomersManager() {
                 </tr>
               ) : customers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-white/60">No customers found.</td>
+                  <td colSpan={7} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <span className="text-6xl">👥</span>
+                      <div>
+                        <h3 className="text-xl font-display font-bold text-white">No Customers Yet</h3>
+                        <p className="text-white/40 text-sm mt-1">KO Eats customers will appear here when they register</p>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 customers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={customer.id} className="hover:bg-[#F97316]/[0.04] transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         {customer.avatar ? (
-                          <img src={customer.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                          <img src={customer.avatar} alt="" className="w-10 h-10 rounded-full object-cover border border-[#F97316]/20" />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#F97316]/20 text-[#F97316] flex items-center justify-center font-display font-bold text-lg">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white flex items-center justify-center font-display font-bold text-lg shadow-lg shadow-[#F97316]/20">
                             {customer.name.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -245,11 +253,11 @@ export default function CustomersManager() {
                       <div className="text-xs text-white/60">{customer.phone || 'No phone'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="bg-[#F97316]/20 text-[#F97316] px-2.5 py-1 rounded-full text-xs font-bold font-sans">
+                      <span className="bg-[#F97316]/15 text-[#F97316] px-2.5 py-1 rounded-full text-xs font-bold font-sans">
                         {customer.totalOrders}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-medium text-green-400">
+                    <td className="px-6 py-4 font-bold text-[#10B981]">
                       {formatCurrency(customer.totalSpent)}
                     </td>
                     <td className="px-6 py-4">
@@ -259,10 +267,10 @@ export default function CustomersManager() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        customer.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        customer.isActive ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-[#EF4444]/15 text-[#EF4444]'
                       }`}>
-                        {customer.isActive ? 'Active' : 'Inactive'}
+                        {customer.isActive ? 'Active' : 'Suspended'}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -340,19 +348,17 @@ export default function CustomersManager() {
 
               {/* Modal Tabs */}
               <div className="flex border-b border-white/10 bg-white/5 px-6 overflow-x-auto">
-                {['Profile', 'Orders', 'Addresses', 'Reviews', 'Notifications', 'Loyalty History'].map((tab) => (
+                {['Profile', 'Orders', 'Addresses', 'Reviews', 'Notifications', 'Loyalty'].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 font-sans ${
+                    className={`px-4 py-3 text-sm font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 font-sans ${
                       activeTab === tab 
                         ? 'text-[#F97316] border-[#F97316]' 
-                        : 'text-white/60 border-transparent hover:text-white'
+                        : 'text-white/40 border-transparent hover:text-white'
                     }`}
                   >
                     {tab}
-                    {tab === 'Orders' && selectedCustomer.orders?.length > 0 && ` (${selectedCustomer.orders.length})`}
-                    {tab === 'Reviews' && selectedCustomer.reviews?.length > 0 && ` (${selectedCustomer.reviews.length})`}
                   </button>
                 ))}
               </div>
@@ -540,9 +546,9 @@ export default function CustomersManager() {
                 {activeTab === 'Notifications' && (
                   <div className="space-y-6">
                     {/* Send Notif Form */}
-                    <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
-                      <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                        <HiOutlinePaperAirplane /> Send Custom Notification
+                    <div className="bg-[#1a1a1a] border border-[#F97316]/[0.08] p-4 rounded-xl">
+                      <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2 uppercase tracking-wider">
+                        <HiOutlinePaperAirplane className="text-[#F97316]" /> Send Notification to Customer
                       </h4>
                       <form onSubmit={handleSendNotification} className="flex flex-col gap-3">
                         <input
@@ -550,23 +556,23 @@ export default function CustomersManager() {
                           placeholder="Notification Title"
                           value={notificationForm.title}
                           onChange={e => setNotificationForm({...notificationForm, title: e.target.value})}
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#F97316]"
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#F97316] transition-colors"
                           required
                         />
                         <textarea
                           placeholder="Notification Message"
                           value={notificationForm.message}
                           onChange={e => setNotificationForm({...notificationForm, message: e.target.value})}
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#F97316] min-h-[80px]"
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#F97316] transition-colors min-h-[80px]"
                           required
                         />
                         <div className="flex justify-end">
                           <button
                             type="submit"
                             disabled={isSendingNotif}
-                            className="px-6 py-2 bg-[#F97316] text-white text-sm font-bold rounded-lg hover:bg-[#F97316]/90 disabled:opacity-50 transition-colors font-sans"
+                            className="px-6 py-2 bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-[#F97316]/20 disabled:opacity-50 transition-all font-sans"
                           >
-                            {isSendingNotif ? 'Sending...' : 'Send Notification'}
+                            {isSendingNotif ? 'Sending...' : 'Send Notification 🔔'}
                           </button>
                         </div>
                       </form>
@@ -601,13 +607,13 @@ export default function CustomersManager() {
                 )}
 
                 {/* TAB: Loyalty History */}
-                {activeTab === 'Loyalty History' && (
+                {activeTab === 'Loyalty' && (
                   <div>
-                    <div className="bg-white/5 border border-[#F97316]/30 p-4 rounded-xl mb-6 flex items-center justify-between">
+                    <div className="bg-[#1a1a1a] border border-[#F97316]/[0.08] p-4 rounded-xl mb-6 flex items-center justify-between">
                       <div>
-                        <h4 className="text-white/60 text-xs font-bold uppercase tracking-wider">Current Balance</h4>
-                        <div className="text-3xl font-bold text-white mt-1 flex items-center gap-2">
-                          <HiStar className="text-yellow-400" /> {selectedCustomer.loyaltyPoints}
+                        <h4 className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">Oasis Points</h4>
+                        <div className="text-3xl font-bold text-[#F97316] mt-1 flex items-center gap-2">
+                          🌴 {selectedCustomer.loyaltyPoints}
                         </div>
                       </div>
                     </div>
@@ -629,7 +635,7 @@ export default function CustomersManager() {
                               <tr key={entry.id} className="hover:bg-white/5">
                                 <td className="px-4 py-3">{new Date(entry.createdAt).toLocaleString()}</td>
                                 <td className="px-4 py-3">{entry.description}</td>
-                                <td className={`px-4 py-3 text-right font-bold ${entry.type === 'credit' ? 'text-green-400' : 'text-red-400'}`}>
+                                <td className={`px-4 py-3 text-right font-bold ${entry.type === 'credit' ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                                   {entry.type === 'credit' ? '+' : ''}{entry.points}
                                 </td>
                               </tr>

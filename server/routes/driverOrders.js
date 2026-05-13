@@ -1,0 +1,309 @@
+import express from "express"
+import prisma from "../lib/prisma.js"
+import driverAuth from "../middleware/driverAuth.js"
+import { getIO } from "../lib/socket.js"
+
+const router = express.Router()
+
+router.use(driverAuth)
+
+// ─── GET AVAILABLE ORDERS ───
+router.get("/available", async (req, res) => {
+  try {
+    const orders = await prisma.customerOrder.findMany({
+      where: {
+        status: "confirmed",
+        type: "delivery",
+        delivery: null
+      },
+      include: {
+        items: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            phone: true
+          }
+        }
+      },
+      orderBy: { createdAt: "asc" }
+    })
+    res.json(orders)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── GET ACTIVE DELIVERY ───
+router.get("/active", async (req, res) => {
+  try {
+    const active = await prisma.driverDelivery.findFirst({
+      where: {
+        driverId: req.driver.id,
+        deliveredAt: null,
+        cancelledAt: null
+      },
+      include: {
+        order: {
+          include: {
+            items: true,
+            customer: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    })
+    res.json(active)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── GET HISTORY ───
+router.get("/history", async (req, res) => {
+  try {
+    const history = await prisma.driverDelivery.findMany({
+      where: {
+        driverId: req.driver.id,
+        deliveredAt: { not: null }
+      },
+      include: {
+        order: {
+          include: { items: true }
+        }
+      },
+      orderBy: { deliveredAt: "desc" },
+      take: 50
+    })
+    res.json(history)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── ACCEPT ORDER ───
+router.post("/:id/accept", async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const order = await prisma.customerOrder.findUnique({
+      where: { id },
+      include: { delivery: true }
+    })
+
+    if (!order || order.status !== "confirmed" || order.delivery) {
+      return res.status(400).json({ message: "Order no longer available" })
+    }
+
+    const active = await prisma.driverDelivery.findFirst({
+      where: {
+        driverId: req.driver.id,
+        deliveredAt: null,
+        cancelledAt: null
+      }
+    })
+
+    if (active) {
+      return res.status(400).json({ message: "Complete your current delivery first" })
+    }
+
+    const delivery = await prisma.driverDelivery.create({
+      data: {
+        driverId: req.driver.id,
+        orderId: id,
+        acceptedAt: new Date(),
+        deliveryFee: order.deliveryFee || 30,
+        driverEarning: 20
+      }
+    })
+
+    await prisma.customerOrder.update({
+      where: { id },
+      data: { status: "preparing" }
+    })
+
+    await prisma.driver.update({
+      where: { id: req.driver.id },
+      data: { status: "delivering" }
+    })
+
+    await prisma.notification.create({
+      data: {
+        customerId: order.customerId,
+        type: "order_confirmed",
+        title: "Driver Assigned! 🛵",
+        message: `${req.driver.name} has accepted your order and is heading to Kokrobite Oasis to pick it up!`,
+        data: { orderId: id }
+      }
+    })
+
+    const io = getIO()
+    io.to(`order_${id}`).emit("order_update", {
+      status: "preparing",
+      driver: {
+        name: req.driver.name,
+        phone: req.driver.phone
+      }
+    })
+
+    res.json({ message: "Order accepted", delivery })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── PICKUP ORDER ───
+router.post("/:id/pickup", async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const delivery = await prisma.driverDelivery.findFirst({
+      where: { 
+        orderId: id, 
+        driverId: req.driver.id 
+      }
+    })
+
+    if (!delivery) return res.status(404).json({ message: "Delivery not found" })
+    if (delivery.pickedUpAt) return res.status(400).json({ message: "Already picked up" })
+
+    await prisma.driverDelivery.update({
+      where: { id: delivery.id },
+      data: { pickedUpAt: new Date() }
+    })
+
+    const order = await prisma.customerOrder.update({
+      where: { id },
+      data: { status: "delivering" }
+    })
+
+    await prisma.notification.create({
+      data: {
+        customerId: order.customerId,
+        type: "order_preparing", // Using preparing for "picked up" or similar
+        title: "Food Picked Up! 🍽️",
+        message: "Your Kokrobite Oasis order has been picked up and is on the way!",
+        data: { orderId: id }
+      }
+    })
+
+    const io = getIO()
+    io.to(`order_${id}`).emit("order_update", { status: "delivering" })
+
+    res.json({ message: "Pickup confirmed" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── DELIVER ORDER ───
+router.post("/:id/deliver", async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const delivery = await prisma.driverDelivery.findFirst({
+      where: { 
+        orderId: id, 
+        driverId: req.driver.id 
+      },
+      include: { order: true }
+    })
+
+    if (!delivery) return res.status(404).json({ message: "Delivery not found" })
+    if (delivery.deliveredAt) return res.status(400).json({ message: "Already delivered" })
+
+    await prisma.driverDelivery.update({
+      where: { id: delivery.id },
+      data: { deliveredAt: new Date() }
+    })
+
+    await prisma.customerOrder.update({
+      where: { id },
+      data: { status: "delivered" }
+    })
+
+    await prisma.driver.update({
+      where: { id: req.driver.id },
+      data: {
+        status: "online",
+        totalDeliveries: { increment: 1 },
+        totalEarnings: { increment: 20 },
+        todayEarnings: { increment: 20 }
+      }
+    })
+
+    await prisma.payout.create({
+      data: {
+        driverId: req.driver.id,
+        amount: 20,
+        type: "delivery_fee",
+        description: `Delivery fee for order ${delivery.order.orderNumber}`
+      }
+    })
+
+    await prisma.notification.create({
+      data: {
+        customerId: delivery.order.customerId,
+        type: "order_delivered",
+        title: "Order Delivered! 🎉",
+        message: "Your Kokrobite Oasis order has been delivered. Enjoy your meal! Please rate your experience.",
+        data: { orderId: id }
+      }
+    })
+
+    const io = getIO()
+    io.to(`order_${id}`).emit("order_update", { status: "delivered" })
+
+    res.json({ message: "Delivery confirmed" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// ─── CANCEL DELIVERY ───
+router.post("/:id/cancel", async (req, res) => {
+  try {
+    const { id } = req.params
+    const { cancelReason } = req.body
+
+    const delivery = await prisma.driverDelivery.findFirst({
+      where: { 
+        orderId: id, 
+        driverId: req.driver.id 
+      }
+    })
+
+    if (!delivery) return res.status(404).json({ message: "Delivery not found" })
+    if (delivery.pickedUpAt) return res.status(400).json({ message: "Cannot cancel after pickup" })
+
+    await prisma.driverDelivery.update({
+      where: { id: delivery.id },
+      data: { 
+        cancelledAt: new Date(),
+        cancelReason
+      }
+    })
+
+    await prisma.customerOrder.update({
+      where: { id },
+      data: { status: "confirmed" }
+    })
+
+    await prisma.driver.update({
+      where: { id: req.driver.id },
+      data: { status: "online" }
+    })
+
+    res.json({ message: "Delivery cancelled" })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+export default router

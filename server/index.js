@@ -1,4 +1,4 @@
-﻿import dotenv from "dotenv"
+import dotenv from "dotenv"
 dotenv.config()
 import express from "express"
 import cors from "cors"
@@ -29,11 +29,23 @@ import customerFeedbackRoutes from "./routes/customerFeedback.js"
 import adminCustomerRoutes from "./routes/adminCustomers.js"
 import adminCustomerOrderRoutes from "./routes/adminCustomerOrders.js"
 import adminFeedbackRoutes from "./routes/adminFeedback.js"
+import deliveryRoutes from "./routes/delivery.js"
+import paymentRoutes from "./routes/payments.js"
+import driverAuthRoutes from "./routes/driverAuth.js"
+import driverOrderRoutes from "./routes/driverOrders.js"
+import driverEarningsRoutes from "./routes/driverEarnings.js"
+import adminDriverRoutes from "./routes/adminDrivers.js"
+import chatRoutes from "./routes/chat.js"
+
+import { createServer } from "http"
+import { initSocket } from "./lib/socket.js"
+import { globalLimiter } from "./middleware/security.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
+const httpServer = createServer(app)
 const PORT = process.env.PORT || 5000
 
 // ─── ALLOWED ORIGINS ───
@@ -46,10 +58,17 @@ const allowedOrigins = [
 
 const isVercel = (url) => url && (url.endsWith(".vercel.app") || url.includes("vercel.app"))
 
+// Initialize Socket.io
+initSocket(httpServer, allowedOrigins)
+
 // ─── MIDDLEWARE ───
+app.use(globalLimiter)
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  crossOriginEmbedderPolicy: false
 }))
+
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -106,6 +125,13 @@ app.use("/api/customers/feedback", customerFeedbackRoutes)
 app.use("/api/admin/customers", adminCustomerRoutes)
 app.use("/api/admin/customer-orders", adminCustomerOrderRoutes)
 app.use("/api/admin/feedback", adminFeedbackRoutes)
+app.use("/api/admin/drivers", adminDriverRoutes)
+app.use("/api/delivery", deliveryRoutes)
+app.use("/api/payments", paymentRoutes)
+app.use("/api/drivers/auth", driverAuthRoutes)
+app.use("/api/drivers/orders", driverOrderRoutes)
+app.use("/api/drivers", driverEarningsRoutes)
+app.use("/api/chat", chatRoutes)
 
 // ─── ROOT ───
 app.get("/", (req, res) => {
@@ -146,7 +172,7 @@ async function start() {
     await prisma.$connect()
     console.log("✅ Database connected via Prisma Accelerate")
     
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`)
       console.log(`✅ Environment: ${process.env.NODE_ENV}`)
       console.log(`✅ Health check: http://localhost:${PORT}/api/health`)

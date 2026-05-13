@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -87,6 +87,10 @@ router.post("/login", async (req, res) => {
 
     if (!customer.isActive) {
       return res.status(403).json({ message: "Account suspended" });
+    }
+
+    if (!customer.password) {
+      return res.status(401).json({ message: "This account uses Google Sign-In. Please use the Google button to login." });
     }
 
     const isMatch = await bcrypt.compare(password, customer.password);

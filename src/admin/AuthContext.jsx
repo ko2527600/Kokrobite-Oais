@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
+      <div className="min-h-screen flex items-center justify-center bg-[#0C0A09]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-white/10 border-t-[#F97316] rounded-full animate-spin"/>
           <p className="text-white/30 text-sm">Checking session...</p>

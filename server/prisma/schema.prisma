@@ -18,6 +18,57 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model CustomerOrderItem {
+  id         String        @id @default(cuid())
+  orderId    String
+  menuItemId String?
+  name       String
+  price      Float
+  quantity   Int
+  image      String?
+  subtotal   Float
+  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model CustomerReview {
+  id           String   @id @default(cuid())
+  customerId   String
+  menuItemId   String?
+  menuItemName String?
+  branch       String?
+  rating       Int
+  comment      String
+  images       String[]
+  approved     Boolean  @default(false)
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  customer     Customer @relation(fields: [customerId], references: [id])
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  customerId String
+  type       NotificationType
+  title      String
+  message    String
+  read       Boolean          @default(false)
+  data       Json?
+  createdAt  DateTime         @default(now())
+  customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyHistory {
+  id          String   @id @default(cuid())
+  customerId  String
+  points      Int
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+
 model MenuItem {
   id          String      @id @default(uuid())
   name        String
@@ -102,7 +153,7 @@ model Announcement {
   id        String   @id @default(uuid())
   text      String
   link      String?
-  bgColor   String   @default("#EC4824")
+  bgColor   String   @default("#F97316")
   textColor String   @default("#ffffff")
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -192,6 +243,7 @@ model CustomerOrder {
   deliveryFee      Float               @default(0)
   totalAmount      Float
   status           OrderStatus         @default(pending)
+  deliveryStatus   DeliveryStatus      @default(PENDING)
   paymentMethod    String              @default("cash")
   paymentStatus    String              @default("unpaid")
   note             String?
@@ -205,64 +257,45 @@ model CustomerOrder {
   longitude        Float?
   customer         Customer            @relation(fields: [customerId], references: [id])
   items            CustomerOrderItem[]
+  delivery         DriverDelivery?
+  messages         ChatMessage[]
 }
 
-model CustomerOrderItem {
-  id         String        @id @default(cuid())
-  orderId    String
-  menuItemId String?
-  name       String
-  price      Float
-  quantity   Int
-  image      String?
-  subtotal   Float
-  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+model DeliverySession {
+  id        String   @id @default(cuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  lat       Float
+  lng       Float
+  timestamp DateTime @default(now())
 }
 
-model CustomerReview {
-  id           String   @id @default(cuid())
-  customerId   String
-  menuItemId   String?
-  menuItemName String?
-  branch       String?
-  rating       Int
-  comment      String
-  images       String[]
-  approved     Boolean  @default(false)
-  featured     Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  customer     Customer @relation(fields: [customerId], references: [id])
-}
-
-model Notification {
-  id         String           @id @default(cuid())
-  customerId String
-  type       NotificationType
-  title      String
-  message    String
-  read       Boolean          @default(false)
-  data       Json?
-  createdAt  DateTime         @default(now())
-  customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
-}
-
-model LoyaltyHistory {
+model Payout {
   id          String   @id @default(cuid())
-  customerId  String
-  points      Int
-  type        String
-  description String
+  driverId    String
+  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  amount      Float
+  type        String   @default("cash_collection") // cash_collection or bank_transfer
+  description String?
   createdAt   DateTime @default(now())
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 enum OrderStatus {
   pending
   confirmed
   preparing
+  ready
   delivered
   cancelled
+}
+
+enum DeliveryStatus {
+  PENDING
+  ACCEPTED
+  PICKED_UP
+  DELIVERED
+  CANCELLED
 }
 
 enum OrderType {
@@ -274,12 +307,14 @@ enum NotificationType {
   order_placed
   order_confirmed
   order_preparing
+  order_ready
   order_delivered
   order_cancelled
   review_approved
   promotion
   welcome
 }
+
 
 enum FeedbackCategory {
   general
@@ -314,3 +349,99 @@ enum Category {
   BeersAndCiders
   SoftDrinks
 }
+
+enum DriverStatus {
+  online
+  offline
+  delivering
+}
+
+enum DriverType {
+  inhouse
+  freelance
+}
+
+model Driver {
+  id              String          @id @default(cuid())
+  name            String
+  email           String?         @unique
+  phone           String          @unique
+  password        String
+  avatar          String?
+  type            DriverType      @default(freelance)
+  status          DriverStatus    @default(offline)
+  vehicleType     String?
+  vehicleNumber   String?
+  licenseNumber   String?
+  isApproved      Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  rating          Float           @default(0)
+  totalRatings    Int             @default(0)
+  totalDeliveries Int             @default(0)
+  totalEarnings   Float           @default(0)
+  todayEarnings   Float           @default(0)
+  currentLat      Float?
+  currentLng      Float?
+  lastLocationAt  DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deliveries      DriverDelivery[]
+  ratings         DriverRating[]
+  sessions        DeliverySession[]
+  payouts         Payout[]
+}
+
+model DriverDelivery {
+  id              String        @id @default(cuid())
+  driver          Driver        @relation(fields: [driverId], references: [id])
+  driverId        String
+  order           CustomerOrder @relation(fields: [orderId], references: [id])
+  orderId         String        @unique
+  acceptedAt      DateTime?
+  pickedUpAt      DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  deliveryFee     Float         @default(30)
+  driverEarning   Float         @default(0)
+  distance        Float?
+  duration        Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model DriverRating {
+  id          String   @id @default(cuid())
+  driver      Driver   @relation(fields: [driverId], references: [id])
+  driverId    String
+  customerId  String
+  orderId     String
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+}
+
+model HubtelTransaction {
+  id               String   @id @default(cuid())
+  orderId          String
+  clientReference  String   @unique
+  amount           Float
+  status           String   @default("pending")
+  transactionId    String?
+  description      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ChatMessage {
+  id         String        @id @default(cuid())
+  orderId    String
+  senderId   String
+  senderRole String        // 'customer', 'driver', 'admin'
+  message    String
+  read       Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  order      CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+

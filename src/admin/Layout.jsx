@@ -131,6 +131,7 @@ const Layout = () => {
         { label: "Orders", path: "/admin/orders", icon: HiOutlineShoppingBag, badge: pendingOrders, badgeColor: 'yellow' },
         { label: "Reviews", path: "/admin/reviews", icon: HiOutlineStar, badge: unapprovedReviews, badgeColor: 'red' },
         { label: "Customers", path: "/admin/customers", icon: HiOutlineUsers, badge: totalCustomers, badgeColor: 'yellow' },
+        { label: "Drivers", path: "/admin/drivers", icon: HiOutlineTruck },
         { label: "Feedback", path: "/admin/feedback", icon: HiOutlineChatBubbleLeftRight, badge: newFeedback, badgeColor: 'red' }
       ]
     },

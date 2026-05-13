@@ -10,6 +10,17 @@ import CustomerProtectedRoute from "./portal/CustomerProtectedRoute"
 import AdminInstallGate from "./admin/AdminInstallGate"
 import PWAUpdateBanner from "./components/PWAUpdateBanner"
 
+// Delivery Pages
+import { DeliveryProvider } from "./delivery/DeliveryContext"
+import DeliveryProtectedRoute from "./delivery/DeliveryProtectedRoute"
+import DeliveryLayout from "./delivery/DeliveryLayout"
+import DriverLogin from "./delivery/pages/Login"
+import DriverRegister from "./delivery/pages/Register"
+import DriverDashboard from "./delivery/pages/Dashboard"
+import ActiveDelivery from "./delivery/pages/ActiveDelivery"
+import DriverEarnings from "./delivery/pages/Earnings"
+import DriverProfile from "./delivery/pages/Profile"
+
 // Admin Pages
 import AdminLayout from "./admin/Layout"
 import Dashboard from "./admin/pages/Dashboard"
@@ -20,6 +31,7 @@ import BranchesManager from "./admin/pages/BranchesManager"
 import ReviewsManager from "./admin/pages/ReviewsManager"
 import AnnouncementsManager from "./admin/pages/AnnouncementsManager"
 import CustomersManager from "./admin/pages/CustomersManager"
+import DriversManager from "./admin/pages/DriversManager"
 import FeedbackManager from "./admin/pages/FeedbackManager"
 import Settings from "./admin/pages/Settings"
 
@@ -68,6 +80,7 @@ export default function App() {
                     <Route path="reviews" element={<ReviewsManager />} />
                     <Route path="announcements" element={<AnnouncementsManager />} />
                     <Route path="customers" element={<CustomersManager />} />
+                    <Route path="drivers" element={<DriversManager />} />
                     <Route path="feedback" element={<FeedbackManager />} />
                     <Route path="settings" element={<Settings />} />
                   </Route>
@@ -100,6 +113,23 @@ export default function App() {
               </Routes>
             </CustomerProvider>
           } />
+
+          {/* ── DELIVERY DRIVER ROUTES ── */}
+          <Route path="/delivery/login" element={<DriverLogin />} />
+          <Route path="/delivery/register" element={<DriverRegister />} />
+          <Route path="/delivery" element={
+            <DeliveryProvider>
+              <DeliveryProtectedRoute />
+            </DeliveryProvider>
+          }>
+            <Route element={<DeliveryLayout />}>
+              <Route index element={<Navigate to="/delivery/dashboard" replace />} />
+              <Route path="dashboard" element={<DriverDashboard />} />
+              <Route path="active" element={<ActiveDelivery />} />
+              <Route path="earnings" element={<DriverEarnings />} />
+              <Route path="profile" element={<DriverProfile />} />
+            </Route>
+          </Route>
 
           {/* ── CATCH ALL ── */}
           <Route path="*" element={

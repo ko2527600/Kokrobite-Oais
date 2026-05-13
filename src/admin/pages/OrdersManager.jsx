@@ -12,18 +12,22 @@ import Modal from "../components/Modal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import Skeleton from "../components/Skeleton";
 import { useToast } from "../components/Toast";
+import ChatWindow from "../../components/Chat/ChatWindow";
+import { useAuth } from "../AuthContext";
 
 const STATUSES = ['pending', 'confirmed', 'preparing', 'delivered', 'cancelled'];
 const BRANCHES = ['East Legon'];
 const SOURCES = ['whatsapp', 'phone', 'walk-in', 'website'];
 
 const OrdersManager = () => {
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('WhatsApp');
   const [orders, setOrders] = useState([]);
   const [customerOrders, setCustomerOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   
   // Filters
   const [search, setSearch] = useState("");
@@ -559,14 +563,41 @@ const OrdersManager = () => {
                  href={`https://wa.me/${(activeTab === 'WhatsApp' ? selectedOrder.customerPhone : selectedOrder.customer?.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hello Kokrobite Oasis! I'd like to order:`)}`}
                  target="_blank"
                  rel="noopener noreferrer"
-                 className="flex-[1.5] bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-3 self-end font-sans"
+                 className="flex-[1] bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-3 self-end font-sans"
                >
-                 <BsWhatsapp size={20} /> Message on WhatsApp
+                 <BsWhatsapp size={20} /> WhatsApp
                </a>
+                
+                {activeTab === 'Portal' && (
+                  <button 
+                    onClick={() => setShowChat(true)}
+                    className="flex-[1.5] bg-[#F97316] hover:bg-[#F97316]/90 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-3 self-end font-sans"
+                  >
+                    Open Live Chat
+                  </button>
+                )}
             </div>
           </div>
         )}
       </Modal>
+
+      {/* ── CHAT OVERLAY ── */}
+      <AnimatePresence>
+        {showChat && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowChat(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <ChatWindow 
+              orderId={selectedOrder?.id} 
+              currentUser={user} 
+              onClose={() => setShowChat(false)} 
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add Order Modal */}
       <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Create New Order" size="lg">

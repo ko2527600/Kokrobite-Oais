@@ -1,0 +1,27 @@
+{
+  "name": "KO Rider — Kokrobite Oasis",
+  "short_name": "KO Rider",
+  "description": "Deliver for Kokrobite Oasis. Earn on your schedule.",
+  "start_url": "/delivery/dashboard",
+  "scope": "/delivery/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#F97316",
+  "background_color": "#0C0A09",
+  "icons": [
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Dashboard",
+      "url": "/delivery/dashboard",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Active Order",
+      "url": "/delivery/active",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}

@@ -143,18 +143,32 @@ const PlaceOrder = () => {
       };
       
       const res = await api.post('/customers/orders', payload);
+      const orderId = res.data.id;
       
-      // WhatsApp Redirect
-      const message = `Hello Kokrobite Oasis! I'd like to order:\n\n` + 
-        cart.map(i => `- ${i.quantity}x ${i.name}`).join('\n') + 
-        `\n\nTotal: GHC ${total}\nType: ${orderType}\nPayment: ${paymentMethod}`;
-      
-      const whatsappUrl = `https://wa.me/233243379412?text=${encodeURIComponent(message)}`;
+      // HUBTEL INTEGRATION
       if (paymentMethod === 'momo') {
-        window.open(whatsappUrl, '_blank');
+        try {
+          const hubtelRes = await api.post('/payments/create-hubtel-checkout', {
+            orderId: orderId,
+            totalAmount: total,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone || ''
+          });
+
+          if (hubtelRes.data.checkoutUrl) {
+            // Redirect to Hubtel
+            window.location.href = hubtelRes.data.checkoutUrl;
+            return; // Don't proceed to success screen yet, Hubtel will redirect back
+          }
+        } catch (hubtelErr) {
+          console.error('Hubtel Checkout Error:', hubtelErr);
+          toast.error('Order placed, but failed to initiate payment. Please contact support.');
+          // Even if payment fail initiation, order is in DB as 'unpaid'
+        }
       }
 
-      setStep(4); // Success screen
+      setStep(4); // Success screen (for Cash orders)
       setCart([]);
       refreshCustomer();
       toast.success('Order placed successfully! 🚀');
@@ -414,7 +428,7 @@ const PlaceOrder = () => {
                            </div>
                            <div>
                               <p className="font-bold text-sm font-sans">{p.label}</p>
-                              {p.id === 'momo' && <p className="text-[10px] text-[#F97316] font-bold uppercase mt-0.5 font-sans">Pay to: 0243379412</p>}
+                              {p.id === 'momo' && <p className="text-[10px] text-[#F97316] font-bold uppercase mt-0.5 font-sans">Pay to: UPDATE_WITH_REAL_KO_WHATSAPP</p>}
                            </div>
                            {paymentMethod === p.id && <HiOutlineCheckCircle className="ml-auto text-[#F97316]" size={20} />}
                         </div>

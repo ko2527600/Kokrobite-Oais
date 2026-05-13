@@ -30,6 +30,12 @@ export const CustomerProvider = ({ children }) => {
     setCustomer(customerData);
   };
 
+  const loginWithGoogle = (newToken, customerData) => {
+    localStorage.setItem('ko_customer_token', newToken);
+    localStorage.setItem('ko_customer_user', JSON.stringify(customerData));
+    setCustomer(customerData);
+  };
+
   const logout = async () => {
     try {
       await api.post('/customers/auth/logout');
@@ -46,10 +52,10 @@ export const CustomerProvider = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF7ED]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-white/10 border-t-[#F97316] rounded-full animate-spin"/>
-          <p className="text-white/30 text-sm">Loading KO Eats...</p>
+          <div className="w-10 h-10 border-2 border-[#F97316]/10 border-t-[#F97316] rounded-full animate-spin"/>
+          <p className="text-[rgba(28,10,0,0.40)] text-sm font-medium">Loading KO Eats...</p>
         </div>
       </div>
     );
@@ -60,6 +66,7 @@ export const CustomerProvider = ({ children }) => {
       customer, 
       loading, 
       login, 
+      loginWithGoogle,
       logout, 
       refreshCustomer 
     }}>

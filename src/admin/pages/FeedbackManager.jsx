@@ -10,21 +10,21 @@ import { toast } from 'react-hot-toast';
 import api from '../../api/axios';
 
 const CATEGORIES = {
-  bug_report: { label: 'Bug Report', color: 'bg-red-500/10 text-red-500' },
-  feature_request: { label: 'Feature Request', color: 'bg-blue-500/10 text-blue-500' },
-  food_quality: { label: 'Food Quality', color: 'bg-orange-500/10 text-orange-500' },
-  delivery_experience: { label: 'Delivery', color: 'bg-yellow-500/10 text-yellow-500' },
-  app_experience: { label: 'App Experience', color: 'bg-purple-500/10 text-purple-500' },
-  payment_issue: { label: 'Payment Issue', color: 'bg-red-500/10 text-red-500' },
-  general: { label: 'General', color: 'bg-gray-500/10 text-gray-400' },
-  other: { label: 'Other', color: 'bg-gray-500/10 text-gray-400' }
+  bug_report: { label: 'Bug Report', color: 'bg-[#EF4444]/15 text-[#EF4444]' },
+  feature_request: { label: 'Feature Request', color: 'bg-[#3B82F6]/15 text-[#3B82F6]' },
+  food_quality: { label: 'Food Quality', color: 'bg-[#F97316]/15 text-[#F97316]' },
+  delivery_experience: { label: 'Delivery', color: 'bg-[#F59E0B]/15 text-[#F59E0B]' },
+  app_experience: { label: 'App Experience', color: 'bg-[#8B5CF6]/15 text-[#8B5CF6]' },
+  payment_issue: { label: 'Payment Issue', color: 'bg-[#EF4444]/15 text-[#EF4444]' },
+  general: { label: 'General', color: 'bg-white/5 text-white/40' },
+  other: { label: 'Other', color: 'bg-white/5 text-white/40' }
 };
 
 const STATUSES = {
-  new: { label: 'New', color: 'bg-white/5 text-white/40' },
-  under_review: { label: 'Under Review', color: 'bg-blue-500/10 text-blue-400' },
-  resolved: { label: 'Resolved', color: 'bg-green-500/10 text-green-400' },
-  dismissed: { label: 'Dismissed', color: 'bg-red-500/10 text-red-400' }
+  new: { label: '🆕 New', color: 'bg-white/5 text-white/40' },
+  under_review: { label: '👀 Under Review', color: 'bg-[#3B82F6]/15 text-[#3B82F6]' },
+  resolved: { label: '✅ Resolved', color: 'bg-[#10B981]/15 text-[#10B981]' },
+  dismissed: { label: '❌ Dismissed', color: 'bg-[#EF4444]/15 text-[#EF4444]' }
 };
 
 const FeedbackManager = () => {
@@ -89,12 +89,12 @@ const FeedbackManager = () => {
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
            {[
-             { label: 'Total Feedback', val: stats.total, icon: <HiOutlineChatBubbleLeftRight size={24} />, color: 'text-white' },
-             { label: 'New / Unread', val: stats.new, icon: <HiOutlineExclamationCircle size={24} />, color: 'text-[#F97316]', badge: true },
-             { label: 'Average Rating', val: (stats.avgRating || 0).toFixed(1), icon: <HiOutlineStar size={24} />, color: 'text-yellow-500', stars: true },
-             { label: 'Resolved', val: stats.resolved, icon: <HiOutlineCheckCircle size={24} />, color: 'text-green-500' }
+             { label: 'Total Feedback', val: stats.total, icon: <HiOutlineChatBubbleLeftRight size={24} />, color: 'text-[#F97316]' },
+             { label: 'New / Unread', val: stats.new, icon: <HiOutlineExclamationCircle size={24} />, color: 'text-[#F59E0B]' },
+             { label: 'Average Rating', val: (stats.avgRating || 0).toFixed(1), icon: <HiOutlineStar size={24} />, color: 'text-[#F97316]', stars: true },
+             { label: 'Resolved', val: stats.resolved, icon: <HiOutlineCheckCircle size={24} />, color: 'text-[#10B981]' }
            ].map((s, i) => (
-             <div key={i} className="bg-[#1a1a1a] border border-white/5 p-6 rounded-[32px] flex items-center gap-5">
+             <div key={i} className="bg-[#1a1a1a] border border-[#F97316]/[0.08] p-6 rounded-[32px] flex items-center gap-5">
                 <div className={`w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center ${s.color}`}>
                    {s.icon}
                 </div>
@@ -102,7 +102,7 @@ const FeedbackManager = () => {
                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">{s.label}</p>
                    <div className="flex items-center gap-2">
                       <span className="text-2xl font-display font-bold text-white">{s.val}</span>
-                      {s.stars && <HiStar className="text-yellow-500 mb-1" />}
+                      {s.stars && <HiStar className="text-[#F97316] mb-1" />}
                    </div>
                 </div>
              </div>
@@ -118,11 +118,11 @@ const FeedbackManager = () => {
                  <button
                    key={s}
                    onClick={() => setFilters({...filters, status: s})}
-                   className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                     filters.status === s ? 'bg-[#F97316] text-white' : 'text-white/40 hover:text-white'
+                   className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all border ${
+                     filters.status === s ? 'bg-[#F97316] border-[#F97316] text-white' : 'border-white/10 text-white/40 hover:text-white'
                    }`}
                  >
-                   {s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ')}
+                   {s === 'all' ? 'All' : s === 'new' ? 'New' : s === 'under_review' ? 'Under Review' : s === 'resolved' ? 'Resolved' : 'Dismissed'}
                  </button>
                ))}
             </div>
@@ -165,17 +165,17 @@ const FeedbackManager = () => {
         {loading ? (
           Array(4).fill(0).map((_, i) => <div key={i} className="h-40 bg-white/5 rounded-[32px] animate-pulse" />)
         ) : feedbacks.length === 0 ? (
-          <div className="bg-white/5 border border-white/5 rounded-[40px] p-20 text-center">
-             <HiOutlineChatBubbleLeftRight className="mx-auto text-white/10 mb-6" size={60} />
-             <h3 className="text-2xl font-black text-white mb-2">No feedback found</h3>
-             <p className="text-white/40">Adjust your filters to see more results.</p>
+          <div className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-[40px] p-20 text-center">
+             <div className="text-6xl mb-6">💬</div>
+             <h3 className="text-2xl font-display font-bold text-white mb-2">No Feedback Yet</h3>
+             <p className="text-white/40 text-sm">Customer feedback from KO Eats will appear here</p>
           </div>
         ) : (
           feedbacks.map(f => (
             <motion.div 
               key={f.id}
               layout
-              className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] flex flex-col lg:flex-row gap-8 items-start group"
+              className="bg-[#1a1a1a] border border-[#F97316]/[0.08] p-8 rounded-[40px] flex flex-col lg:flex-row gap-8 items-start group"
             >
                <div className="flex items-start gap-4 flex-1">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/5">
@@ -194,12 +194,12 @@ const FeedbackManager = () => {
                         <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${CATEGORIES[f.category]?.color}`}>
                            {CATEGORIES[f.category]?.label}
                         </span>
-                        <div className="flex text-yellow-500">
+                        <div className="flex text-[#F97316]">
                            {[...Array(5)].map((_, i) => <HiStar key={i} size={14} className={i >= f.rating ? 'opacity-10' : ''} />)}
                         </div>
                      </div>
                      <p className="text-white/40 text-xs font-medium mb-4">{f.customer.email}</p>
-                     <h3 className="text-white font-bold text-xl mb-3 font-display">{f.title}</h3>
+                     <h3 className="text-white font-semibold text-xl mb-3 font-display">{f.title}</h3>
                      <p className="text-white/60 text-sm leading-relaxed max-w-2xl">{f.message}</p>
                      
                      <div className="flex flex-wrap items-center gap-6 mt-6">
@@ -207,7 +207,7 @@ const FeedbackManager = () => {
                            <HiOutlineClock size={14} /> {new Date(f.createdAt).toLocaleString()}
                         </div>
                         {f.deviceInfo && (
-                          <div className="text-[10px] text-white/20 font-medium max-w-[200px] truncate" title={f.deviceInfo}>
+                          <div className="text-[10px] text-white/25 font-mono max-w-[200px] truncate" title={f.deviceInfo}>
                              Device: {f.deviceInfo.split(')')[0].split('(')[1] || f.deviceInfo}
                           </div>
                         )}
@@ -250,7 +250,7 @@ const FeedbackManager = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-[10%] left-[5%] right-[5%] lg:left-1/2 lg:-translate-x-1/2 lg:w-[800px] bg-[#1a1a1a] border border-white/10 rounded-[40px] z-[101] overflow-hidden flex flex-col max-h-[80vh]"
+              className="fixed top-[10%] left-[5%] right-[5%] lg:left-1/2 lg:-translate-x-1/2 lg:w-[800px] bg-[#1a1a1a] border border-[#F97316]/10 rounded-[40px] z-[101] overflow-hidden flex flex-col max-h-[80vh]"
             >
                <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
                   <h3 className="text-2xl font-display font-bold text-white uppercase tracking-tight">Manage Feedback</h3>
@@ -293,7 +293,7 @@ const FeedbackManager = () => {
                         {selectedFeedback.screenshot ? (
                           <div>
                             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2">Screenshot</p>
-                            <a href={selectedFeedback.screenshot} target="_blank" rel="noreferrer" className="block rounded-2xl overflow-hidden border border-white/10 hover:border-[#F97316]/50 transition-all">
+                            <a href={selectedFeedback.screenshot} target="_blank" rel="noreferrer" className="block rounded-lg overflow-hidden border border-[#F97316]/15 hover:border-[#F97316]/50 transition-all">
                                <img src={selectedFeedback.screenshot} className="w-full object-contain" alt="" />
                             </a>
                           </div>
@@ -315,7 +315,7 @@ const FeedbackManager = () => {
                            <select 
                              value={updateData.status}
                              onChange={e => setUpdateData({...updateData, status: e.target.value})}
-                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-bold font-sans"
+                             className="w-full bg-[#1a1a1a] border border-[#F97316]/15 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-bold font-sans"
                            >
                               {Object.entries(STATUSES).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
                            </select>
@@ -327,15 +327,15 @@ const FeedbackManager = () => {
                              value={updateData.adminNote}
                              onChange={e => setUpdateData({...updateData, adminNote: e.target.value})}
                              placeholder="Internal note or message to customer..."
-                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-medium resize-none text-sm font-sans"
+                             className="w-full bg-[#1a1a1a] border border-[#F97316]/15 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-medium resize-none text-sm font-sans"
                            />
-                           <p className="text-[9px] text-white/20 ml-1 italic">* This note will be sent as a notification if status is 'Resolved'.</p>
+                           <p className="text-[9px] text-white/20 ml-1 italic">* Your Kokrobite Oasis feedback has been resolved! Thank you 🌴</p>
                         </div>
                      </div>
                      <button
                        onClick={handleUpdateStatus}
                        disabled={updating}
-                       className="w-full bg-[#F97316] hover:bg-[#F97316]/90 text-white font-bold py-5 rounded-2xl shadow-xl shadow-[#F97316]/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 font-sans uppercase tracking-widest text-xs"
+                       className="w-full bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white font-bold py-5 rounded-2xl shadow-xl shadow-[#F97316]/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 font-sans uppercase tracking-widest text-xs"
                      >
                        {updating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'UPDATE FEEDBACK STATUS'}
                      </button>
