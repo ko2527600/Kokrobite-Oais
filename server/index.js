@@ -86,6 +86,9 @@ io.on("connection", (socket) => {
   })
 })
 
+// ─── HEALTH CHECK (Exempt from limiter) ───
+app.use("/api/health", healthRoutes)
+
 // ─── MIDDLEWARE ───
 app.use(globalLimiter)
 app.use(helmet({
@@ -129,7 +132,6 @@ app.use("/uploads", express.static(
 ))
 
 // ─── API ROUTES ───
-app.use("/api/health", healthRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/menu", menuRoutes)
 app.use("/api/orders", orderRoutes)

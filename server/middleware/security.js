@@ -4,7 +4,7 @@ import { z } from 'zod';
 // ─── RATE LIMITERS ───
 export const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 300, 
+  max: 600, 
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many requests, please try again later.' },
