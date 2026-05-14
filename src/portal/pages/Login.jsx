@@ -43,17 +43,57 @@ const CustomerLogin = () => {
     }
   };
 
-  const handleGoogleSuccess = async (response) => {
+  const handleGoogleLogin = async (response) => {
     try {
-      // Typically you'd send the credential to your backend
-      const res = await api.post('/customers/auth/google', { 
-        credential: response.credential 
-      });
-      login(res.data.token, res.data.customer);
+      setLoading(true);
+      setError('');
+
+      // response.credential is a JWT token
+      const credential = response.credential;
+
+      if (!credential) {
+        setError("Google login failed. Please try again.");
+        return;
+      }
+
+      // Decode the JWT payload (base64)
+      const base64Url = credential.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(window.atob(base64));
+
+      console.log("Google payload:", payload);
+
+      // Extract user info from decoded token
+      const googleData = {
+        googleId: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        avatar: payload.picture
+      };
+
+      if (!googleData.email) {
+        setError("Could not get email from Google. Please try again.");
+        return;
+      }
+
+      // Send to backend
+      const res = await api.post("/customers/auth/google", googleData);
+
+      const { token, customer } = res.data;
+      
+      // Use the context login to keep state in sync
+      login(token, customer);
+
       toast.success('Welcome back with Google! 👋');
-      navigate('/portal/dashboard');
+      navigate("/portal/dashboard");
+
     } catch (err) {
-      toast.error('Google Sign-In failed');
+      console.error("Google login error:", err.response?.data || err.message);
+      const msg = err.response?.data?.message || "Google login failed. Please try again.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -218,12 +258,14 @@ const CustomerLogin = () => {
 
           <div className="flex justify-center">
             <GoogleLogin 
-              onSuccess={handleGoogleSuccess} 
-              onError={() => toast.error('Google Login Error')}
-              theme="outline"
+              onSuccess={handleGoogleLogin} 
+              onError={() => {
+                setError("Google login failed. Please try again.");
+              }}
+              useOneTap={false}
+              theme="filled_black"
               shape="rectangular"
-              size="large"
-              text="continue_with"
+              text="signin_with"
               width="320"
             />
           </div>

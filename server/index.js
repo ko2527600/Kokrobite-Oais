@@ -85,6 +85,18 @@ app.use("/api/health", healthRoutes)
 
 // ─── MIDDLEWARE ───
 app.use(globalLimiter)
+app.use((req, res, next) => {
+  res.setHeader(
+    "Cross-Origin-Opener-Policy", 
+    "unsafe-none"
+  )
+  res.setHeader(
+    "Cross-Origin-Embedder-Policy",
+    "unsafe-none"
+  )
+  next()
+})
+
 app.use(helmet({
   crossOriginOpenerPolicy: false,
   crossOriginEmbedderPolicy: false,

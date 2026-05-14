@@ -149,10 +149,14 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // @access  Public
 router.post("/google", async (req, res) => {
   try {
+    console.log("Google auth body:", JSON.stringify(req.body));
     const { googleId, email, name, avatar } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    if (!email || email.trim() === "") {
+      return res.status(400).json({ 
+        message: "Email is required. Google data not received correctly.",
+        received: req.body
+      });
     }
 
     let customer = null;
