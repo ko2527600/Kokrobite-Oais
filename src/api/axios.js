@@ -30,12 +30,16 @@ api.interceptors.response.use(
       localStorage.removeItem("ko_driver_user")
 
       const path = window.location.pathname
-      if (path.startsWith("/admin")) {
-        window.location.href = "/admin/login"
-      } else if (path.startsWith("/portal")) {
-        window.location.href = "/portal/login"
-      } else if (path.startsWith("/delivery")) {
-        window.location.href = "/delivery/login"
+      const isLoginPage = path.endsWith("/login") || path.endsWith("/register")
+      
+      if (!isLoginPage) {
+        if (path.startsWith("/admin")) {
+          window.location.href = "/admin/login"
+        } else if (path.startsWith("/portal")) {
+          window.location.href = "/portal/login"
+        } else if (path.startsWith("/delivery")) {
+          window.location.href = "/delivery/login"
+        }
       }
     }
     return Promise.reject(error)
