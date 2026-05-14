@@ -15,88 +15,22 @@ export default defineConfig(({mode}) => {
         includeAssets: [
           "favicon.png",
           "icons/*.png",
-          "assets/**/*"
         ],
         manifest: false,
-        // We use our own manifest.json files
-        
         workbox: {
           globPatterns: [
-            "**/*.{js,css,html,ico,png,svg,woff2}"
+            "**/*.{js,css,html,png,svg,ico}"
           ],
-
-          
-          // Cache strategies:
-          runtimeCaching: [
-            {
-              // API calls — Network first, fallback cache
-              urlPattern: /^https?:\/\/(localhost:5000|kokrobite-oasis-api\.onrender\.com)\/api\/.*/i,
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "api-cache",
-                expiration: {
-                  maxEntries: 100,
-                  maxAgeSeconds: 60 * 60 * 24
-                },
-                networkTimeoutSeconds: 10,
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
-              }
-            },
-            {
-              // Images — Cache first
-              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-              handler: "CacheFirst",
-              options: {
-                cacheName: "image-cache",
-                expiration: {
-                  maxEntries: 200,
-                  maxAgeSeconds: 60 * 60 * 24 * 30
-                }
-              }
-            },
-            {
-              // Google Fonts
-              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-              handler: "CacheFirst",
-              options: {
-                cacheName: "google-fonts-cache",
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365
-                }
-              }
-            },
-            {
-              // Unsplash images
-              urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
-              handler: "CacheFirst",
-              options: {
-                cacheName: "unsplash-cache",
-                expiration: {
-                  maxEntries: 50,
-                  maxAgeSeconds: 60 * 60 * 24 * 7
-                }
-              }
-            }
-          ],
-          
-          // Skip waiting — update immediately
           skipWaiting: true,
           clientsClaim: true,
-          
-          // Offline fallback page
           navigateFallback: "/index.html",
           navigateFallbackDenylist: [
             /^\/api/,
             /^\/uploads/
           ]
         },
-        
         devOptions: {
-          enabled: true,
-          type: "module"
+          enabled: false
         }
       })
     ],

@@ -1,26 +1,22 @@
 {
   "name": "Kokrobite Oasis — KO Eats",
   "short_name": "KO Eats",
-  "description": "Order beach-inspired food and drinks from Kokrobite Oasis. East Legon, Accra.",
-  "start_url": "/portal/dashboard",
-  "scope": "/portal/",
+  "start_url": "/portal/login",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#F97316",
   "background_color": "#FFF7ED",
-  "categories": ["food", "lifestyle", "shopping"],
-  "lang": "en-GH",
+  "theme_color": "#F97316",
   "icons": [
-    { "src": "/icons/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/logo.png", "sizes": "180x180", "type": "image/png" }
-  ],
-  "shortcuts": [
     {
-      "name": "Order Food",
-      "short_name": "Order",
-      "url": "/portal/order",
-      "icons": [{ "src": "/icons/logo.png", "sizes": "96x96" }]
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

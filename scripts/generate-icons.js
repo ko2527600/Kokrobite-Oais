@@ -2,7 +2,7 @@ import sharp from "sharp"
 import fs from "fs"
 import path from "path"
 
-const SOURCE = "./public/assets/logo.jpg"
+const SOURCE = "./public/icons/logo.png"
 const OUT = "./public/icons"
 
 if (!fs.existsSync(OUT)) fs.mkdirSync(OUT, { recursive: true })

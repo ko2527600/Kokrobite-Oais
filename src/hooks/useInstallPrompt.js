@@ -1,42 +1,68 @@
 import { useState, useEffect } from "react"
 
 export function useInstallPrompt() {
-  const [installPrompt, setInstallPrompt] = useState(null)
-  const [isInstalled, setIsInstalled] = useState(false)
-  const [isInstallable, setIsInstallable] = useState(false)
+  const [installPrompt, setInstallPrompt] = 
+    useState(null)
+  const [isInstalled, setIsInstalled] = 
+    useState(false)
+  const [isInstallable, setIsInstallable] = 
+    useState(false)
 
   useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    // Check if already running as PWA
+    const isStandalone = 
+      window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches ||
+      window.navigator.standalone === true
+
+    if (isStandalone) {
       setIsInstalled(true)
       return
     }
 
-    // Capture install prompt
-    const handler = (e) => {
+    // Listen for install prompt
+    const handlePrompt = (e) => {
       e.preventDefault()
+      console.log("✅ Install prompt captured!")
       setInstallPrompt(e)
       setIsInstallable(true)
     }
 
-    window.addEventListener("beforeinstallprompt", handler)
+    window.addEventListener(
+      "beforeinstallprompt", 
+      handlePrompt
+    )
 
-    // Detect successful install
-    window.addEventListener("appinstalled", () => {
-      setIsInstalled(true)
-      setIsInstallable(false)
-      setInstallPrompt(null)
-      console.log("✅ PWA installed")
-    })
+    // Listen for successful install
+    window.addEventListener(
+      "appinstalled", 
+      () => {
+        console.log("✅ App installed!")
+        setIsInstalled(true)
+        setIsInstallable(false)
+        setInstallPrompt(null)
+      }
+    )
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handler)
+      window.removeEventListener(
+        "beforeinstallprompt", 
+        handlePrompt
+      )
     }
   }, [])
 
   const triggerInstall = async () => {
-    if (!installPrompt) return false
+    if (!installPrompt) {
+      console.log("No install prompt available")
+      return false
+    }
+    
+    console.log("Triggering install prompt...")
     const result = await installPrompt.prompt()
+    console.log("Install result:", result.outcome)
+    
     if (result.outcome === "accepted") {
       setIsInstalled(true)
       setIsInstallable(false)
@@ -46,5 +72,9 @@ export function useInstallPrompt() {
     return false
   }
 
-  return { isInstallable, isInstalled, triggerInstall }
+  return { 
+    isInstallable, 
+    isInstalled, 
+    triggerInstall 
+  }
 }

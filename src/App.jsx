@@ -9,6 +9,7 @@ import ProtectedRoute from "./admin/ProtectedRoute"
 import CustomerProtectedRoute from "./portal/CustomerProtectedRoute"
 import AdminInstallGate from "./admin/AdminInstallGate"
 import PWAUpdateBanner from "./components/PWAUpdateBanner"
+import InstallBanner from "./components/InstallBanner"
 
 // Delivery Pages
 import { DeliveryProvider } from "./delivery/DeliveryContext"
@@ -20,6 +21,10 @@ import DriverDashboard from "./delivery/pages/Dashboard"
 import ActiveDelivery from "./delivery/pages/ActiveDelivery"
 import DriverEarnings from "./delivery/pages/Earnings"
 import DriverProfile from "./delivery/pages/Profile"
+import DriverLanding from "./delivery/pages/Landing"
+import DriverTerms from "./delivery/pages/Terms"
+
+
 
 // Admin Pages
 import AdminLayout from "./admin/Layout"
@@ -57,6 +62,7 @@ export default function App() {
       clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <PWAUpdateBanner />
+        <InstallBanner />
         <Toaster position="bottom-left" />
         <Routes>
 
@@ -117,7 +123,10 @@ export default function App() {
           } />
 
           {/* ── DELIVERY DRIVER ROUTES ── */}
+          <Route path="/delivery" element={<DriverLanding />} />
           <Route path="/delivery/register" element={<DriverRegister />} />
+
+          <Route path="/delivery/terms" element={<DriverTerms />} />
           <Route path="/delivery/*" element={
             <DeliveryProvider>
               <Routes>
