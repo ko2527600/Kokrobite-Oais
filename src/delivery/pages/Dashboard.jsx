@@ -95,7 +95,7 @@ export default function DriverDashboard() {
 
   const goOnline = async () => {
     try {
-      await api.patch("/drivers/status", { status: "online" })
+      await api.patch("/drivers/earnings/status", { status: "online" })
       await refreshDriver()
       fetchData()
     } catch (err) {

@@ -49,8 +49,9 @@ const CustomerLayout = () => {
     const fetchNotifs = async () => {
       try {
         const res = await api.get('/customers/notifications');
-        setRecentNotifs(res.data.slice(0, 5));
-        setUnreadCount(res.data.filter(n => !n.read).length);
+        const list = Array.isArray(res.data) ? res.data : (res.data?.notifications || []);
+        setRecentNotifs(list.slice(0, 5));
+        setUnreadCount(list.filter(n => !n.read).length);
       } catch (err) {
         console.error('Failed to fetch notifications', err);
       }
