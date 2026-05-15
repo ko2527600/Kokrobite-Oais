@@ -16,7 +16,17 @@ const MyReviews = () => {
   const [submitting, setSubmitting] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [branches, setBranches] = useState([]);
-  
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
+  const [formErrors, setFormErrors] = useState({ menuItemId: '', comment: '' });
+  const [menuSearch, setMenuSearch] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const filteredMenuItems = menuItems.filter(item =>
+    item.name.toLowerCase().includes(menuSearch.toLowerCase())
+  );
+
+  const selectedMenuItem = menuItems.find(item => item.id === formData.menuItemId);
+
   const [formData, setFormData] = useState({
     menuItemId: '',
     branchId: '',
@@ -47,9 +57,12 @@ const MyReviews = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.comment.length < 20) return toast.error('Review must be at least 20 characters');
-    if (!formData.menuItemId) return toast.error('Please select a menu item');
-    
+    const errors = { menuItemId: '', comment: '' };
+    if (!formData.menuItemId) errors.menuItemId = 'Please select a menu item.';
+    if (formData.comment.length < 20) errors.comment = 'Review must be at least 20 characters.';
+    if (errors.menuItemId || errors.comment) { setFormErrors(errors); return; }
+    setFormErrors({ menuItemId: '', comment: '' });
+
     setSubmitting(true);
     try {
       await api.post('/customers/reviews', formData);
@@ -64,7 +77,7 @@ const MyReviews = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this review?")) return;
+    setDeleteConfirm({ open: false, id: null });
     try {
       await api.delete(`/customers/reviews/${id}`);
       toast.success('Review deleted');
@@ -127,7 +140,7 @@ const MyReviews = () => {
              </div>
 
              <div className="pt-6 border-t border-white/5 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleDelete(review.id)} className="p-3 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">
+                <button onClick={() => setDeleteConfirm({ open: true, id: review.id })} className="p-3 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all">
                    <HiOutlineTrash size={18} />
                 </button>
              </div>
@@ -166,24 +179,52 @@ const MyReviews = () => {
                 <h3 className="text-2xl font-display font-bold text-white uppercase mb-8">Share Your Experience</h3>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                   <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                   <div className="space-y-4">
+                      <div className="space-y-2 relative">
                          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Menu Item</label>
-                         <select 
-                           required
-                           value={formData.menuItemId}
-                           onChange={e => setFormData({...formData, menuItemId: e.target.value})}
-                           className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none text-white appearance-none font-sans"
+                         <button
+                           type="button"
+                           onClick={() => { setMenuOpen(v => !v); setMenuSearch(''); }}
+                           className={`w-full bg-black/30 border rounded-2xl p-4 text-sm outline-none text-left font-sans flex justify-between items-center transition-all ${formErrors.menuItemId ? 'border-red-500/50' : 'border-white/10 focus:border-[#F97316]'}`}
                          >
-                            <option value="">Select Item</option>
-                            {menuItems.map(item => (
-                              <option key={item.id} value={item.id}>{item.name}</option>
-                            ))}
-                         </select>
+                           <span className={selectedMenuItem ? 'text-white' : 'text-white/30'}>
+                             {selectedMenuItem ? selectedMenuItem.name : 'Search for a menu item...'}
+                           </span>
+                           <span className="text-white/20 text-xs">▾</span>
+                         </button>
+                         {menuOpen && (
+                           <div className="absolute z-20 top-full mt-1 w-full bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                             <div className="p-2 border-b border-white/5">
+                               <input
+                                 autoFocus
+                                 type="text"
+                                 value={menuSearch}
+                                 onChange={e => setMenuSearch(e.target.value)}
+                                 placeholder="Type to search..."
+                                 className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/20 outline-none font-sans"
+                               />
+                             </div>
+                             <div className="max-h-48 overflow-y-auto">
+                               {filteredMenuItems.length === 0 ? (
+                                 <p className="text-center text-white/30 text-xs py-4 font-sans">No items found</p>
+                               ) : filteredMenuItems.map(item => (
+                                 <button
+                                   key={item.id}
+                                   type="button"
+                                   onClick={() => { setFormData({...formData, menuItemId: item.id}); setMenuOpen(false); if (formErrors.menuItemId) setFormErrors(e => ({...e, menuItemId: ''})); }}
+                                   className={`w-full text-left px-4 py-3 text-sm font-sans hover:bg-white/5 transition-all ${formData.menuItemId === item.id ? 'text-[#F97316] font-bold' : 'text-white/60'}`}
+                                 >
+                                   {item.name}
+                                 </button>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                         {formErrors.menuItemId && <p className="text-[10px] text-red-400 font-bold ml-1">{formErrors.menuItemId}</p>}
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Branch (Optional)</label>
-                          <select 
+                          <select
                            value={formData.branchId}
                            onChange={e => setFormData({...formData, branchId: e.target.value})}
                            className="w-full bg-black/30 border border-white/10 rounded-2xl p-4 text-sm focus:border-[#F97316] outline-none text-white appearance-none font-sans"
@@ -214,20 +255,25 @@ const MyReviews = () => {
 
                    <div className="space-y-2">
                       <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Your Comment</label>
-                      <textarea 
-                         required
+                      <textarea
                          value={formData.comment}
-                         onChange={e => setFormData({...formData, comment: e.target.value})}
-                         className="w-full bg-black/30 border border-white/10 rounded-2xl p-6 text-sm focus:border-[#F97316] outline-none h-40 font-sans"
+                         onChange={e => { setFormData({...formData, comment: e.target.value}); if (formErrors.comment) setFormErrors(err => ({...err, comment: ''})); }}
+                         className={`w-full bg-black/30 border rounded-2xl p-6 text-sm focus:border-[#F97316] outline-none h-40 font-sans transition-all ${formErrors.comment ? 'border-red-500/50' : 'border-white/10'}`}
                         placeholder="Tell us what you liked about the meal! (Min 20 characters)"
                       />
-                      <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest text-right">
-                         Characters: {formData.comment.length} / 20
-                      </p>
+                      <div className="flex justify-between items-center">
+                        {formErrors.comment
+                          ? <p className="text-[10px] text-red-400 font-bold ml-1">{formErrors.comment}</p>
+                          : <span />
+                        }
+                        <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest text-right">
+                          {formData.comment.length} / 20 chars
+                        </p>
+                      </div>
                    </div>
 
                    <div className="flex gap-4 pt-4">
-                      <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest">Cancel</button>
+                      <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest border border-white/10 rounded-2xl hover:border-white/20 transition-all">Cancel</button>
                        <button 
                          type="submit" 
                          disabled={submitting} 
@@ -243,6 +289,47 @@ const MyReviews = () => {
                    </div>
                 </form>
              </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirm Dialog */}
+      <AnimatePresence>
+        {deleteConfirm.open && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirm({ open: false, id: null })}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-[#0C0A09] border border-white/10 rounded-[2.5rem] p-8 space-y-6 text-center"
+            >
+              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500">
+                <HiOutlineTrash size={26} />
+              </div>
+              <div>
+                <h4 className="text-lg font-display font-bold text-white uppercase mb-2">Delete Review?</h4>
+                <p className="text-sm text-white/40 font-sans">This review will be permanently removed.</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm({ open: false, id: null })}
+                  className="flex-1 py-3.5 font-black text-xs text-white/40 uppercase tracking-widest border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirm.id)}
+                  className="flex-[2] py-3.5 bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all"
+                >
+                  Delete Review
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

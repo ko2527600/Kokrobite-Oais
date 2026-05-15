@@ -66,6 +66,7 @@ const FeedbackPage = () => {
   });
   const [screenshot, setScreenshot] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [formError, setFormError] = useState('');
 
   const fetchFeedbacks = async () => {
     try {
@@ -93,7 +94,7 @@ const FeedbackPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.message.length < 20) return toast.error('Please provide more details (min 20 chars)');
+    if (formData.message.length < 20) { setFormError('Please provide at least 20 characters.'); return; }
 
     setSubmitting(true);
     const data = new FormData();
@@ -105,6 +106,7 @@ const FeedbackPage = () => {
 
     try {
       await api.post('/customers/feedback', data);
+      setFormError('');
       setSubmitted(true);
       fetchFeedbacks();
       setFormData({ rating: 5, category: 'general', title: '', message: '' });
@@ -318,15 +320,16 @@ const FeedbackPage = () => {
                                 {formData.message.length} / 500
                              </span>
                           </div>
-                          <textarea 
+                          <textarea
                             required
                             rows={4}
                             maxLength={500}
                              value={formData.message}
-                             onChange={e => setFormData({...formData, message: e.target.value})}
+                             onChange={e => { setFormData({...formData, message: e.target.value}); if (formError) setFormError(''); }}
                              placeholder="Tell us more about your experience... (min 20 characters)"
                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#F97316] transition-all font-sans font-medium resize-none"
                           />
+                          {formError && <p className="text-[10px] text-red-400 font-bold ml-1">{formError}</p>}
                        </div>
                     </div>
 

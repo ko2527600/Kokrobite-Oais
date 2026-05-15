@@ -18,6 +18,7 @@ const Settings = () => {
   
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
   const [showPass, setShowPass] = useState({ current: false, new: false });
+  const [passError, setPassError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState({ profile: false, config: false, pass: false, clear: false });
 
@@ -65,8 +66,8 @@ const Settings = () => {
 
   const handlePasswordSave = async (e) => {
     e.preventDefault();
-    if (passwords.new !== passwords.confirm) return showToast("Passwords do not match", "warning");
-    
+    if (passwords.new !== passwords.confirm) { setPassError("Passwords do not match"); return; }
+    setPassError("");
     setLoading({ ...loading, pass: true });
     try {
       await api.post("/auth/change-password", {
@@ -131,7 +132,7 @@ const Settings = () => {
            </div>
 
            <form onSubmit={handleProfileSave} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                    <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1 font-sans">Display Name</label>
                    <input value={admin.name} onChange={e => setAdmin({ ...admin, name: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 font-sans transition-all" placeholder="Enter name" />
@@ -159,23 +160,35 @@ const Settings = () => {
                     </button>
                  </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-4">
                     <div className="relative">
                        <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">New Password</label>
-                       <input required type={showPass.new ? "text" : "password"} value={passwords.new} onChange={e => setPasswords({ ...passwords, new: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
+                       <input required type={showPass.new ? "text" : "password"} value={passwords.new} onChange={e => { setPasswords({ ...passwords, new: e.target.value }); if (passError) setPassError(""); }} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
                        <button type="button" onClick={() => setShowPass({ ...showPass, new: !showPass.new })} className="absolute right-4 bottom-3.5 text-white/20">
                          {showPass.new ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
                        </button>
                        <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
                           <div className={`h-full transition-all duration-500 ${strength.color}`} style={{ width: strength.width }} />
                        </div>
-                       <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-40">{strength.label}</p>
+                       <div className="mt-2 space-y-1">
+                         {[
+                           { label: '8+ characters', met: passwords.new.length >= 8 },
+                           { label: 'One uppercase letter', met: /[A-Z]/.test(passwords.new) },
+                           { label: 'One number', met: /[0-9]/.test(passwords.new) },
+                           { label: 'One special character', met: /[^A-Za-z0-9]/.test(passwords.new) },
+                         ].map(req => (
+                           <p key={req.label} className={`text-[10px] font-bold flex items-center gap-1.5 transition-colors ${req.met ? 'text-[#10B981]' : 'text-white/20'}`}>
+                             <span>{req.met ? '✓' : '○'}</span>{req.label}
+                           </p>
+                         ))}
+                       </div>
                     </div>
                     <div>
                        <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-2 font-sans">Confirm New Password</label>
-                       <input required type="password" value={passwords.confirm} onChange={e => setPasswords({ ...passwords, confirm: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
-                       {passwords.new && passwords.confirm && passwords.new === passwords.confirm && (
-                         <p className="text-[8px] font-bold text-[#10B981] uppercase tracking-widest mt-2">✓ Passwords match</p>
+                       <input required type="password" value={passwords.confirm} onChange={e => { setPasswords({ ...passwords, confirm: e.target.value }); if (passError) setPassError(""); }} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/20 font-sans transition-all" placeholder="••••••••" />
+                       {passError && <p className="text-[10px] text-red-400 font-bold mt-1.5">{passError}</p>}
+                       {!passError && passwords.new && passwords.confirm && passwords.new === passwords.confirm && (
+                         <p className="text-[10px] font-bold text-[#10B981] mt-1.5 flex items-center gap-1">✓ Passwords match</p>
                        )}
                     </div>
                  </div>
@@ -196,7 +209,7 @@ const Settings = () => {
           <p className="text-xs text-white/20 font-bold uppercase tracking-widest mt-1 ml-9">This updates info shown across KO Eats portal</p>
         </div>
         <form onSubmit={handleConfigSave} className="p-8 space-y-6">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="space-y-6">
               <div className="space-y-2">
                  <label className="text-[10px] font-bold text-white/20 uppercase tracking-widest ml-1">Restaurant Name</label>
                  <input value={config.restaurantName} onChange={e => setConfig({ ...config, restaurantName: e.target.value })} className="w-full bg-[#111111] border border-white/5 rounded-lg px-4 py-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316] focus:ring-4 focus:ring-[#F97316]/15 transition-all font-sans" placeholder="Kokrobite Oasis" />
