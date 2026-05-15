@@ -25,6 +25,7 @@ const ProfileCard = ({ title, icon: Icon, children }) => (
 const CustomerProfile = () => {
   const { customer, refreshCustomer } = useCustomer();
   const [loading, setLoading] = useState(false);
+  const [passError, setPassError] = useState('');
   
   const [profileData, setProfileData] = useState({
     name: customer?.name || '',
@@ -54,8 +55,10 @@ const CustomerProfile = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      return toast.error('Passwords do not match');
+      setPassError('Passwords do not match');
+      return;
     }
+    setPassError('');
     setLoading(true);
     try {
       await api.patch('/customers/auth/change-password', passwordData);
@@ -188,23 +191,38 @@ const CustomerProfile = () => {
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">New Password</label>
-                       <input 
-                          type="password" 
+                       <input
+                          type="password"
                           required
                           value={passwordData.newPassword}
-                          onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                          onChange={e => { setPasswordData({...passwordData, newPassword: e.target.value}); if (passError) setPassError(''); }}
                           className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-3.5 text-sm text-white focus:border-[#F97316] outline-none transition-all font-sans"
                        />
+                       {passwordData.newPassword && (
+                         <div className="mt-2 space-y-1">
+                           {[
+                             { label: '8+ characters', met: passwordData.newPassword.length >= 8 },
+                             { label: 'One uppercase letter', met: /[A-Z]/.test(passwordData.newPassword) },
+                             { label: 'One number', met: /[0-9]/.test(passwordData.newPassword) },
+                             { label: 'One special character', met: /[^A-Za-z0-9]/.test(passwordData.newPassword) },
+                           ].map(req => (
+                             <p key={req.label} className={`text-[10px] font-bold flex items-center gap-1.5 transition-colors ${req.met ? 'text-[#10B981]' : 'text-white/20'}`}>
+                               <span>{req.met ? '✓' : '○'}</span>{req.label}
+                             </p>
+                           ))}
+                         </div>
+                       )}
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Confirm New Password</label>
-                       <input 
-                          type="password" 
+                       <input
+                          type="password"
                           required
                           value={passwordData.confirmPassword}
-                          onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-3.5 text-sm text-white focus:border-[#F97316] outline-none transition-all font-sans"
+                          onChange={e => { setPasswordData({...passwordData, confirmPassword: e.target.value}); if (passError) setPassError(''); }}
+                          className={`w-full bg-white/5 border rounded-2xl px-6 py-3.5 text-sm text-white focus:border-[#F97316] outline-none transition-all font-sans ${passError ? 'border-red-500/50' : 'border-white/10'}`}
                        />
+                       {passError && <p className="text-[10px] text-red-400 font-bold mt-1">{passError}</p>}
                     </div>
                     <button 
                       disabled={loading}

@@ -25,6 +25,7 @@ const PlaceOrder = () => {
   const [categories, setCategories] = useState(['All']);
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   // Cart State
   const [cart, setCart] = useState([]);
@@ -242,18 +243,26 @@ const PlaceOrder = () => {
                 className="space-y-8"
               >
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                   <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full sm:w-auto">
-                      {categories.map(cat => (
-                        <button 
+                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                      {(showAllCategories ? categories : categories.slice(0, 7)).map(cat => (
+                        <button
                           key={cat}
                           onClick={() => setActiveCategory(cat)}
-                          className={`px-6 py-2.5 rounded-xl font-sans transition-all whitespace-nowrap ${
+                          className={`px-5 py-2.5 rounded-xl font-sans transition-all whitespace-nowrap text-sm ${
                             activeCategory === cat ? 'bg-[#F97316] text-white shadow-lg' : 'bg-white/5 text-white/40 hover:text-white'
                           }`}
                         >
                           {cat}
                         </button>
                       ))}
+                      {categories.length > 7 && (
+                        <button
+                          onClick={() => setShowAllCategories(v => !v)}
+                          className="px-5 py-2.5 rounded-xl font-sans transition-all whitespace-nowrap text-sm bg-white/5 text-[#F97316] hover:bg-white/10 font-bold"
+                        >
+                          {showAllCategories ? '− Less' : `+${categories.length - 7} More`}
+                        </button>
+                      )}
                    </div>
                    <div className="relative w-full sm:w-64">
                       <HiOutlineMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
@@ -729,10 +738,10 @@ const PlaceOrder = () => {
                      />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Area / Neighborhood</label>
-                       <input 
+                       <input
                           type="text"
                           value={newAddress.area}
                           onChange={e => setNewAddress({...newAddress, area: e.target.value})}
@@ -742,7 +751,7 @@ const PlaceOrder = () => {
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Landmark</label>
-                       <input 
+                       <input
                           type="text"
                           value={newAddress.landmark}
                           onChange={e => setNewAddress({...newAddress, landmark: e.target.value})}
@@ -777,7 +786,7 @@ const PlaceOrder = () => {
                </div>
 
                <div className="flex gap-4 pt-4">
-                  <button onClick={() => setShowAddressForm(false)} className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-white/40 hover:text-white">Cancel</button>
+                  <button onClick={() => setShowAddressForm(false)} className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-white/40 hover:text-white border border-white/10 rounded-2xl hover:border-white/20 transition-all">Cancel</button>
                   <button onClick={saveNewAddress} className="flex-1 bg-[#F97316] text-white font-black py-4 rounded-2xl shadow-xl shadow-[#F97316]/20">SAVE ADDRESS</button>
                </div>
             </motion.div>

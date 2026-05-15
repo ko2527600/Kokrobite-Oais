@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { 
-  HiOutlineEnvelope, HiLockClosed, HiOutlineEye, HiOutlineEyeSlash, 
+import {
+  HiOutlineEnvelope, HiLockClosed, HiOutlineEye, HiOutlineEyeSlash,
   HiOutlineUser, HiOutlinePhone, HiOutlineArrowRight, HiOutlineShieldCheck
 } from 'react-icons/hi2';
+// HiOutlinePhone used for phone field (HiOutlineDevicePhoneMobile alias)
 import { Gift } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-hot-toast';
@@ -16,6 +17,7 @@ const CustomerRegister = () => {
   const { login } = useCustomer();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ password: '', confirmPassword: '' });
   const [formData, setFormData] = useState({ 
     name: '', 
     email: '', 
@@ -38,11 +40,14 @@ const CustomerRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      return toast.error('Passwords do not match');
+      setErrors(e => ({ ...e, confirmPassword: 'Passwords do not match' }));
+      return;
     }
     if (passwordStrength < 50) {
-      return toast.error('Please choose a stronger password');
+      setErrors(e => ({ ...e, password: 'Password is too weak — see requirements below' }));
+      return;
     }
+    setErrors({ password: '', confirmPassword: '' });
 
     setLoading(true);
     try {
@@ -124,7 +129,7 @@ const CustomerRegister = () => {
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-[#1C0A00] uppercase tracking-widest ml-1">Phone Number</label>
                 <div className="relative group">
-                    <HiOutlineDevicePhoneMobile className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
+                    <HiOutlinePhone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type="tel" 
                       required
@@ -165,6 +170,21 @@ const CustomerRegister = () => {
                    <div className={`flex-1 rounded-full transition-all ${passwordStrength >= 75 ? 'bg-yellow-500' : 'bg-[#1C0A00]/10'}`} />
                    <div className={`flex-1 rounded-full transition-all ${passwordStrength >= 100 ? 'bg-green-500' : 'bg-[#1C0A00]/10'}`} />
                 </div>
+                {formData.password && (
+                  <div className="mt-2 space-y-1 px-1">
+                    {[
+                      { label: '8+ characters', met: formData.password.length >= 8 },
+                      { label: 'One uppercase letter', met: /[A-Z]/.test(formData.password) },
+                      { label: 'One number', met: /[0-9]/.test(formData.password) },
+                      { label: 'One special character', met: /[^A-Za-z0-9]/.test(formData.password) },
+                    ].map(req => (
+                      <p key={req.label} className={`text-[10px] font-bold flex items-center gap-1.5 transition-colors ${req.met ? 'text-green-600' : 'text-[#1C0A00]/30'}`}>
+                        <span>{req.met ? '✓' : '○'}</span>{req.label}
+                      </p>
+                    ))}
+                  </div>
+                )}
+                {errors.password && <p className="text-[10px] text-red-500 font-bold px-1 mt-1">{errors.password}</p>}
               </div>
 
               <div className="space-y-2">
@@ -175,12 +195,13 @@ const CustomerRegister = () => {
                       type={showPassword ? "text" : "password"} 
                       required
                       value={formData.confirmPassword}
-                      onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
+                      onChange={e => { setFormData({...formData, confirmPassword: e.target.value}); if (errors.confirmPassword) setErrors(e2 => ({...e2, confirmPassword: ''})); }}
                       placeholder="Repeat password"
                       className="w-full bg-white border rounded-2xl pl-12 pr-4 py-3.5 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all text-sm font-sans"
-                      style={{ borderColor: 'rgba(249,115,22,0.25)' }}
+                      style={{ borderColor: errors.confirmPassword ? '#EF4444' : 'rgba(249,115,22,0.25)' }}
                     />
                 </div>
+                {errors.confirmPassword && <p className="text-[10px] text-red-500 font-bold px-1 mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 

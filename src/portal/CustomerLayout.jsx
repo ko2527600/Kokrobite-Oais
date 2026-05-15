@@ -57,17 +57,28 @@ const CustomerLayout = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const navItems = [
-    { label: "Dashboard", path: "/portal/dashboard", icon: HiOutlineHome },
-    { label: "Place Order", path: "/portal/order", icon: HiOutlineShoppingBag, highlight: true },
-    { label: "My Orders", path: "/portal/orders", icon: HiOutlineClipboardDocumentList },
-    { label: "Reviews", path: "/portal/reviews", icon: HiOutlineStar },
-    { label: "Notifications", path: "/portal/notifications", icon: HiOutlineBell, badge: unreadCount },
-    { label: "Addresses", path: "/portal/addresses", icon: HiOutlineMapPin },
-    { label: "Loyalty Points", path: "/portal/loyalty", icon: HiOutlineGift },
-    { label: "Feedback", path: "/portal/feedback", icon: HiOutlineChatBubbleLeftRight },
-    { label: "Profile", path: "/portal/profile", icon: HiOutlineUser },
+  const navSections = [
+    {
+      title: "ORDERING",
+      items: [
+        { label: "Dashboard", path: "/portal/dashboard", icon: HiOutlineHome },
+        { label: "Place Order", path: "/portal/order", icon: HiOutlineShoppingBag },
+        { label: "My Orders", path: "/portal/orders", icon: HiOutlineClipboardDocumentList },
+        { label: "Notifications", path: "/portal/notifications", icon: HiOutlineBell, badge: unreadCount },
+        { label: "Addresses", path: "/portal/addresses", icon: HiOutlineMapPin },
+      ],
+    },
+    {
+      title: "ACCOUNT",
+      items: [
+        { label: "Reviews", path: "/portal/reviews", icon: HiOutlineStar },
+        { label: "Loyalty Points", path: "/portal/loyalty", icon: HiOutlineGift },
+        { label: "Feedback", path: "/portal/feedback", icon: HiOutlineChatBubbleLeftRight },
+        { label: "Profile", path: "/portal/profile", icon: HiOutlineUser },
+      ],
+    },
   ];
+  const navItems = navSections.flatMap(s => s.items);
 
   const getPageTitle = () => {
     const item = navItems.find(i => location.pathname.startsWith(i.path));
@@ -133,13 +144,16 @@ const CustomerLayout = () => {
           </div>
         )}
 
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          {navItems.map((item) => (
-            <NavItem 
-              key={item.label} 
-              {...item} 
-              active={location.pathname === item.path}
-            />
+        <nav className="flex-1 px-4 overflow-y-auto custom-scrollbar space-y-4">
+          {navSections.map(section => (
+            <div key={section.title}>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 px-4 mb-1">{section.title}</p>
+              <div className="space-y-1">
+                {section.items.map(item => (
+                  <NavItem key={item.label} {...item} active={location.pathname === item.path} />
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
@@ -275,14 +289,16 @@ const CustomerLayout = () => {
                 </button>
               </div>
 
-              <div className="space-y-2 flex-1">
-                {navItems.map((item) => (
-                  <NavItem 
-                    key={item.label} 
-                    {...item} 
-                    active={location.pathname === item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  />
+              <div className="flex-1 space-y-4 overflow-y-auto">
+                {navSections.map(section => (
+                  <div key={section.title}>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 px-4 mb-1">{section.title}</p>
+                    <div className="space-y-1">
+                      {section.items.map(item => (
+                        <NavItem key={item.label} {...item} active={location.pathname === item.path} onClick={() => setIsMobileMenuOpen(false)} />
+                      ))}
+                    </div>
+                  </div>
                 ))}
 
                 {isInstallable && !isInstalled && (

@@ -198,6 +198,20 @@ export default function DriverRegister() {
                   }`} />
                 ))}
               </div>
+              {formData.password && (
+                <div className="mt-2 space-y-1">
+                  {[
+                    { label: '8+ characters', met: formData.password.length >= 8 },
+                    { label: 'One uppercase letter', met: /[A-Z]/.test(formData.password) },
+                    { label: 'One number', met: /[0-9]/.test(formData.password) },
+                    { label: 'One special character', met: /[^A-Za-z0-9]/.test(formData.password) },
+                  ].map(req => (
+                    <p key={req.label} className={`text-[10px] font-bold flex items-center gap-1.5 transition-colors ${req.met ? 'text-[#10B981]' : 'text-white/20'}`}>
+                      <span>{req.met ? '✓' : '○'}</span>{req.label}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -245,17 +259,14 @@ export default function DriverRegister() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Vehicle Type</label>
-              <select 
-                value={formData.vehicleType} onChange={e => setFormData({...formData, vehicleType: e.target.value})}
-                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all appearance-none"
-              >
-                <option value="Motorcycle">Motorcycle</option>
-                <option value="Car">Car</option>
-                <option value="Bicycle">Bicycle</option>
-                <option value="Other">Other</option>
-              </select>
+              <div className="grid grid-cols-2 gap-3">
+                <SelectionCard title="Motorcycle" icon={<Bike size={16} />} sub="2-wheel motor" selected={formData.vehicleType === 'Motorcycle'} onClick={() => setFormData({...formData, vehicleType: 'Motorcycle'})} />
+                <SelectionCard title="Car" icon={<Car size={16} />} sub="4-wheel vehicle" selected={formData.vehicleType === 'Car'} onClick={() => setFormData({...formData, vehicleType: 'Car'})} />
+                <SelectionCard title="Bicycle" icon={<Bike size={16} />} sub="Pedal-powered" selected={formData.vehicleType === 'Bicycle'} onClick={() => setFormData({...formData, vehicleType: 'Bicycle'})} />
+                <SelectionCard title="Other" icon={<Package size={16} />} sub="Other vehicle" selected={formData.vehicleType === 'Other'} onClick={() => setFormData({...formData, vehicleType: 'Other'})} />
+              </div>
             </div>
 
             <div className="space-y-1.5">

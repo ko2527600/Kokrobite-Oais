@@ -28,14 +28,8 @@ const CustomerLogin = () => {
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Check your credentials.';
       setError(msg);
-      
-      // If it's a Google account, we can highlight the Google button
       if (msg.toLowerCase().includes('google sign-in')) {
-        toast.error("This account uses Google. Use the button below!", {
-          duration: 5000
-        });
-      } else {
-        toast.error(msg);
+        toast.error("This account uses Google sign-in — use the button below!", { duration: 5000 });
       }
     } finally {
       setLoading(false);

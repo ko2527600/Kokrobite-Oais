@@ -15,6 +15,7 @@ const SavedAddresses = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
   const [formData, setFormData] = useState({
     label: 'Home',
     address: '',
@@ -65,7 +66,7 @@ const SavedAddresses = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this address?")) return;
+    setDeleteConfirm({ open: false, id: null });
     try {
       await api.delete(`/customers/profile/addresses/${id}`);
       toast.success('Address deleted');
@@ -142,7 +143,7 @@ const SavedAddresses = () => {
                   <button onClick={() => handleOpenModal(addr)} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-all flex-1 flex justify-center">
                     <HiOutlinePencil size={18} />
                   </button>
-                  <button onClick={() => handleDelete(addr.id)} className="p-3 bg-white/5 hover:bg-red-500/20 rounded-xl text-white/40 hover:text-red-500 transition-all flex-1 flex justify-center">
+                  <button onClick={() => setDeleteConfirm({ open: true, id: addr.id })} className="p-3 bg-white/5 hover:bg-red-500/20 rounded-xl text-white/40 hover:text-red-500 transition-all flex-1 flex justify-center">
                     <HiOutlineTrash size={18} />
                   </button>
                   {!addr.isDefault && (
@@ -215,10 +216,10 @@ const SavedAddresses = () => {
                       />
                    </div>
 
-                   <div className="grid grid-cols-2 gap-4">
+                   <div className="space-y-4">
                       <div className="space-y-2">
                          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Area / Neighborhood</label>
-                         <input 
+                         <input
                             required
                             type="text"
                             value={formData.area}
@@ -229,7 +230,7 @@ const SavedAddresses = () => {
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Landmark</label>
-                         <input 
+                         <input
                             type="text"
                             value={formData.landmark}
                             onChange={e => setFormData({...formData, landmark: e.target.value})}
@@ -251,13 +252,54 @@ const SavedAddresses = () => {
                    </div>
 
                    <div className="flex gap-4 pt-4">
-                      <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest">Cancel</button>
+                      <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black text-xs text-white/40 uppercase tracking-widest border border-white/10 rounded-2xl hover:border-white/20 transition-all">Cancel</button>
                       <button type="submit" disabled={loading} className="flex-[2] bg-[#F97316] text-white font-black py-4 rounded-2xl shadow-xl shadow-[#F97316]/20 disabled:opacity-50 uppercase tracking-widest text-xs">
                         {loading ? 'SAVING...' : 'SAVE ADDRESS'}
                       </button>
                    </div>
                 </form>
              </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirm Dialog */}
+      <AnimatePresence>
+        {deleteConfirm.open && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirm({ open: false, id: null })}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-[#0C0A09] border border-white/10 rounded-[2.5rem] p-8 space-y-6 text-center"
+            >
+              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500">
+                <HiOutlineTrash size={26} />
+              </div>
+              <div>
+                <h4 className="text-lg font-display font-bold text-white uppercase mb-2">Delete Address?</h4>
+                <p className="text-sm text-white/40 font-sans">This address will be permanently removed and cannot be recovered.</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm({ open: false, id: null })}
+                  className="flex-1 py-3.5 font-black text-xs text-white/40 uppercase tracking-widest border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirm.id)}
+                  className="flex-[2] py-3.5 bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all"
+                >
+                  Delete Address
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
