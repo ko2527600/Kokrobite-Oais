@@ -39,24 +39,40 @@ const CustomerRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.name.trim().length < 3) {
+      toast.error('Please enter your full name (at least 3 characters)');
+      return;
+    }
+
+    const cleanPhone = formData.phone.replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setErrors(e => ({ ...e, confirmPassword: 'Passwords do not match' }));
       return;
     }
-    if (passwordStrength < 50) {
-      setErrors(e => ({ ...e, password: 'Password is too weak — see requirements below' }));
+    if (passwordStrength < 100) {
+      setErrors(e => ({ ...e, password: 'Password is too weak — must meet all requirements' }));
       return;
     }
     setErrors({ password: '', confirmPassword: '' });
 
     setLoading(true);
     try {
-      const res = await api.post('/customers/auth/register', formData);
+      const res = await api.post('/customers/auth/register', {
+        ...formData,
+        phone: cleanPhone,
+        name: formData.name.trim()
+      });
       login(res.data.token, res.data.customer);
       toast.success('Welcome to KO Eats! You earned 50 Oasis Points');
       navigate('/portal/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed.');
+      toast.error(err.response?.data?.message || 'Registration failed. This email or phone may already be in use.');
     } finally {
       setLoading(false);
     }
@@ -64,14 +80,18 @@ const CustomerRegister = () => {
 
   const handleGoogleSuccess = async (response) => {
     try {
+      setLoading(true);
       const res = await api.post('/customers/auth/google', { 
         credential: response.credential 
       });
       login(res.data.token, res.data.customer);
-      toast.success('Registered with Google!');
+      toast.success('Welcome to the family! Registered with Google.');
       navigate('/portal/dashboard');
     } catch (err) {
-      toast.error('Google Sign-Up failed');
+      console.error('Google registration error:', err);
+      toast.error(err.response?.data?.message || 'Google registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,6 +107,20 @@ const CustomerRegister = () => {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md space-y-8 relative z-10 py-10"
         >
+          <AnimatePresence>
+            {loading && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-[#FFF7ED]/80 backdrop-blur-sm rounded-3xl"
+              >
+                <div className="w-12 h-12 border-4 border-[#F97316]/20 border-t-[#F97316] rounded-full animate-spin mb-4" />
+                <p className="text-[#1C0A00] font-bold text-sm tracking-widest uppercase">Processing...</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div>
             <h2 className="text-4xl font-display font-bold tracking-tight text-[#1C0A00] mb-2">Create Account</h2>
             <p className="text-[#1C0A00]/50 font-medium text-sm">Join KO Eats today</p>

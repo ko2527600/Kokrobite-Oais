@@ -38,9 +38,12 @@ export default function DriverRegister() {
 
   const passwordStrength = (pwd) => {
     if (!pwd) return 0
-    if (pwd.length < 5) return 1
-    if (pwd.length < 8) return 2
-    return 3
+    let score = 0
+    if (pwd.length >= 8) score++
+    if (/[A-Z]/.test(pwd)) score++
+    if (/[0-9]/.test(pwd)) score++
+    if (/[^A-Za-z0-9]/.test(pwd)) score++
+    return score
   }
 
   const strength = passwordStrength(formData.password)
@@ -49,13 +52,23 @@ export default function DriverRegister() {
     e.preventDefault()
     setError("")
 
+    if (formData.name.trim().length < 3) {
+      setError("Please enter your full name (at least 3 characters)")
+      return
+    }
+
+    if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      setError("Please enter a valid 10-digit phone number")
+      return
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
       return
     }
 
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters")
+    if (strength < 4) {
+      setError("Please choose a stronger password matching all requirements (8+ characters, uppercase, number, and special character)")
       return
     }
 
@@ -67,13 +80,11 @@ export default function DriverRegister() {
     setLoading(true)
     try {
       await api.post("/drivers/auth/register", {
-        name: formData.name,
-        phone: formData.phone,
+        name: formData.name.trim(),
+        phone: formData.phone.replace(/\D/g, ''),
         password: formData.password,
         type: formData.type,
-        vehicleType: formData.vehicleType,
-        vehicleNumber: formData.vehicleNumber,
-        licenseNumber: formData.licenseNumber
+        vehicleType: formData.vehicleType
       })
       localStorage.removeItem("ko_terms_accepted")
       setStep(2)
@@ -103,14 +114,14 @@ export default function DriverRegister() {
           
           <div className="bg-[#10B981]/10 border border-[#10B981]/20 rounded-2xl p-6 mb-8 text-left">
             <p className="text-white/60 text-sm leading-relaxed mb-6">
-              Your driver application has been received. The Kokrobite Oasis management team will review your details and approve your account within 24 hours.
+              Your rider application has been received. Our team will review your details and approve your account shortly.
             </p>
             
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-4">What happens next:</p>
             <div className="space-y-3">
               <StepItem icon={<HiOutlineCheckCircle className="text-[#10B981]" />} text="Application received" />
-              <StepItem icon={<HiOutlineClock className="text-[#F59E0B]" />} text="Management review (24hrs)" />
-              <StepItem icon={<HiOutlineBellAlert className="text-white/20" />} text="You receive approval notification" />
+              <StepItem icon={<HiOutlineClock className="text-[#F59E0B]" />} text="Quick review by management" />
+              <StepItem icon={<HiOutlineBellAlert className="text-white/20" />} text="Log in once approved" />
             </div>
           </div>
 
@@ -118,7 +129,7 @@ export default function DriverRegister() {
             onClick={() => navigate("/delivery/login")}
             className="w-full bg-[#F97316] text-white font-bold py-4 rounded-xl hover:bg-[#F97316]/90 transition-all shadow-xl shadow-[#F97316]/20"
           >
-            Back to Login
+            Go to Login
           </button>
         </motion.div>
       </div>
@@ -140,22 +151,21 @@ export default function DriverRegister() {
           <h1 className="text-4xl font-display italic font-bold text-white mb-1">KO Rider</h1>
           <div className="flex items-center justify-center gap-2 text-white/30 text-xs">
             <Palmtree size={12} />
-            <span>by Kokrobite Oasis</span>
+            <span>Pilot Phase Onboarding</span>
           </div>
-          <p className="text-[#F97316] text-[10px] font-bold uppercase tracking-[0.2em] mt-3">Join our delivery team</p>
         </div>
 
         <div className="h-px bg-[#F97316]/15 w-full mb-10" />
 
-        <h2 className="text-3xl font-display font-bold text-white mb-2">Create Driver Account</h2>
+        <h2 className="text-3xl font-display font-bold text-white mb-2">Join the Team</h2>
         <p className="text-white/40 text-sm leading-relaxed mb-10">
-          Fill in your details below. Your account will be reviewed before you can start delivering.
+          Quick registration for our delivery riders. Simple and fast.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8 pb-10">
           {/* SECTION 1: PERSONAL INFO */}
           <div className="space-y-6">
-            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Personal Information</p>
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Basic Details</p>
             
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>
@@ -169,11 +179,10 @@ export default function DriverRegister() {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Phone Number</label>
               <input 
-                required type="tel" placeholder="+233 XX XXX XXXX"
+                required type="tel" placeholder="055 XXX XXXX"
                 value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
                 className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
               />
-              <p className="text-[10px] text-white/20 ml-1">This will be your login ID</p>
             </div>
 
             <div className="space-y-1.5">
@@ -192,9 +201,9 @@ export default function DriverRegister() {
                 </button>
               </div>
               <div className="flex gap-1 mt-2">
-                {[1, 2, 3].map(i => (
+                {[1, 2, 3, 4].map(i => (
                   <div key={i} className={`h-1 flex-1 rounded-full ${
-                    i <= strength ? (strength === 1 ? 'bg-[#EF4444]' : strength === 2 ? 'bg-[#F59E0B]' : 'bg-[#10B981]') : 'bg-white/5'
+                    i <= strength ? (strength <= 2 ? 'bg-[#EF4444]' : strength === 3 ? 'bg-[#F59E0B]' : 'bg-[#10B981]') : 'bg-white/5'
                   }`} />
                 ))}
               </div>
@@ -229,25 +238,20 @@ export default function DriverRegister() {
                   {showConfirmPassword ? <HiOutlineEyeSlash size={18} /> : <HiOutlineEye size={18} />}
                 </button>
               </div>
-              {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                <p className="text-[10px] text-[#10B981] font-bold mt-1.5 flex items-center gap-1">
-                   <HiOutlineCheckCircle /> Passwords match
-                </p>
-              )}
             </div>
           </div>
 
           <div className="h-px bg-white/5 w-full" />
 
-          {/* SECTION 2: VEHICLE INFO */}
+          {/* SECTION 2: RIDER TYPE */}
           <div className="space-y-6">
-            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Vehicle Information</p>
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Rider Profile</p>
             
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">I am a...</label>
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Rider Type</label>
               <div className="grid grid-cols-2 gap-3">
                 <SelectionCard 
-                  title="In-House" icon={<Building2 size={16} />} sub="Employed by KO" 
+                  title="In-House" icon={<Building2 size={16} />} sub="KO Employee" 
                   selected={formData.type === 'inhouse'} 
                   onClick={() => setFormData({...formData, type: 'inhouse'})} 
                 />
@@ -260,35 +264,13 @@ export default function DriverRegister() {
             </div>
 
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Vehicle Type</label>
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Vehicle</label>
               <div className="grid grid-cols-2 gap-3">
-                <SelectionCard title="Motorcycle" icon={<Bike size={16} />} sub="2-wheel motor" selected={formData.vehicleType === 'Motorcycle'} onClick={() => setFormData({...formData, vehicleType: 'Motorcycle'})} />
-                <SelectionCard title="Car" icon={<Car size={16} />} sub="4-wheel vehicle" selected={formData.vehicleType === 'Car'} onClick={() => setFormData({...formData, vehicleType: 'Car'})} />
-                <SelectionCard title="Bicycle" icon={<Bike size={16} />} sub="Pedal-powered" selected={formData.vehicleType === 'Bicycle'} onClick={() => setFormData({...formData, vehicleType: 'Bicycle'})} />
-                <SelectionCard title="Other" icon={<Package size={16} />} sub="Other vehicle" selected={formData.vehicleType === 'Other'} onClick={() => setFormData({...formData, vehicleType: 'Other'})} />
+                <SelectionCard title="Motorcycle" icon={<Bike size={16} />} sub="Motor" selected={formData.vehicleType === 'Motorcycle'} onClick={() => setFormData({...formData, vehicleType: 'Motorcycle'})} />
+                <SelectionCard title="Car" icon={<Car size={16} />} sub="4-Wheel" selected={formData.vehicleType === 'Car'} onClick={() => setFormData({...formData, vehicleType: 'Car'})} />
+                <SelectionCard title="Bicycle" icon={<Bike size={16} />} sub="Pedal" selected={formData.vehicleType === 'Bicycle'} onClick={() => setFormData({...formData, vehicleType: 'Bicycle'})} />
+                <SelectionCard title="Other" icon={<Package size={16} />} sub="Other" selected={formData.vehicleType === 'Other'} onClick={() => setFormData({...formData, vehicleType: 'Other'})} />
               </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">
-                Vehicle Registration Number <span className="text-white/20">(Optional)</span>
-              </label>
-              <input 
-                type="text" placeholder="GR-1234-22"
-                value={formData.vehicleNumber} onChange={e => setFormData({...formData, vehicleNumber: e.target.value})}
-                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">
-                Driver's License Number <span className="text-white/20">(Optional)</span>
-              </label>
-              <input 
-                type="text" placeholder="DL-XXXXXXXX"
-                value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value})}
-                className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white focus:border-[#F97316] outline-none transition-all"
-              />
             </div>
           </div>
 
@@ -306,7 +288,7 @@ export default function DriverRegister() {
                 </div>
                 <div className="flex-1">
                   <p className="text-[#10B981] font-bold text-sm">Terms & Conditions Accepted</p>
-                  <p className="text-white/30 text-xs">Click to review again →</p>
+                  <p className="text-white/30 text-xs">Tap to review →</p>
                 </div>
               </div>
             ) : (
@@ -317,7 +299,7 @@ export default function DriverRegister() {
                   </div>
                   <div>
                     <p className="text-white font-bold text-sm">Terms & Conditions</p>
-                    <p className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">Required before registering</p>
+                    <p className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">Required</p>
                   </div>
                 </div>
                 <button 
@@ -325,7 +307,7 @@ export default function DriverRegister() {
                   onClick={() => navigate("/delivery/terms?from=register")}
                   className="bg-[#F97316] text-white font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg hover:bg-[#F97316]/90 transition-all shrink-0"
                 >
-                  Read & Accept →
+                  Accept →
                 </button>
               </div>
             )}
@@ -348,13 +330,12 @@ export default function DriverRegister() {
           <button 
             type="submit"
             disabled={loading || !termsAccepted}
-            title={!termsAccepted ? "Please accept Terms & Conditions first" : ""}
             className={`w-full bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white font-bold uppercase tracking-widest text-sm py-4 rounded-xl shadow-2xl shadow-[#F97316]/30 transition-all flex items-center justify-center gap-2 ${
               loading || !termsAccepted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'
             }`}
           >
             {loading ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting...</>
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Registering...</>
             ) : (
               <span className="flex items-center gap-2">Submit Application <Bike size={18} /></span>
             )}

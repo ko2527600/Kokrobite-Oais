@@ -48,9 +48,9 @@ const LandingPage = () => {
           axios.get('/api/gallery?visible=true'),
           axios.get('/api/reviews?approved=true')
         ]);
-        setMenuItems(menuRes.data);
-        setGalleryItems(galleryRes.data.slice(0, 8));
-        setReviews(reviewsRes.data.slice(0, 4));
+        setMenuItems(Array.isArray(menuRes.data) ? menuRes.data : []);
+        setGalleryItems(Array.isArray(galleryRes.data) ? galleryRes.data.slice(0, 8) : []);
+        setReviews(Array.isArray(reviewsRes.data) ? reviewsRes.data.slice(0, 4) : []);
       } catch (error) {
         console.error('Error fetching landing page data:', error);
       }

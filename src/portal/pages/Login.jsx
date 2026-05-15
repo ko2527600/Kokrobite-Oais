@@ -42,17 +42,16 @@ const CustomerLogin = () => {
       setError('');
       const credential = response.credential;
       if (!credential) {
-        setError('Google login failed. Please try again.');
-        return;
+        throw new Error('Google authentication was cancelled or failed.');
       }
       const res = await api.post('/customers/auth/google', { credential });
       const { token, customer } = res.data;
       login(token, customer);
-      toast.success('Welcome back with Google.');
+      toast.success(`Welcome back, ${customer.name.split(' ')[0]}!`);
       navigate('/portal/dashboard');
     } catch (err) {
       console.error('Google login error:', err.response?.data || err.message);
-      const msg = err.response?.data?.message || 'Google login failed. Please try again.';
+      const msg = err.response?.data?.message || err.message || 'Google login failed. Please try again.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -118,6 +117,20 @@ const CustomerLogin = () => {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md space-y-10 relative z-10"
         >
+          <AnimatePresence>
+            {loading && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-brand-cream/80 backdrop-blur-sm rounded-3xl"
+              >
+                <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin mb-4" />
+                <p className="text-brand-dark font-bold text-sm tracking-widest uppercase">Authenticating...</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div>
             <h2 className="text-4xl font-display font-bold tracking-tight text-brand-dark mb-2">Welcome back</h2>
             <p className="text-brand-dark/60 font-medium">Sign in to KO Eats</p>

@@ -42,8 +42,8 @@ const CustomerDashboard = () => {
         api.get('/customers/notifications')
       ]);
 
-      const orders = ordersRes.data;
-      const totalSpent = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const orders = Array.isArray(ordersRes.data) ? ordersRes.data : [];
+      const totalSpent = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
       const pendingCount = orders.filter(o => ['pending', 'confirmed', 'preparing'].includes(o.status)).length;
 
       setStats({
@@ -52,7 +52,10 @@ const CustomerDashboard = () => {
         pendingCount
       });
       setRecentOrders(orders.slice(0, 3));
-      setRecentNotifs((notifsRes.data.notifications || []).slice(0, 3));
+      
+      const notifsData = notifsRes.data;
+      const notifsList = Array.isArray(notifsData) ? notifsData : (Array.isArray(notifsData?.notifications) ? notifsData.notifications : []);
+      setRecentNotifs(notifsList.slice(0, 3));
     } catch (err) {
       console.error('Failed to fetch dashboard data', err);
     } finally {
