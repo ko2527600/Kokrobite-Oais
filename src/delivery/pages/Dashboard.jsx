@@ -43,16 +43,34 @@ export default function DriverDashboard() {
   useEffect(() => {
     fetchData(true)
 
-    const availInterval = setInterval(() => {
-      api.get("/drivers/orders/available").then(res => setAvailableOrders(res.data)).catch(() => {})
+    const availInterval = setInterval(async () => {
+      try {
+        const res = await api.get("/drivers/orders/available")
+        setAvailableOrders(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(res.data)) return prev
+          return res.data
+        })
+      } catch (e) {}
     }, 20000)
 
-    const activeInterval = setInterval(() => {
-      api.get("/drivers/orders/active").then(res => setActiveOrder(res.data)).catch(() => {})
+    const activeInterval = setInterval(async () => {
+      try {
+        const res = await api.get("/drivers/orders/active")
+        setActiveOrder(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(res.data)) return prev
+          return res.data
+        })
+      } catch (e) {}
     }, 15000)
 
-    const sumInterval = setInterval(() => {
-      api.get("/drivers/earnings/summary").then(res => setSummary(res.data)).catch(() => {})
+    const sumInterval = setInterval(async () => {
+      try {
+        const res = await api.get("/drivers/earnings/summary")
+        setSummary(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(res.data)) return prev
+          return res.data
+        })
+      } catch (e) {}
     }, 60000)
 
     return () => {
@@ -164,6 +182,7 @@ export default function DriverDashboard() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            layout={false}
             className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 shadow-sm"
           >
             <div className="flex justify-between items-center mb-3">
@@ -236,7 +255,7 @@ export default function DriverDashboard() {
             ) : (
               availableOrders.map((order) => (
                 <motion.div
-                  layout
+                  layout={false}
                   key={order.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

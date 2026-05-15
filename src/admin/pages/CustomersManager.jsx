@@ -151,8 +151,8 @@ export default function CustomersManager() {
           { label: 'New Today', value: stats.newToday, icon: HiOutlineCheckCircle, color: 'text-[#FB923C]', bg: 'bg-[#FB923C]/10' },
           { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: HiOutlineCurrencyDollar, color: 'text-[#10B981]', bg: 'bg-[#10B981]/10' },
           { label: 'Avg Order Value', value: formatCurrency(stats.avgOrderValue), icon: HiOutlineShoppingBag, color: 'text-[#F59E0B]', bg: 'bg-[#F59E0B]/10' },
-        ].map((stat, i) => (
-          <div key={i} className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-xl p-4 flex items-center gap-4">
+        ].map((stat) => (
+          <div key={stat.label} className="bg-[#1a1a1a] border border-[#F97316]/[0.08] rounded-xl p-4 flex items-center gap-4">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stat.bg} ${stat.color}`}>
               <stat.icon size={24} />
             </div>

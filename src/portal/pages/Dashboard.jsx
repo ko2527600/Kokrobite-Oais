@@ -42,33 +42,49 @@ const CustomerDashboard = () => {
   const [recentNotifs, setRecentNotifs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [ordersRes, notifsRes] = await Promise.all([
-          api.get('/customers/orders'),
-          api.get('/customers/notifications')
-        ]);
-        
-        const orders = ordersRes.data;
-        const totalSpent = orders.reduce((sum, o) => sum + o.totalAmount, 0);
-        const pendingCount = orders.filter(o => ['pending', 'confirmed', 'preparing'].includes(o.status)).length;
-        
-        setStats({
+  const fetchData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    try {
+      const [ordersRes, notifsRes] = await Promise.all([
+        api.get('/customers/orders'),
+        api.get('/customers/notifications')
+      ]);
+      
+      const orders = ordersRes.data;
+      const totalSpent = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const pendingCount = orders.filter(o => ['pending', 'confirmed', 'preparing'].includes(o.status)).length;
+      
+      const newData = {
+        stats: {
           totalOrders: orders.length,
           totalSpent: totalSpent,
           pendingCount: pendingCount
-        });
-        setRecentOrders(orders.slice(0, 3));
-        setRecentNotifs((notifsRes.data.notifications || []).slice(0, 3));
-      } catch (err) {
-        console.error('Failed to fetch dashboard data', err);
-      } finally {
-        setLoading(false);
+        },
+        recentOrders: orders.slice(0, 3),
+        recentNotifs: (notifsRes.data.notifications || []).slice(0, 3)
+      };
+
+      if (isSilent) {
+        setStats(prev => JSON.stringify(prev) === JSON.stringify(newData.stats) ? prev : newData.stats);
+        setRecentOrders(prev => JSON.stringify(prev) === JSON.stringify(newData.recentOrders) ? prev : newData.recentOrders);
+        setRecentNotifs(prev => JSON.stringify(prev) === JSON.stringify(newData.recentNotifs) ? prev : newData.recentNotifs);
+      } else {
+        setStats(newData.stats);
+        setRecentOrders(newData.recentOrders);
+        setRecentNotifs(newData.recentNotifs);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch dashboard data', err);
+    } finally {
+      if (!isSilent) setLoading(false);
+    }
+  }, [customer?.loyaltyPoints]);
+
+  useEffect(() => {
     fetchData();
-  }, []);
+    const interval = setInterval(() => fetchData(true), 30000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -82,7 +98,7 @@ const CustomerDashboard = () => {
       <div className="flex flex-col gap-8 animate-pulse">
         <div className="h-48 bg-white/5 rounded-3xl" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-white/5 rounded-2xl" />)}
+          {[...Array(4)].map((_, i) => <div key={`stat-skeleton-${i}`} className="h-32 bg-white/5 rounded-2xl" />)}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            <div className="lg:col-span-2 h-96 bg-white/5 rounded-2xl" />

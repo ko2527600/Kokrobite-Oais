@@ -41,7 +41,14 @@ const Dashboard = () => {
     if (!isSilent) setLoading(true);
     try {
       const response = await api.get("/analytics/summary");
-      setData(response.data);
+      if (isSilent) {
+        setData(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(response.data)) return prev;
+          return response.data;
+        });
+      } else {
+        setData(response.data);
+      }
       setError(null);
     } catch (err) {
       if (!isSilent) setError(err.response?.data?.message || "Failed to load dashboard data");
@@ -404,8 +411,8 @@ const Dashboard = () => {
                   paddingAngle={8}
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                  {pieData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} stroke="none" />
                   ))}
                 </Pie>
                 <Tooltip 
