@@ -55,6 +55,8 @@ import MyReviews from "./portal/pages/Reviews"
 import Notifications from "./portal/pages/Notifications"
 import LoyaltyPoints from "./portal/pages/Loyalty"
 import FeedbackPage from "./portal/pages/FeedbackPage"
+import PortalLanding from "./portal/pages/LandingPage"
+
 
 export default function App() {
   return (
@@ -66,10 +68,11 @@ export default function App() {
         <Toaster position="bottom-left" />
         <Routes>
 
-          {/* ── ROOT → redirect to portal login ── */}
+          {/* ── ROOT → redirect to portal landing ── */}
           <Route path="/" element={
-            <Navigate to="/portal/login" replace />
+            <Navigate to="/portal" replace />
           } />
+
 
           {/* ── ADMIN ROUTES ── */}
           <Route path="/admin/*" element={
@@ -98,7 +101,10 @@ export default function App() {
           } />
 
           {/* ── CUSTOMER PORTAL ROUTES ── */}
+          <Route path="/portal" element={<PortalLanding />} />
+
           <Route path="/portal/*" element={
+
             <CustomerProvider>
               <Routes>
                 <Route path="login" element={<CustomerLogin />} />
@@ -146,8 +152,9 @@ export default function App() {
 
           {/* ── CATCH ALL ── */}
           <Route path="*" element={
-            <Navigate to="/portal/login" replace />
+            <Navigate to="/portal" replace />
           } />
+
 
         </Routes>
       </BrowserRouter>
