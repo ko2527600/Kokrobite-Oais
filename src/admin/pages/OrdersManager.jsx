@@ -193,7 +193,11 @@ const OrdersManager = () => {
     return list.filter(o => {
       const name = activeTab === 'WhatsApp' ? o.customerName : (o.customer?.name || '');
       const phone = activeTab === 'WhatsApp' ? o.customerPhone : (o.customer?.phone || '');
-      return name.toLowerCase().includes(search.toLowerCase()) || phone.includes(search);
+      const q = search.toLowerCase().trim();
+      if (!q) return true;
+      const orderNo = (o.orderNumber || o.id || "").toLowerCase();
+      const status = (o.status || "").toLowerCase();
+      return name.toLowerCase().includes(q) || phone.includes(q) || orderNo.includes(q) || status.includes(q);
     });
   }, [orders, customerOrders, search, activeTab]);
 

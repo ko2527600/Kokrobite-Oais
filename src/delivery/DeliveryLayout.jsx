@@ -38,7 +38,7 @@ export default function DeliveryLayout() {
     setUpdating(true)
     try {
       const newStatus = driver.status === "online" ? "offline" : "online"
-      await api.patch("/drivers/status", { status: newStatus })
+      await api.patch("/drivers/earnings/status", { status: newStatus })
       await refreshDriver()
     } catch (err) {
       console.error("Status update failed", err)

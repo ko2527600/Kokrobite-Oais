@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import prisma from "../lib/prisma.js";
+import { randomUUID } from "crypto";
 import customerAuth from "../middleware/customerAuth.js";
 
 router.use(customerAuth);
@@ -42,6 +43,7 @@ router.post("/addresses", async (req, res) => {
 
     await prisma.customerAddress.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         label,
         address,

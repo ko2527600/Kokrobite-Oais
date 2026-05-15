@@ -619,7 +619,7 @@ const PlaceOrder = () => {
 
         {/* Right Column: Order Summary / Cart */}
         {step < 4 && (
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 order-first lg:order-none">
             <div 
               className="rounded-[2.5rem] p-8 sticky top-24"
               style={{ background: '#1C0A00', border: '1px solid rgba(249,115,22,0.20)' }}

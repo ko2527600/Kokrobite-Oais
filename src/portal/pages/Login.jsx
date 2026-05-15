@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { HiOutlineEnvelope, HiLockClosed, HiOutlineEye, HiOutlineEyeSlash, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi2';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-hot-toast';

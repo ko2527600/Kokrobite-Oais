@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   HiOutlineEnvelope, HiLockClosed, HiOutlineEye, HiOutlineEyeSlash,
   HiOutlineUser, HiOutlinePhone, HiOutlineArrowRight, HiOutlineShieldCheck
@@ -12,12 +12,21 @@ import { toast } from 'react-hot-toast';
 import { useCustomer } from '../CustomerContext';
 import api from '../../api/axios';
 
+
+const GH_PHONE_PREFIXES = ["020","023","024","025","026","027","028","050","053","054","055","056","057","059"];
+
+const normalizePhone = (value = '') => value.replace(/\D/g, '').slice(0, 10);
+const isValidGhanaPhone = (value = '') => {
+  const clean = normalizePhone(value);
+  return clean.length === 10 && GH_PHONE_PREFIXES.includes(clean.slice(0, 3));
+};
+
 const CustomerRegister = () => {
   const navigate = useNavigate();
   const { login } = useCustomer();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({ password: '', confirmPassword: '' });
+  const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
   const [formData, setFormData] = useState({ 
     name: '', 
     email: '', 
@@ -45,9 +54,9 @@ const CustomerRegister = () => {
       return;
     }
 
-    const cleanPhone = formData.phone.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
-      toast.error('Please enter a valid 10-digit phone number');
+    const cleanPhone = normalizePhone(formData.phone);
+    if (!isValidGhanaPhone(cleanPhone)) {
+      setErrors(e => ({ ...e, phone: 'Enter a valid Ghana number (e.g. 024, 025, 054, 055, 057, 050, 027, 020, 059, 026)' }));
       return;
     }
 
@@ -59,7 +68,7 @@ const CustomerRegister = () => {
       setErrors(e => ({ ...e, password: 'Password is too weak — must meet all requirements' }));
       return;
     }
-    setErrors({ password: '', confirmPassword: '' });
+    setErrors({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
 
     setLoading(true);
     try {
@@ -75,6 +84,24 @@ const CustomerRegister = () => {
       toast.error(err.response?.data?.message || 'Registration failed. This email or phone may already be in use.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const validateField = (name, value) => {
+    if (name === 'name') return value.trim().length >= 3 ? '' : 'Enter at least 3 characters';
+    if (name === 'email') return /\S+@\S+\.\S+/.test(value) ? '' : 'Enter a valid email address';
+    if (name === 'phone') return isValidGhanaPhone(value) ? '' : 'Use a valid Ghana prefix (024, 025, 054, 055, 057, 050, 027, 020, 059, 026...)';
+    if (name === 'password') return passwordStrength < 100 ? 'Password must meet all requirements below' : '';
+    if (name === 'confirmPassword') return value === formData.password ? '' : 'Passwords do not match';
+    return '';
+  };
+
+  const handleFieldChange = (name, value) => {
+    const nextValue = name === 'phone' ? normalizePhone(value) : value;
+    setFormData(prev => ({ ...prev, [name]: nextValue }));
+    setErrors(prev => ({ ...prev, [name]: validateField(name, nextValue) }));
+    if (name === 'password' && formData.confirmPassword) {
+      setErrors(prev => ({ ...prev, confirmPassword: validateField('confirmPassword', formData.confirmPassword) }));
     }
   };
 
@@ -134,9 +161,10 @@ const CustomerRegister = () => {
                     <HiOutlineUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type="text" 
+                      autoComplete="name"
                       required
                       value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
+                      onChange={e => handleFieldChange('name', e.target.value)} onBlur={e => setErrors(prev => ({...prev, name: validateField('name', e.target.value)}))}
                       placeholder="John Doe"
                       className="w-full bg-white border rounded-2xl pl-12 pr-4 py-3.5 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all text-sm font-sans"
                       style={{ borderColor: 'rgba(249,115,22,0.25)' }}
@@ -150,9 +178,10 @@ const CustomerRegister = () => {
                     <HiOutlineEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type="email" 
+                      autoComplete="email"
                       required
                       value={formData.email}
-                      onChange={e => setFormData({...formData, email: e.target.value})}
+                      onChange={e => handleFieldChange('email', e.target.value)} onBlur={e => setErrors(prev => ({...prev, email: validateField('email', e.target.value)}))}
                       placeholder="john@example.com"
                       className="w-full bg-white border rounded-2xl pl-12 pr-4 py-3.5 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all text-sm font-sans"
                       style={{ borderColor: 'rgba(249,115,22,0.25)' }}
@@ -166,14 +195,16 @@ const CustomerRegister = () => {
                     <HiOutlinePhone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type="tel" 
+                      autoComplete="tel"
                       required
                       value={formData.phone}
-                      onChange={e => setFormData({...formData, phone: e.target.value})}
+                      onChange={e => handleFieldChange('phone', e.target.value)} onBlur={e => setErrors(prev => ({...prev, phone: validateField('phone', e.target.value)}))}
                       placeholder="024 XXX XXXX"
                       className="w-full bg-white border rounded-2xl pl-12 pr-4 py-3.5 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all text-sm font-sans"
                       style={{ borderColor: 'rgba(249,115,22,0.25)' }}
                     />
                 </div>
+                {errors.phone && <p className="text-[11px] text-red-600 font-semibold px-1">{errors.phone}</p>}
               </div>
 
               <div className="space-y-2">
@@ -182,9 +213,10 @@ const CustomerRegister = () => {
                     <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type={showPassword ? "text" : "password"} 
+                      autoComplete="new-password"
                       required
                       value={formData.password}
-                      onChange={e => setFormData({...formData, password: e.target.value})}
+                      onChange={e => handleFieldChange('password', e.target.value)} onBlur={e => setErrors(prev => ({...prev, password: validateField('password', e.target.value)}))}
                       placeholder="Create password"
                       className="w-full bg-white border rounded-2xl pl-12 pr-12 py-3.5 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all text-sm font-sans"
                       style={{ borderColor: 'rgba(249,115,22,0.25)' }}
@@ -197,6 +229,7 @@ const CustomerRegister = () => {
                       {showPassword ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
                     </button>
                 </div>
+                {errors.password && <p className="text-[11px] text-red-600 font-semibold px-1">{errors.password}</p>}
                 {/* Strength Meter */}
                 <div className="flex gap-1 px-1 h-1">
                    <div className={`flex-1 rounded-full transition-all ${passwordStrength >= 25 ? 'bg-red-500' : 'bg-[#1C0A00]/10'}`} />
@@ -227,6 +260,7 @@ const CustomerRegister = () => {
                     <HiOutlineShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
                     <input 
                       type={showPassword ? "text" : "password"} 
+                      autoComplete="new-password"
                       required
                       value={formData.confirmPassword}
                       onChange={e => { setFormData({...formData, confirmPassword: e.target.value}); if (errors.confirmPassword) setErrors(e2 => ({...e2, confirmPassword: ''})); }}

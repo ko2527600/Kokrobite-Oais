@@ -38,12 +38,15 @@ router.post("/accept-order/:orderId", driverAuth, async (req, res) => {
       where: { id: orderId },
       data: {
         driverId: driverId,
-        deliveryStatus: "ACCEPTED"
+        deliveryStatus: "ACCEPTED",
+        status: "confirmed"
       }
     })
 
     const io = getIO()
     io.to(`order_${orderId}`).emit("order_status", { status: "ACCEPTED", driverId: driverId })
+
+    await prisma.driver.update({ where: { id: driverId }, data: { status: "delivering" } })
 
     res.json(order)
   } catch (err) {
@@ -101,7 +104,38 @@ router.post("/complete-order/:orderId", driverAuth, async (req, res) => {
     const io = getIO()
     io.to(`order_${orderId}`).emit("order_status", { status: "DELIVERED" })
 
+    await prisma.driver.update({ where: { id: req.driver.id }, data: { status: "online" } })
+
     res.json(order)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+
+// ─── UPDATE DRIVER STATUS (Legacy route compatibility) ───
+router.patch("/status", driverAuth, async (req, res) => {
+  try {
+    const { status } = req.body
+    const validStatuses = ["online", "offline", "delivering"]
+
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" })
+    }
+
+    await prisma.driver.update({
+      where: { id: req.driver.id },
+      data: { status }
+    })
+
+    const io = getIO()
+    io.emit("driver_status_update", {
+      driverId: req.driver.id,
+      name: req.driver.name,
+      status
+    })
+
+    res.json({ status })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
@@ -115,7 +149,7 @@ router.post("/update-location", driverAuth, async (req, res) => {
 
     await prisma.driver.update({
       where: { id: driverId },
-      data: { currentLatitude: latitude, currentLongitude: longitude }
+      data: { currentLat: parseFloat(latitude), currentLng: parseFloat(longitude), lastLocationAt: new Date() }
     })
 
     const io = getIO()

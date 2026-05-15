@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import prisma from "../lib/prisma.js";
+import { randomUUID } from "crypto";
 import customerAuth from "../middleware/customerAuth.js";
 import { validate, orderSchema } from "../middleware/security.js";
 
@@ -92,24 +93,26 @@ router.post("/", validate(orderSchema), async (req, res) => {
     // Create order
     const order = await prisma.customerOrder.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         orderNumber,
         type,
         branch,
-        deliveryAddress,
-        deliveryArea,
-        deliveryLandmark,
+        deliveryAddress: type === "delivery" ? (deliveryAddress || null) : null,
+        deliveryArea: type === "delivery" ? (deliveryArea || null) : null,
+        deliveryLandmark: type === "delivery" ? (deliveryLandmark || null) : null,
         subtotal,
         deliveryFee,
         totalAmount,
         paymentMethod,
         note,
-        latitude,
-        longitude,
+        latitude: type === "delivery" && Number.isFinite(Number(latitude)) ? Number(latitude) : null,
+        longitude: type === "delivery" && Number.isFinite(Number(longitude)) ? Number(longitude) : null,
         status: "pending",
         estimatedTime: type === "delivery" ? "30-45 minutes" : "15-20 minutes",
         items: {
           create: items.map(i => ({
+            id: randomUUID(),
             menuItemId: i.menuItemId || null,
             name: i.name,
             price: parseFloat(i.price),
@@ -135,6 +138,7 @@ router.post("/", validate(orderSchema), async (req, res) => {
     // Add loyalty history
     await prisma.loyaltyHistory.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         points: pointsEarned,
         type: "credit",
@@ -145,6 +149,7 @@ router.post("/", validate(orderSchema), async (req, res) => {
     // Create notification
     await prisma.notification.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         type: "order_placed",
         title: "Order Placed Successfully! 🎉",
@@ -194,6 +199,7 @@ router.post("/:id/cancel", async (req, res) => {
 
     await prisma.loyaltyHistory.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         points: -pointsToReverse,
         type: "debit",
@@ -204,6 +210,7 @@ router.post("/:id/cancel", async (req, res) => {
     // Notification
     await prisma.notification.create({
       data: {
+        id: randomUUID(),
         customerId: req.customer.id,
         type: "order_cancelled",
         title: "Order Cancelled",

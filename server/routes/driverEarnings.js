@@ -7,7 +7,7 @@ import customerAuth from "../middleware/customerAuth.js"
 const router = express.Router()
 
 // ─── EARNINGS SUMMARY ───
-router.get("/earnings/summary", driverAuth, async (req, res) => {
+router.get("/summary", driverAuth, async (req, res) => {
   try {
     const driver = await prisma.driver.findUnique({
       where: { id: req.driver.id },
@@ -87,7 +87,7 @@ router.get("/earnings/summary", driverAuth, async (req, res) => {
 })
 
 // ─── EARNINGS HISTORY ───
-router.get("/earnings/history", driverAuth, async (req, res) => {
+router.get("/history", driverAuth, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1
     const limit = 20
