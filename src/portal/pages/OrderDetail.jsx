@@ -203,7 +203,7 @@ const OrderDetail = () => {
                  <div key={item.id} className="flex justify-between items-center group">
                     <div className="flex gap-4">
                        <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden shrink-0">
-                          <img src={item.menuItem?.image} alt="" className="w-full h-full object-cover" />
+                          <img src={item.menuItem?.image} alt={item.menuItem?.name || ''} loading="lazy" className="w-full h-full object-cover" />
                        </div>
                        <div>
                           <p className="font-bold text-white/80 text-sm font-sans">{item.menuItem?.name || item.name}</p>

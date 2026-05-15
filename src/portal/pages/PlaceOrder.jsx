@@ -271,11 +271,12 @@ const PlaceOrder = () => {
                    {filteredMenu.map(item => (
                      <div key={item.id} className={`bg-[#0C0A09] border-2 rounded-[2rem] overflow-hidden transition-all group ${getItemQuantity(item.id) > 0 ? 'border-[#F97316]' : 'border-white/5'}`}>
                          <div className="h-48 relative overflow-hidden bg-white/5">
-                            <img 
-                              src={item.image ? getImgUrl(item.image) : '/assets/placeholder.jpg'} 
-                              alt={item.name} 
+                            <img
+                              src={item.image ? getImgUrl(item.image) : '/assets/placeholder.jpg'}
+                              alt={item.name}
+                              loading="lazy"
                               onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'; }}
-                              className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                              className="w-full h-full object-cover transition-transform group-hover:scale-110"
                             />
                            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white font-black px-3 py-1.5 rounded-full text-xs">
                               ₵{item.price}

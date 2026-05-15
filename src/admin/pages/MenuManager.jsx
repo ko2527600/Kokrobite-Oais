@@ -268,7 +268,7 @@ const MenuManager = () => {
               >
                 <div className="h-48 relative overflow-hidden bg-white/5 flex items-center justify-center">
                   {item.image ? (
-                    <img src={getImgUrl(item.image)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={item.name} />
+                    <img src={getImgUrl(item.image)} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={item.name} />
                   ) : (
                     <HiOutlinePhoto size={40} className="text-white/10" />
                   )}

@@ -28,12 +28,8 @@ const CustomerLogin = () => {
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Check your credentials.';
       setError(msg);
-      
-      // If it's a Google account, we can highlight the Google button
       if (msg.toLowerCase().includes('google sign-in')) {
-        toast.error("This account uses Google. Use the button below!", {
-          duration: 5000
-        });
+        toast.error('This account uses Google. Use the button below.', { duration: 5000 });
       } else {
         toast.error(msg);
       }
@@ -46,28 +42,19 @@ const CustomerLogin = () => {
     try {
       setLoading(true);
       setError('');
-
       const credential = response.credential;
-
       if (!credential) {
-        setError("Google login failed. Please try again.");
+        setError('Google login failed. Please try again.');
         return;
       }
-
-      // Send raw credential to backend for secure verification
-      const res = await api.post("/customers/auth/google", { credential });
-
+      const res = await api.post('/customers/auth/google', { credential });
       const { token, customer } = res.data;
-      
-      // Use the context login to keep state in sync
       login(token, customer);
-
-      toast.success('Welcome back with Google!');
-      navigate("/portal/dashboard");
-
+      toast.success('Welcome back with Google.');
+      navigate('/portal/dashboard');
     } catch (err) {
-      console.error("Google login error:", err.response?.data || err.message);
-      const msg = err.response?.data?.message || "Google login failed. Please try again.";
+      console.error('Google login error:', err.response?.data || err.message);
+      const msg = err.response?.data?.message || 'Google login failed. Please try again.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -75,168 +62,169 @@ const CustomerLogin = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    if (!formData.email) {
+      toast.error('Enter your email above first, then tap Forgot password again.');
+      return;
+    }
+    toast('A password reset link will be sent to ' + formData.email, { icon: '✉️' });
+    api.post('/customers/auth/forgot-password', { email: formData.email })
+      .then(() => toast.success('Check your email for reset instructions.'))
+      .catch(() => toast.error('We could not send the email. Try again in a moment.'));
+  };
+
   return (
-    <div className="min-h-screen bg-[#FFF7ED] flex overflow-hidden">
-      
-      {/* Left Column: Image/Branding */}
-      <div className="hidden lg:flex w-1/2 relative bg-[#1a1a1a]">
+    <div className="min-h-screen bg-brand-cream flex overflow-hidden">
+
+      <div className="hidden lg:flex w-1/2 relative bg-brand-dark">
         <div className="absolute inset-0 z-0 overflow-hidden">
-           <img 
+           <img
             src="https://images.unsplash.com/photo-1530062845289-9109b2c9c868?auto=format&fit=crop&q=80&w=1200"
-            alt="Delicious food" 
-            className="w-full h-full object-cover opacity-40 scale-110 blur-[2px]"
+            alt=""
+            loading="eager"
+            className="w-full h-full object-cover opacity-40 scale-110"
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.75), rgba(28,10,0,0.85))' }} />
+          <div className="absolute inset-0 bg-brand-dark/60" aria-hidden="true" />
         </div>
-        
+
         <div className="relative z-10 w-full flex flex-col justify-between p-16">
-          <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/40 hover:text-white transition-colors text-sm font-bold">
-            <HiOutlineArrowLeft size={18} /> Back to Website
+          <Link to="/" className="inline-flex items-center gap-3 px-4 py-3 min-h-12 text-text-primary/60 hover:text-text-primary transition-colors text-sm font-bold">
+            <HiOutlineArrowLeft size={18} aria-hidden="true" /> Back to website
           </Link>
 
           <div>
-             <motion.h1 
+             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-6xl font-display font-bold tracking-tighter leading-tight text-white mb-6"
+              className="text-5xl lg:text-6xl font-display font-bold tracking-tighter leading-tight text-text-primary mb-6"
             >
-              WELCOME <br /> <span className="text-[#F97316]">BACK.</span>
+              Welcome <br /> <span className="text-brand-primary">back.</span>
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-white/60 max-w-md font-medium"
+              className="text-xl text-text-primary/70 max-w-md font-medium"
             >
               Order your favourite meals, track your deliveries, and earn loyalty points with every bite.
             </motion.p>
           </div>
 
-          <div className="flex gap-4">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl">
-               <p className="text-2xl font-display font-bold text-white">50+</p>
-               <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest font-sans">Menu Items</p>
-            </div>
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl">
-               <p className="text-2xl font-display font-bold text-[#F97316]">2k+</p>
-               <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest font-sans">Happy Foodies</p>
-            </div>
-          </div>
+          <div />
         </div>
       </div>
 
-      {/* Right Column: Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative bg-[#FFF7ED]">
-        {/* Subtle background glow for mobile */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#F97316]/10 blur-[120px] rounded-full lg:hidden" />
-        
-        <motion.div 
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative bg-brand-cream">
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md space-y-10 relative z-10"
         >
           <div>
-            <h2 className="text-4xl font-display font-bold tracking-tight text-[#1C0A00] mb-2">Welcome Back</h2>
-            <p className="text-[#1C0A00]/50 font-medium">Sign in to KO Eats</p>
+            <h2 className="text-4xl font-display font-bold tracking-tight text-brand-dark mb-2">Welcome back</h2>
+            <p className="text-brand-dark/60 font-medium">Sign in to KO Eats</p>
           </div>
 
           {error && (
-            <motion.div 
+            <motion.div
+              role="alert"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 rounded-xl text-sm font-medium border"
-              style={{ 
-                color: '#DC2626', 
-                backgroundColor: '#FEF2F2', 
-                borderColor: '#FECACA' 
-              }}
+              className="p-4 rounded-xl text-sm font-medium border text-red-700 bg-red-50 border-red-200"
             >
               {error}
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" aria-label="Sign in">
             <div className="space-y-2">
-               <label className="text-xs font-bold text-[#1C0A00] uppercase tracking-widest ml-1">Email Address</label>
+               <label htmlFor="email" className="text-xs font-bold text-brand-dark uppercase tracking-widest ml-1 block">Email address</label>
                <div className="relative group">
-                  <HiOutlineEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
-                  <input 
-                    type="email" 
+                  <HiOutlineEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/30 group-focus-within:text-brand-primary transition-colors" size={20} aria-hidden="true" />
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
                     required
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
                     placeholder="name@email.com"
-                    className="w-full bg-white border rounded-2xl pl-12 pr-4 py-4 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all font-sans"
-                    style={{ borderColor: 'rgba(249,115,22,0.25)' }}
+                    className="w-full bg-white border border-brand-primary/25 rounded-2xl pl-12 pr-4 py-4 text-brand-dark placeholder-brand-dark/35 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 transition-all font-sans"
                   />
                </div>
             </div>
 
             <div className="space-y-2">
                <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-bold text-[#1C0A00] uppercase tracking-widest">Password</label>
-                  <button type="button" className="text-[10px] font-bold text-[#F97316] hover:underline uppercase tracking-wider">Forgot Password?</button>
+                  <label htmlFor="password" className="text-xs font-bold text-brand-dark uppercase tracking-widest">Password</label>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-[10px] font-bold text-brand-primary hover:underline uppercase tracking-wider min-h-10 px-2"
+                  >
+                    Forgot password?
+                  </button>
                </div>
                <div className="relative group">
-                  <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 group-focus-within:text-[#F97316] transition-colors" size={20} />
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/30 group-focus-within:text-brand-primary transition-colors" size={20} aria-hidden="true" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     required
                     value={formData.password}
                     onChange={e => setFormData({...formData, password: e.target.value})}
-                    placeholder="••••••••"
-                    className="w-full bg-white border rounded-2xl pl-12 pr-12 py-4 text-[#1C0A00] placeholder-[rgba(28,10,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[#F97316]/30 transition-all font-sans"
-                    style={{ borderColor: 'rgba(249,115,22,0.25)' }}
+                    placeholder="Your password"
+                    className="w-full bg-white border border-brand-primary/25 rounded-2xl pl-12 pr-14 py-4 text-brand-dark placeholder-brand-dark/35 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 transition-all font-sans"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1C0A00]/30 hover:text-[#1C0A00] transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center text-brand-dark/40 hover:text-brand-dark transition-colors rounded-lg"
                   >
-                    {showPassword ? <HiOutlineEyeSlash size={20} /> : <HiOutlineEye size={20} />}
+                    {showPassword ? <HiOutlineEyeSlash size={20} aria-hidden="true" /> : <HiOutlineEye size={20} aria-hidden="true" />}
                   </button>
                </div>
             </div>
 
             <div className="flex items-center gap-3 px-1">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 id="rememberMe"
                 checked={rememberMe}
                 onChange={e => setRememberMe(e.target.checked)}
-                className="w-5 h-5 accent-[#F97316] cursor-pointer rounded-lg"
+                className="w-5 h-5 accent-brand-primary cursor-pointer rounded-lg"
               />
-              <label htmlFor="rememberMe" className="text-[rgba(28,10,0,0.50)] text-sm cursor-pointer hover:text-[#1C0A00]/70 transition-colors">
+              <label htmlFor="rememberMe" className="text-brand-dark/55 text-sm cursor-pointer hover:text-brand-dark/80 transition-colors">
                 Keep me logged in for 30 days
               </label>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              className="w-full text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 group transition-all active:scale-95 disabled:opacity-50 font-sans"
-              style={{ background: 'linear-gradient(135deg, #F97316, #FB923C)', boxShadow: '0 8px 25px rgba(249,115,22,0.35)' }}
+              className="w-full text-text-primary font-bold py-4 min-h-12 rounded-2xl flex items-center justify-center gap-2 group transition-colors active:scale-[0.98] disabled:opacity-50 bg-brand-primary hover:bg-brand-primary/90 font-sans"
             >
-              {loading ? 'AUTHENTICATING...' : (
+              {loading ? 'Authenticating…' : (
                 <>
-                  SIGN IN TO PORTAL
-                  <HiOutlineArrowRight className="group-hover:translate-x-1 transition-transform" />
+                  Sign in to portal
+                  <HiOutlineArrowRight className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="relative flex items-center justify-center py-2">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#1C0A00]/10"></div></div>
-            <span className="relative px-4 bg-[#FFF7ED] text-[10px] font-bold text-[rgba(28,10,0,0.35)] uppercase tracking-[0.2em]">Or continue with</span>
+          <div className="relative flex items-center justify-center py-2" aria-hidden="true">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-dark/15"></div></div>
+            <span className="relative px-4 bg-brand-cream text-[10px] font-bold text-brand-dark/40 uppercase tracking-[0.2em]">Or continue with</span>
           </div>
 
           <div className="flex justify-center">
-            <GoogleLogin 
-              onSuccess={handleGoogleLogin} 
-              onError={() => {
-                setError("Google login failed. Please try again.");
-              }}
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => setError('Google login failed. Please try again.')}
               useOneTap={false}
               theme="filled_black"
               shape="rectangular"
@@ -245,14 +233,14 @@ const CustomerLogin = () => {
             />
           </div>
 
-          <p className="text-center text-sm font-medium text-[rgba(28,10,0,0.50)]">
-            Don't have an account? {' '}
-            <Link to="/portal/register" className="text-[#F97316] font-bold hover:underline">Create Account</Link>
+          <p className="text-center text-sm font-medium text-brand-dark/55">
+            Don't have an account?{' '}
+            <Link to="/portal/register" className="text-brand-primary font-bold hover:underline">Create account</Link>
           </p>
 
           <div className="pt-8 text-center">
-             <a href="https://kokrobiteoasis.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-[#1C0A00]/30 hover:text-[#F97316] uppercase tracking-widest transition-colors">
-                ← Visit Kokrobite Oasis Website
+             <a href="https://kokrobiteoasis.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-brand-dark/35 hover:text-brand-primary uppercase tracking-widest transition-colors">
+                ← Visit Kokrobite Oasis website
              </a>
           </div>
         </motion.div>

@@ -55,7 +55,7 @@ const SortableItem = ({ id, item, onEdit, onDelete, onToggle }) => {
       style={style}
       className={`group relative aspect-square rounded-2xl overflow-hidden bg-[#0C0A09] border transition-all ${!item.visible ? 'opacity-35 border-red-500/20' : 'border-[#F97316]/05'} ${isDragging ? 'border-[#F97316] shadow-[0_20_40_rgba(249,115,22,0.20)]' : ''}`}
     >
-      <img src={getImgUrl(item.url)} className="w-full h-full object-cover" alt={item.title} />
+      <img src={getImgUrl(item.url)} loading="lazy" className="w-full h-full object-cover" alt={item.title} />
       
       {!item.visible && (
         <div className="absolute top-3 left-3 bg-[#EF4444]/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-[#EF4444] uppercase tracking-widest border border-[#EF4444]/20">
