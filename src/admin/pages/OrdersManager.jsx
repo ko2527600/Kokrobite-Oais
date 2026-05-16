@@ -15,9 +15,25 @@ import { useToast } from "../components/Toast";
 import ChatWindow from "../../components/Chat/ChatWindow";
 import { useAuth } from "../AuthContext";
 
-const STATUSES = ['pending', 'confirmed', 'preparing', 'delivered', 'cancelled'];
+const STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
 const BRANCHES = ['East Legon'];
 const SOURCES = ['whatsapp', 'phone', 'walk-in', 'website'];
+
+// Statuses admin can transition to for a CustomerOrder.
+// Delivery orders: driver owns the "delivered" transition (via /deliver).
+// Pickup orders: admin owns the full lifecycle.
+// Once the driver picks up a delivery order, only `cancelled` is allowed.
+const allowedAdminTransitions = (order, isWhatsApp) => {
+  if (isWhatsApp) return STATUSES;
+  if (!order) return STATUSES;
+  if (order.status === 'delivered' || order.status === 'cancelled') {
+    return [order.status];
+  }
+  const kitchen = ['pending', 'confirmed', 'preparing', 'ready', 'cancelled'];
+  if (order.type === 'pickup') return [...kitchen, 'delivered'];
+  if (order.delivery?.pickedUpAt) return [order.status, 'cancelled'];
+  return kitchen;
+};
 
 const OrdersManager = () => {
   const { user } = useAuth();
@@ -389,13 +405,18 @@ const OrdersManager = () => {
                     </td>
                     <td className="px-8 py-5 text-sm font-bold text-[#F97316]">₵{order.totalAmount}</td>
                     <td className="px-8 py-5" onClick={e => e.stopPropagation()}>
-                       <select 
+                       <select
                          value={order.status}
                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
                          className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase outline-none cursor-pointer ${getStatusStyle(order.status)}`}
                        >
-                         {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                         {allowedAdminTransitions(order, activeTab === 'WhatsApp').map(s => (
+                           <option key={s} value={s}>{s}</option>
+                         ))}
                        </select>
+                       {activeTab === 'Portal' && order.type === 'delivery' && order.delivery?.pickedUpAt && (
+                         <p className="text-[9px] text-white/30 mt-1 uppercase tracking-widest">Driver in transit</p>
+                       )}
                     </td>
                     <td className="px-8 py-5 text-[10px] text-white/40 font-bold uppercase tracking-widest whitespace-nowrap">
                       {new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -554,14 +575,23 @@ const OrdersManager = () => {
                <div className="flex-1 space-y-2">
                  <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1 font-sans">Update Status</label>
                  <div className="flex gap-2">
-                   <select 
+                   <select
                      value={selectedOrder.status}
                      onChange={(e) => handleStatusChange(selectedOrder.id, e.target.value)}
                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-[#F97316] font-sans"
                    >
-                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                     {allowedAdminTransitions(selectedOrder, activeTab === 'WhatsApp').map(s => (
+                       <option key={s} value={s}>{s}</option>
+                     ))}
                    </select>
                  </div>
+                 {activeTab === 'Portal' && selectedOrder.type === 'delivery' && (
+                   <p className="text-[10px] text-white/40 font-sans">
+                     {selectedOrder.delivery?.pickedUpAt
+                       ? 'Driver is in transit. Only cancel is available.'
+                       : 'Delivery completion is set automatically when the driver confirms.'}
+                   </p>
+                 )}
                </div>
                <a 
                  href={`https://wa.me/${(activeTab === 'WhatsApp' ? selectedOrder.customerPhone : selectedOrder.customer?.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hello Kokrobite Oasis! I'd like to order:`)}`}

@@ -203,14 +203,16 @@ export default function LiveTracking() {
                       </div>
                       
                       <div className="relative">
-                        <select 
+                        <select
                           value={order.status}
                           onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
                           className="bg-white/5 border border-white/10 rounded-lg pl-3 pr-8 py-1.5 text-[10px] font-bold text-white uppercase tracking-widest appearance-none outline-none focus:border-[#F97316]"
                         >
                           <option value="confirmed">Confirmed</option>
                           <option value="preparing">Preparing</option>
-                          <option value="delivered">Delivered</option>
+                          <option value="ready">Ready</option>
+                          {order.type === 'pickup' && <option value="delivered">Delivered</option>}
+                          <option value="cancelled">Cancelled</option>
                         </select>
                         <HiOutlineChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" size={12} />
                       </div>
