@@ -62,32 +62,35 @@ export default function LiveTracking() {
   useEffect(() => {
     if (!socket) return
 
-    socket.on("connect", () => setIsSocketConnected(true))
-    socket.on("disconnect", () => setIsSocketConnected(false))
+    setIsSocketConnected(socket.connected)
 
-    socket.on("driver_status_update", (data) => {
+    const handleConnect = () => setIsSocketConnected(true)
+    const handleDisconnect = () => setIsSocketConnected(false)
+    const handleDriverStatus = (data) => {
       setDrivers(prev => prev.map(d => d.id === data.driverId ? { ...d, status: data.status } : d))
       if (data.status === 'online') toast.success(`${data.name} is now Online`)
       if (data.status === 'offline') toast.error(`${data.name} went Offline`)
       fetchData()
-    })
-
-    socket.on("driver_location", (data) => {
-      setDrivers(prev => prev.map(d => 
+    }
+    const handleDriverLocation = (data) => {
+      setDrivers(prev => prev.map(d =>
         d.id === data.driverId ? { ...d, currentLat: data.lat, currentLng: data.lng, lastLocationAt: new Date() } : d
       ))
-    })
+    }
+    const handleOrderUpdate = () => fetchData()
 
-    socket.on("order_update", (data) => {
-      fetchData()
-    })
+    socket.on("connect", handleConnect)
+    socket.on("disconnect", handleDisconnect)
+    socket.on("driver_status_update", handleDriverStatus)
+    socket.on("driver_location_update", handleDriverLocation)
+    socket.on("order_update", handleOrderUpdate)
 
     return () => {
-      socket.off("driver_status_update")
-      socket.off("driver_location")
-      socket.off("order_update")
-      socket.off("connect")
-      socket.off("disconnect")
+      socket.off("connect", handleConnect)
+      socket.off("disconnect", handleDisconnect)
+      socket.off("driver_status_update", handleDriverStatus)
+      socket.off("driver_location_update", handleDriverLocation)
+      socket.off("order_update", handleOrderUpdate)
     }
   }, [socket, fetchData])
 

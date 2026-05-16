@@ -1,35 +1,32 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import { io } from "socket.io-client"
 
 const SOCKET_URL = import.meta.env.VITE_API_URL
   ?.replace("/api", "")
 
 export function useSocket() {
-  const socketRef = useRef(null)
+  const [socket, setSocket] = useState(null)
 
   useEffect(() => {
-    if (!socketRef.current) {
-      socketRef.current = io(SOCKET_URL, {
-        withCredentials: true,
-        transports: ["websocket", "polling"]
-      })
+    const newSocket = io(SOCKET_URL, {
+      withCredentials: true,
+      transports: ["websocket", "polling"]
+    })
 
-      socketRef.current.on("connect", () => {
-        console.log("✅ Socket connected")
-      })
+    newSocket.on("connect", () => {
+      console.log("✅ Socket connected")
+    })
 
-      socketRef.current.on("disconnect", () => {
-        console.log("❌ Socket disconnected")
-      })
-    }
+    newSocket.on("disconnect", () => {
+      console.log("❌ Socket disconnected")
+    })
+
+    setSocket(newSocket)
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect()
-        socketRef.current = null
-      }
+      newSocket.disconnect()
     }
   }, [])
 
-  return socketRef.current
+  return socket
 }
