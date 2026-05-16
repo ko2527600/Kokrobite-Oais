@@ -10,61 +10,52 @@ import {
 } from "react-icons/hi2";
 import { useAuth } from "./AuthContext";
 import api from "../api/axios";
+import Breadcrumbs from "./components/Breadcrumbs";
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, badgeColor, onClick, isCollapsed }) => (
-  <motion.div
-    initial={{ x: -10, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    transition={{ type: "spring", damping: 20, stiffness: 100 }}
+  <Link
+    to={path}
+    onClick={onClick}
+    className={`flex items-center gap-2.5 px-4 py-2 mx-2 rounded-lg cursor-pointer transition-colors relative group ${
+      active
+        ? 'text-[#F97316] bg-[#F97316]/10'
+        : 'text-white/50 hover:text-white hover:bg-white/[0.04]'
+    } ${isCollapsed ? 'justify-center px-0 mx-3' : ''}`}
   >
-    <Link
-      to={path}
-      onClick={onClick}
-      className={`flex items-center gap-3 px-6 py-3 cursor-pointer transition-all border-l-[3px] relative group ${
-        active 
-          ? 'text-[#F97316] bg-[#F97316]/10 border-[#F97316]' 
-          : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'
-      } ${isCollapsed ? 'justify-center px-0' : ''}`}
-    >
-      <Icon size={isCollapsed ? 22 : 18} />
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.span 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            className="text-sm font-medium font-sans whitespace-nowrap"
-          >
-            {label}
-          </motion.span>
-        )}
-      </AnimatePresence>
-      
-      {!isCollapsed && badge > 0 && (
-        <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold ${
-          badgeColor === 'yellow' ? 'bg-[#F59E0B]/20 text-[#F59E0B]' : 
-          badgeColor === 'orange' ? 'bg-[#F97316]/20 text-[#F97316]' :
-          'bg-[#EF4444]/20 text-[#EF4444]'
-        }`}>
-          {badge}
-        </span>
-      )}
+    {active && !isCollapsed && (
+      <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#F97316]" />
+    )}
+    <Icon size={isCollapsed ? 20 : 16} className="shrink-0" />
+    {!isCollapsed && (
+      <span className="text-[13px] font-medium whitespace-nowrap">
+        {label}
+      </span>
+    )}
 
-      {isCollapsed && badge > 0 && (
-        <span className={`absolute top-2 right-4 w-2 h-2 rounded-full ${
-          badgeColor === 'yellow' ? 'bg-[#F59E0B]' : 
-          badgeColor === 'orange' ? 'bg-[#F97316]' :
-          'bg-[#EF4444]'
-        }`} />
-      )}
+    {!isCollapsed && badge > 0 && (
+      <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none ${
+        badgeColor === 'yellow' ? 'bg-[#F59E0B]/20 text-[#F59E0B]' :
+        badgeColor === 'orange' ? 'bg-[#F97316]/20 text-[#F97316]' :
+        'bg-[#EF4444]/20 text-[#EF4444]'
+      }`}>
+        {badge}
+      </span>
+    )}
 
-      {isCollapsed && (
-        <div className="absolute left-full ml-4 px-3 py-2 bg-[#1A1A1A] border border-white/10 rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[110] whitespace-nowrap shadow-2xl">
-          {label}
-        </div>
-      )}
-    </Link>
-  </motion.div>
+    {isCollapsed && badge > 0 && (
+      <span className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${
+        badgeColor === 'yellow' ? 'bg-[#F59E0B]' :
+        badgeColor === 'orange' ? 'bg-[#F97316]' :
+        'bg-[#EF4444]'
+      }`} />
+    )}
+
+    {isCollapsed && (
+      <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1A1A1A] border border-white/10 rounded-lg text-[11px] text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[110] whitespace-nowrap shadow-2xl">
+        {label}
+      </div>
+    )}
+  </Link>
 );
 
 const Layout = () => {
@@ -73,9 +64,35 @@ const Layout = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
+  );
   const [time, setTime] = useState(new Date());
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Close drawer whenever the route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll while the drawer is open on mobile
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   // Stats placeholders
   const [pendingOrders, setPendingOrders] = useState(0);
@@ -167,7 +184,8 @@ const Layout = () => {
     }
   ];
 
-  const sidebarWidth = isCollapsed ? 80 : 280;
+  const sidebarWidth = isDesktop ? (isCollapsed ? 80 : 280) : 280;
+  const mainOffset = isDesktop ? sidebarWidth : 0;
 
   return (
     <div className="min-h-screen bg-[#0C0A09] font-sans selection:bg-[#F97316]/20">
@@ -185,41 +203,48 @@ const Layout = () => {
 
       <motion.aside
         initial={false}
-        animate={{ 
-          x: isMobileMenuOpen ? 0 : (window.innerWidth < 1024 ? -280 : 0),
-          width: sidebarWidth 
+        animate={{
+          x: isDesktop ? 0 : (isMobileMenuOpen ? 0 : -sidebarWidth),
+          width: sidebarWidth
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="fixed top-0 left-0 h-full bg-[#111111] border-r border-[#F97316]/10 z-[101] flex flex-col overflow-hidden"
       >
-        <div className={`p-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 shrink-0 rounded-xl bg-white/5 flex items-center justify-center p-2 shadow-lg shadow-[#F97316]/5 overflow-hidden">
+        <div className={`px-5 py-5 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          <div className="flex items-center gap-2.5">
+             <div className="w-9 h-9 shrink-0 rounded-xl bg-white/5 flex items-center justify-center p-1.5 shadow-lg shadow-[#F97316]/5 overflow-hidden">
                 <img src="/icons/logo.png" alt="KO" className="w-full h-full object-contain" />
              </div>
              {!isCollapsed && (
-               <motion.h1 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="font-display text-xl font-bold text-white tracking-tight"
-               >
+               <h1 className="font-display text-base font-bold text-white tracking-tight leading-tight">
                  Kokrobite <span className="text-[#F97316]">Oasis</span>
-               </motion.h1>
+               </h1>
              )}
           </div>
+          {!isDesktop && !isCollapsed && (
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-white/30 hover:text-white p-1"
+              aria-label="Close navigation"
+            >
+              <HiXMark size={20} />
+            </button>
+          )}
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar py-4">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-3">
           {navSections.map((section, idx) => (
-            <div key={section.title} className="mb-6">
-              {!isCollapsed && (
-                <p className="text-[10px] uppercase tracking-widest text-white/20 px-6 mb-2 mt-6">{section.title}</p>
+            <div key={section.title} className="mb-3">
+              {!isCollapsed ? (
+                <p className="text-[9px] uppercase tracking-[0.2em] text-white/25 px-6 mt-4 mb-1.5">{section.title}</p>
+              ) : (
+                <div className="h-px bg-white/5 mx-5 mt-4 mb-2" />
               )}
-              {isCollapsed && <div className="h-px bg-white/5 mx-6 mb-4 mt-6" />}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {section.items.map((item, i) => (
-                  <SidebarItem 
-                    key={item.label} 
-                    {...item} 
+                  <SidebarItem
+                    key={item.label}
+                    {...item}
                     isCollapsed={isCollapsed}
                     active={location.pathname === item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -231,67 +256,70 @@ const Layout = () => {
         </div>
 
         {/* COLLAPSE TOGGLE */}
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex items-center justify-center h-12 border-t border-white/5 hover:bg-white/5 text-white/20 hover:text-[#F97316] transition-all"
+          className="hidden lg:flex items-center justify-center h-9 border-t border-white/5 hover:bg-white/5 text-white/25 hover:text-[#F97316] transition-all"
         >
           <motion.div animate={{ rotate: isCollapsed ? 180 : 0 }}>
-            <HiOutlineChevronRight size={20} />
+            <HiOutlineChevronRight size={16} />
           </motion.div>
         </button>
 
-        <div className={`p-6 border-t border-white/5 mt-auto bg-[#0C0A09]/50 ${isCollapsed ? 'flex justify-center' : ''}`}>
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
+        <div className={`px-4 py-4 border-t border-white/5 mt-auto bg-[#0C0A09]/50 ${isCollapsed ? 'flex justify-center' : ''}`}>
+          <div className="flex items-center gap-2.5">
+             <div className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg"
                style={{ background: 'linear-gradient(135deg, #F97316, #1C0A00)' }}>
                {user?.name?.charAt(0) || 'A'}
              </div>
              {!isCollapsed && (
-               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 min-w-0">
-                 <p className="text-sm font-bold text-white truncate font-sans">{user?.name || 'Admin'}</p>
-                 <p className="text-[10px] text-white/40 truncate font-sans">{user?.email || 'admin@kokrobiteoasis.com'}</p>
-               </motion.div>
+               <div className="flex-1 min-w-0">
+                 <p className="text-[12px] font-semibold text-white truncate leading-tight">{user?.name || 'Admin'}</p>
+                 <p className="text-[10px] text-white/40 truncate leading-tight">{user?.email || 'admin@kokrobiteoasis.com'}</p>
+               </div>
              )}
              {!isCollapsed && (
-               <button 
+               <button
                  onClick={logout}
-                 className="p-2 text-[#EF4444] hover:bg-[#EF4444]/10 rounded-lg transition-all"
+                 className="p-1.5 text-[#EF4444] hover:bg-[#EF4444]/10 rounded-lg transition-all"
                  title="Logout"
                >
-                 <HiOutlineArrowRightOnRectangle size={20} />
+                 <HiOutlineArrowRightOnRectangle size={16} />
                </button>
              )}
           </div>
         </div>
       </motion.aside>
 
-      <motion.div 
-        animate={{ marginLeft: sidebarWidth }}
-        className="transition-all"
+      <motion.div
+        animate={{ marginLeft: mainOffset }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
       >
-        <header className="fixed top-0 right-0 h-16 bg-[#0C0A09]/95 backdrop-blur-xl border-b border-[#F97316]/10 z-50 px-8 flex items-center justify-between"
-          style={{ left: sidebarWidth }}>
-          <div className="flex items-center gap-4">
-            <button 
+        <header
+          className="fixed top-0 right-0 h-16 bg-[#0C0A09]/95 backdrop-blur-xl border-b border-[#F97316]/10 z-50 px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+          style={{ left: mainOffset }}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden text-white/60 hover:text-white"
+              className="lg:hidden text-white/60 hover:text-white -ml-1 p-2"
+              aria-label="Open navigation"
             >
               <HiBars3 size={24} />
             </button>
-            <h2 className="font-display font-bold text-white text-lg hidden sm:block uppercase tracking-tight">{getPageTitle()}</h2>
+            <h2 className="font-display font-bold text-white text-base sm:text-lg uppercase tracking-tight truncate">{getPageTitle()}</h2>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="hidden md:block text-white/30 text-xs font-sans tracking-widest uppercase">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="hidden md:block text-white/30 text-[10px] tracking-widest uppercase">
               {formatTime(time)}
             </div>
 
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative text-white/40 hover:text-white transition-colors"
+                className="relative text-white/40 hover:text-white transition-colors p-1"
               >
-                <HiBell size={22} />
+                <HiBell size={20} />
                 {pendingOrders > 0 && (
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#F97316] rounded-full" />
                 )}
@@ -358,13 +386,16 @@ const Layout = () => {
           </div>
         </header>
 
-        <main className="pt-24 p-8 min-h-screen">
+        <div className="sticky top-16 z-40 mt-16">
+          <Breadcrumbs />
+        </div>
+        <main className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 min-h-screen">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.3 }}
             >
               <Outlet />
             </motion.div>
