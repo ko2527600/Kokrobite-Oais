@@ -122,11 +122,11 @@ export default function CustomersManager() {
   const handleReviewAction = async (reviewId, action) => {
     try {
       if (action === 'approve') {
-        await api.patch(`/admin/reviews/${reviewId}/approve`);
+        await api.patch(`/admin/customers/reviews/${reviewId}/approve`);
         addToast('Review approved', 'success');
       } else if (action === 'delete') {
         if (!window.confirm("Delete this review?")) return;
-        await api.delete(`/admin/reviews/${reviewId}`);
+        await api.delete(`/admin/customers/reviews/${reviewId}`);
         addToast('Review deleted', 'success');
       }
       openCustomerModal(selectedCustomer.id); // refresh

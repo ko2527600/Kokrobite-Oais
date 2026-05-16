@@ -458,7 +458,7 @@ export default function DriversManager() {
                       <InfoBox label="Today Earnings" value={`GHC ${selectedDriver.todayEarnings || 0}`} icon={<HiOutlineClock />} color="text-[#10B981]" />
                       <InfoBox label="Average Rating" value={`⭐ ${selectedDriver.rating.toFixed(1)}`} icon={<HiOutlineStar />} />
                       <InfoBox label="Member Since" value={new Date(selectedDriver.createdAt).toLocaleDateString()} icon={<HiOutlineCalendarDays />} />
-                      <InfoBox label="Last Login" value={selectedDriver.lastLogin ? new Date(selectedDriver.lastLogin).toLocaleDateString() : 'N/A'} icon={<HiOutlineClock />} />
+                      <InfoBox label="Last Login" value={selectedDriver.lastLoginAt ? new Date(selectedDriver.lastLoginAt).toLocaleDateString() : 'N/A'} icon={<HiOutlineClock />} />
                       <InfoBox label="Vehicle" value={`${selectedDriver.vehicleType} — ${selectedDriver.vehicleNumber}`} icon={<HiOutlineHashtag />} />
                       <InfoBox label="License" value={selectedDriver.licenseNumber || 'N/A'} icon={<HiOutlineIdentification />} />
                     </div>

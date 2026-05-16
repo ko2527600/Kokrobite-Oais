@@ -63,7 +63,7 @@ const OrderDetail = () => {
       toast.success(`Order Status: ${data.status}`);
     });
 
-    socket.on("driver_location", (data) => {
+    socket.on("driver_location_update", (data) => {
       setDriverLocation({ lat: data.lat, lng: data.lng });
     });
 

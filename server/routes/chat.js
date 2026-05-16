@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken"
 import express from "express"
 import prisma from "../lib/prisma.js"
-import { getIO } from "../lib/socket.js"
 
 const router = express.Router()
 
@@ -112,7 +111,7 @@ router.post("/:orderId", anyAuth, async (req, res) => {
     })
 
     // Emit via Socket.io
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${orderId}`).emit("new_chat_message", chatMessage)
 
     res.status(201).json(chatMessage)

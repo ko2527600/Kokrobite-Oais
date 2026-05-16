@@ -53,13 +53,26 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://kokrobite-oais.vercel.app",
+  "https://kokrobite-oasis.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean)
 
+const corsOriginCheck = (origin, callback) => {
+  if (!origin) return callback(null, true)
+  if (allowedOrigins.some(allowed =>
+    origin === allowed ||
+    origin.endsWith(".vercel.app")
+  )) {
+    return callback(null, true)
+  }
+  callback(new Error(`CORS blocked: ${origin}`))
+}
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || allowedOrigins,
-    credentials: true
+    origin: corsOriginCheck,
+    credentials: true,
+    methods: ["GET", "POST"]
   }
 })
 
@@ -71,9 +84,24 @@ io.on("connection", (socket) => {
     socket.join(`order_${orderId}`)
     console.log(`Joined room: order_${orderId}`)
   })
+  socket.on("join_driver", (driverId) => {
+    socket.join(`driver_${driverId}`)
+    console.log(`Driver joined room: driver_${driverId}`)
+  })
   socket.on("update_location", async (data) => {
-    const { driverId, lat, lng } = data
-    socket.broadcast.emit("driver_location_update", { driverId, lat, lng })
+    const { driverId, latitude, longitude, lat, lng } = data
+    const finalLat = latitude ?? lat
+    const finalLng = longitude ?? lng
+    io.to(`driver_${driverId}`).emit("location_updated", {
+      driverId,
+      latitude: finalLat,
+      longitude: finalLng
+    })
+    socket.broadcast.emit("driver_location_update", {
+      driverId,
+      lat: finalLat,
+      lng: finalLng
+    })
   })
   socket.on("disconnect", () => {
     console.log("Socket disconnected:", socket.id)
@@ -118,8 +146,11 @@ app.use(helmet({
         "https://accounts.google.com",
         "https://oauth2.googleapis.com",
         process.env.CLIENT_URL,
-        "https://kokrobite-oasis.vercel.app"
-      ]
+        "https://kokrobite-oais.vercel.app",
+        "https://kokrobite-oasis.vercel.app",
+        "wss:",
+        "ws:"
+      ].filter(Boolean)
     }
   },
   crossOriginResourcePolicy: { 
@@ -128,16 +159,7 @@ app.use(helmet({
 }))
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true)
-    if (allowedOrigins.some(allowed => 
-      origin === allowed || 
-      origin.endsWith(".vercel.app")
-    )) {
-      return callback(null, true)
-    }
-    callback(new Error(`CORS blocked: ${origin}`))
-  },
+  origin: corsOriginCheck,
   credentials: true,
   methods: ["GET","POST","PUT",
             "PATCH","DELETE","OPTIONS"],
@@ -150,7 +172,10 @@ app.use(cors({
   exposedHeaders: ["Set-Cookie"]
 }))
 
-app.options("*", cors())
+app.options("*", cors({
+  origin: corsOriginCheck,
+  credentials: true
+}))
 
 app.use(morgan(
   process.env.NODE_ENV === "production" ? "combined" : "dev"

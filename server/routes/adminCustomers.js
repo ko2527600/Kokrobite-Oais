@@ -122,6 +122,39 @@ router.post("/:id/notify", async (req, res) => {
   }
 });
 
+// @route   PATCH /api/admin/customers/reviews/:reviewId/approve
+// @desc    Toggle approval on a customer review
+router.patch("/reviews/:reviewId/approve", async (req, res) => {
+  try {
+    const review = await prisma.customerReview.findUnique({
+      where: { id: req.params.reviewId }
+    });
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    const updated = await prisma.customerReview.update({
+      where: { id: req.params.reviewId },
+      data: { approved: !review.approved }
+    });
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// @route   DELETE /api/admin/customers/reviews/:reviewId
+// @desc    Delete a customer review
+router.delete("/reviews/:reviewId", async (req, res) => {
+  try {
+    await prisma.customerReview.delete({
+      where: { id: req.params.reviewId }
+    });
+    res.json({ message: "Review deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // @route   PATCH /api/admin/customers/:id/loyalty
 // @desc    Adjust customer loyalty points
 router.patch("/:id/loyalty", async (req, res) => {

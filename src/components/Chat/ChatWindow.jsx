@@ -30,8 +30,8 @@ export default function ChatWindow({ orderId, currentUser, onClose }) {
     fetchHistory()
 
     // 2. Setup Socket
-    const SOCKET_URL = import.meta.env.VITE_API_URL.replace("/api", "")
-    socketRef.current = io(SOCKET_URL)
+    const SOCKET_URL = import.meta.env.VITE_API_URL?.replace("/api", "")
+    socketRef.current = io(SOCKET_URL, { withCredentials: true, transports: ["websocket", "polling"] })
     
     socketRef.current.emit("join_order", orderId)
     

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import api from "../../api/axios"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Phone, MapPin, ExternalLink, Package, 
+import {
+  Phone, MapPin, ExternalLink, Package, Box,
   CheckCircle2, Clock, Loader2, XCircle, ChevronRight
 } from "lucide-react"
 import { toast } from "react-hot-toast"

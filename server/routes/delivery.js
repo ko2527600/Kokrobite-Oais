@@ -2,7 +2,6 @@ import express from "express"
 import prisma from "../lib/prisma.js"
 import auth from "../middleware/auth.js"
 import driverAuth from "../middleware/driverAuth.js"
-import { getIO } from "../lib/socket.js"
 
 const router = express.Router()
 
@@ -43,7 +42,7 @@ router.post("/accept-order/:orderId", driverAuth, async (req, res) => {
       }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${orderId}`).emit("order_status", { status: "ACCEPTED", driverId: driverId })
 
     await prisma.driver.update({ where: { id: driverId }, data: { status: "delivering" } })
@@ -63,7 +62,7 @@ router.post("/pickup-order/:orderId", driverAuth, async (req, res) => {
       data: { deliveryStatus: "PICKED_UP" }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${orderId}`).emit("order_status", { status: "PICKED_UP" })
 
     res.json(order)
@@ -101,7 +100,7 @@ router.post("/complete-order/:orderId", driverAuth, async (req, res) => {
       }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.to(`order_${orderId}`).emit("order_status", { status: "DELIVERED" })
 
     await prisma.driver.update({ where: { id: req.driver.id }, data: { status: "online" } })
@@ -128,7 +127,7 @@ router.patch("/status", driverAuth, async (req, res) => {
       data: { status }
     })
 
-    const io = getIO()
+    const io = req.app.get("io")
     io.emit("driver_status_update", {
       driverId: req.driver.id,
       name: req.driver.name,
@@ -146,14 +145,31 @@ router.post("/update-location", driverAuth, async (req, res) => {
   try {
     const { latitude, longitude } = req.body
     const driverId = req.driver.id
+    const lat = parseFloat(latitude)
+    const lng = parseFloat(longitude)
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      return res.status(400).json({ message: "Invalid latitude/longitude" })
+    }
 
     await prisma.driver.update({
       where: { id: driverId },
-      data: { currentLat: parseFloat(latitude), currentLng: parseFloat(longitude), lastLocationAt: new Date() }
+      data: { currentLat: lat, currentLng: lng, lastLocationAt: new Date() }
     })
 
-    const io = getIO()
-    io.to(`driver_${driverId}`).emit("location_updated", { latitude, longitude })
+    const io = req.app.get("io")
+    const payload = { driverId, lat, lng, latitude: lat, longitude: lng }
+    io.to(`driver_${driverId}`).emit("location_updated", payload)
+    io.to(`driver_${driverId}`).emit("driver_location_update", payload)
+
+    // Broadcast to any active order rooms for this driver so the customer can track
+    const activeDeliveries = await prisma.driverDelivery.findMany({
+      where: { driverId, deliveredAt: null, cancelledAt: null },
+      select: { orderId: true }
+    })
+    for (const d of activeDeliveries) {
+      io.to(`order_${d.orderId}`).emit("driver_location_update", payload)
+    }
 
     res.json({ success: true })
   } catch (err) {
