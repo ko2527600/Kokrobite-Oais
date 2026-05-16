@@ -132,7 +132,7 @@ export default function DriverEarnings() {
         </div>
 
         <div className="space-y-2">
-          {history?.payouts.length === 0 ? (
+          {(history?.payouts?.length || 0) === 0 ? (
             <div className="bg-[#1a1a1a] border border-white/5 rounded-xl py-12 flex flex-col items-center justify-center text-center px-6">
               <CircleDollarSign size={40} className="text-white/10 mb-4" />
               <p className="text-white/40 font-semibold mb-1">No payouts yet</p>

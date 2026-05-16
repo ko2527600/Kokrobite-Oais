@@ -45,7 +45,7 @@ export default function ActiveDelivery() {
         async (position) => {
           const { latitude, longitude } = position.coords
           try {
-            await api.post("/delivery/update-location", { latitude, longitude })
+            await api.post("/drivers/update-location", { latitude, longitude })
           } catch (err) {
             console.error("Failed to update location", err)
           }
