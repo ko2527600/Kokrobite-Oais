@@ -10,7 +10,7 @@ import {
 } from "react-icons/hi2";
 import { useAuth } from "./AuthContext";
 import api from "../api/axios";
-import Breadcrumbs from "./components/Breadcrumbs";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, badgeColor, onClick, isCollapsed }) => (
   <Link
@@ -387,7 +387,7 @@ const Layout = () => {
         </header>
 
         <div className="sticky top-16 z-40 mt-16">
-          <Breadcrumbs />
+          <Breadcrumbs homePath="/admin/dashboard" homeLabel="Admin" />
         </div>
         <main className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 min-h-screen">
           <AnimatePresence mode="wait">

@@ -12,6 +12,7 @@ import { useCustomer } from './CustomerContext';
 import LoyaltyBadge from './components/LoyaltyBadge';
 import api from '../api/axios';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const NavItem = ({ icon: Icon, label, path, active, badge, onClick }) => (
   <Link
@@ -181,31 +182,31 @@ const CustomerLayout = () => {
       {/* Main Content */}
       <main className="lg:pl-72 min-h-screen flex flex-col pb-24 lg:pb-0">
 
-        <header className="h-20 bg-brand-bg border-b border-border-subtle sticky top-0 z-40 px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <header className="h-14 sm:h-16 bg-brand-bg border-b border-border-subtle sticky top-0 z-40 px-3 sm:px-5 flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
             <button
-              className="lg:hidden w-12 h-12 inline-flex items-center justify-center text-text-muted hover:text-text-primary"
+              className="lg:hidden w-10 h-10 inline-flex items-center justify-center text-text-muted hover:text-text-primary -ml-1"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open navigation"
               aria-expanded={isMobileMenuOpen}
             >
-              <HiBars3 size={24} aria-hidden="true" />
+              <HiBars3 size={22} aria-hidden="true" />
             </button>
-            <h1 className="text-xl font-display font-bold tracking-tight uppercase hidden sm:block">{getPageTitle()}</h1>
+            <h1 className="text-base sm:text-lg font-display font-bold tracking-tight uppercase truncate">{getPageTitle()}</h1>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative">
               <button
                 onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                className="w-12 h-12 inline-flex items-center justify-center bg-text-primary/5 hover:bg-text-primary/10 rounded-xl transition-colors relative text-text-muted hover:text-text-primary"
+                className="w-10 h-10 inline-flex items-center justify-center bg-text-primary/5 hover:bg-text-primary/10 rounded-xl transition-colors relative text-text-muted hover:text-text-primary"
                 aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
                 aria-haspopup="menu"
                 aria-expanded={showNotifDropdown}
               >
-                <HiOutlineBell size={22} aria-hidden="true" />
+                <HiOutlineBell size={20} aria-hidden="true" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-primary rounded-full" aria-hidden="true" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-brand-primary rounded-full" aria-hidden="true" />
                 )}
               </button>
 
@@ -240,18 +241,18 @@ const CustomerLayout = () => {
               </AnimatePresence>
             </div>
 
-            <div className="h-8 w-px bg-border-subtle mx-2" aria-hidden="true" />
+            <div className="h-6 w-px bg-border-subtle mx-1 hidden sm:block" aria-hidden="true" />
 
             <Link
               to="/portal/order"
-              className="hidden md:inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary/90 text-text-primary px-5 py-2 min-h-12 rounded-xl font-bold text-sm gap-2 transition-colors font-sans"
+              className="hidden md:inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary/90 text-text-primary px-4 py-2 rounded-xl font-bold text-xs gap-2 transition-colors font-sans"
             >
-              <HiOutlineShoppingBag size={18} aria-hidden="true" />
+              <HiOutlineShoppingBag size={16} aria-hidden="true" />
               Order now
             </Link>
 
-            <Link to="/portal/profile" className="flex items-center gap-3 p-1 pr-3 bg-text-primary/5 hover:bg-text-primary/10 rounded-xl transition-colors border border-border-subtle">
-              <div className="w-10 h-10 rounded-lg overflow-hidden">
+            <Link to="/portal/profile" className="flex items-center gap-2 p-1 pr-2 sm:pr-2.5 bg-text-primary/5 hover:bg-text-primary/10 rounded-xl transition-colors border border-border-subtle">
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
                  {customer?.avatar ? (
                   <img src={customer.avatar} alt={`${customer.name} avatar`} className="w-full h-full object-cover" />
                 ) : (
@@ -260,12 +261,14 @@ const CustomerLayout = () => {
                   </div>
                 )}
               </div>
-              <span className="text-xs font-bold text-text-primary/80 hidden sm:inline">{customer?.name?.split(' ')[0]}</span>
+              <span className="text-[11px] font-bold text-text-primary/80 hidden sm:inline">{customer?.name?.split(' ')[0]}</span>
             </Link>
           </div>
         </header>
 
-        <div className="flex-1 p-6 lg:p-10">
+        <Breadcrumbs homePath="/portal/dashboard" homeLabel="My Account" variant="dark" />
+
+        <div className="flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-8 lg:py-8">
           <Outlet />
         </div>
       </main>

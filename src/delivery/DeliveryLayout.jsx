@@ -4,6 +4,7 @@ import { useDelivery } from "./DeliveryContext"
 import { LayoutGrid, Navigation, Wallet, User, Loader2, Truck } from "lucide-react"
 import api from "../api/axios"
 import { motion, AnimatePresence } from "framer-motion"
+import Breadcrumbs from "../components/Breadcrumbs"
 
 export default function DeliveryLayout() {
   const { driver, refreshDriver } = useDelivery()
@@ -99,8 +100,13 @@ export default function DeliveryLayout() {
         </div>
       </header>
 
+      {/* ── BREADCRUMBS ── */}
+      <div className="mt-16 sticky top-16 z-40">
+        <Breadcrumbs homePath="/delivery/dashboard" homeLabel="Rider" variant="dark" />
+      </div>
+
       {/* ── MAIN CONTENT ── */}
-      <main className="pt-16 pb-20 p-4">
+      <main className="pb-24 px-3 sm:px-4 pt-3">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
